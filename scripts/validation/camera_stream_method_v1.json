@@ -1,0 +1,25 @@
+{
+  "method_id": "camera_stream_native_main_v1_20261104",
+  "protocol_version": 1,
+  "phases": [
+    {"id": "normal", "seconds": 60, "ack_delay_ms": 0},
+    {"id": "slow_ack", "seconds": 10, "ack_delay_ms": 150},
+    {"id": "reopened", "seconds": 15, "ack_delay_ms": 0}
+  ],
+  "first_frame_timeout_seconds": 20,
+  "worker_exit_timeout_seconds": 5,
+  "clock_drift_limit_ms": 50,
+  "metadata_max_bytes": 65536,
+  "jpeg_max_bytes": 5242880,
+  "decoded_rgb_allocation_max_bytes": 33554432,
+  "performance_gate": null,
+  "acceptance_scope": "Protocol, decode, ownership and cleanup only; latency distributions are baseline observations",
+  "age_origin": "after_camera_frame_return",
+  "consumer": "Python websockets 15.0.1 and Pillow 12.3.0; production capture/inference/tracker remain native Rust",
+  "not_measured": ["sensor_exposure_latency", "browser_decode", "browser_paint", "physical_display_present", "person_identity_accuracy", "physical_gimbal_stationarity", "physical_following"],
+  "frame_gap_meaning": "Capture IDs not delivered to this consumer; includes latest-slot and WebSocket sampling, not proven network packet loss",
+  "raw_media_saved": false,
+  "target_selection_api_calls": 0,
+  "ptz_api_calls": 0,
+  "audio_api_calls": 0
+}

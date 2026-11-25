@@ -1,0 +1,16 @@
+{
+  "synthetic_fixture": true,
+  "execution_status": "NOT_RUN",
+  "scope": "Isolated simulator data only. No production learner records, camera, microphone, speech playback, model invocation or browser automation performed by this change.",
+  "sample": {"profile_name":"学习者 A / Learner A","goal":"发送","reported_result":"还没有记录本次观察","pending_step":"Keep the same speed，再试一次","source_type":"simulated"},
+  "tasks": [
+    {"id":"language-independent","status":"NOT_RUN","zh":"切换界面英文，保持教学中文、输入草稿及原始目标/观察不变。原文恰好等于“发送”等界面文字时也不翻译。","en":"Switch the UI to English while keeping Chinese teaching, the draft and original goal/observation. Do not translate original wording even when it equals an interface label such as 发送."},
+    {"id":"activity-and-inventory","status":"NOT_RUN","zh":"检查活动阶段、模块名称/未知/报告状态、空状态和报告输入提示为所选语言；报告-only 与显式空模块确认仍按原校验。","en":"Check localized stages, module names/statuses, empty states and report prompts. Report-only submissions and explicit empty-inventory confirmation keep their existing rules."},
+    {"id":"forget-scope","status":"NOT_RUN","zh":"分别打开单条记忆和整个合成档案的删除确认，不提交真实数据删除。中英标题、按钮、不可撤销说明清楚区分范围，原内容不翻译，取消不修改记录。","en":"Open the single-memory and synthetic-profile deletion dialogs without touching real data. Verify localized scope, buttons and irreversibility text; preserve original content and leave records unchanged on cancel."},
+    {"id":"failure-recovery","status":"NOT_RUN","zh":"使用隔离 fixture 的录音无结果/服务错误状态，检查恢复提示与关闭提示按钮的中英；服务详情可展开且保持原文，不自动发送输入。","en":"Use synthetic no-transcript and service-error states. Check localized recovery and dismissal, expandable verbatim details, and that input is never sent automatically."},
+    {"id":"source-consistency","status":"NOT_RUN","zh":"比较活动、模块来源、比较记录、记忆说明的同一 source_type，名称一致；人工报告确认仍明确未经硬件验证，模拟不作为真实学习证据。","en":"Compare the same source type across activity, module reports, comparisons and memory. Use consistent labels; human confirmation is not hardware verification and simulation is not real learning evidence."},
+    {"id":"reading-level","status":"NOT_RUN","zh":"依次选择 plain/standard/technical：来源与原句始终可见，分类/帮助/重要性可展开，technical 默认展开；不新增年龄标签或能力判断。","en":"Choose plain, standard and technical. Keep sources and original wording visible, allow category/support/importance details, and expand them by default in technical mode without age or ability labels."},
+    {"id":"missing-and-plans","status":"NOT_RUN","zh":"查看无 metadata 的旧记录、仅有 0 分项的记录和待测计划。摘要不编造保留理由、学习成绩或计划完成。","en":"Review old records without metadata, zero-only factors and pending plans. Do not invent retention reasons, learning scores or plan completion."},
+    {"id":"narrow-keyboard","status":"NOT_RUN","zh":"在窄宽布局以键盘打开报告表、记忆细节和确认框，检查长英文换行、焦点、按钮和标签；实际屏幕阅读器效果另行记录。","en":"At narrow and wide widths, use the keyboard for reports, memory details and dialogs. Check long-English wrapping, focus, buttons and labels; record screen-reader behavior separately."}
+  ]
+}

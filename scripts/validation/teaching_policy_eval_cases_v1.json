@@ -1,0 +1,62 @@
+{
+  "fixture_version": "teaching-policy-eval-inputs-v1-20261106",
+  "synthetic_only": true,
+  "cases": [
+    {
+      "id": "quantity_roles_30_20_zh",
+      "group": "known_quantity_regression",
+      "language": "zh",
+      "history": [],
+      "text": "测距模块报告前方距离是 30 厘米。我还没有让小车行驶，想先确认 20 厘米的停车阈值是否合适。请给一个下一步，并把已报告的事实与建议分开。"
+    },
+    {
+      "id": "quantity_roles_30_20_en",
+      "group": "known_quantity_regression",
+      "language": "en",
+      "history": [],
+      "text": "The distance sensor reports 30 cm. I have not driven the rover yet. I want to check whether a 20 cm stopping threshold is suitable. Give one next step and distinguish what I reported from your suggestion."
+    },
+    {
+      "id": "powered_off_ruler_units_zh",
+      "group": "reported_static_measurement",
+      "language": "zh",
+      "history": [],
+      "text": "小车已经切断电源，车轮完全静止。我把直尺的零刻度对齐车头前缘，前方标线对应的读数是 240 毫米。我只做了这一次静态测量，没有测停车过程。记录表要求用厘米，请帮我写清这个结果，再给一个简单的下一步。"
+    },
+    {
+      "id": "motion_disabled_sensor_units_en",
+      "group": "reported_static_measurement",
+      "language": "en",
+      "history": [],
+      "text": "The motors are disconnected from their battery and the wheels are completely still; only the distance sensor has separate USB power. Using a ruler from the sensor's marked measuring face, I placed a flat card 8 cm away. The sensor displays 85 mm. Please explain the difference in plain language and give one next step without running the rover."
+    },
+    {
+      "id": "reported_ready_threshold_comparison_zh",
+      "group": "reported_ready_comparison",
+      "language": "zh",
+      "history": [],
+      "text": "这次小车的控制器、电机和测距模块已连接；我已核对前向读数，传感器的测距基准在车头前缘。程序在读数不大于所选阈值时停止驱动，速度固定为低速。起点有标线，路径平整，前方和两侧无人，使用同一块软挡板。看护者站在车轮范围外的急停按钮旁，已确认按钮能切断电机电源。我准备比较 25 厘米和 35 厘米两个阈值，但这组比较还没做。请给一个具体的下一步。"
+    },
+    {
+      "id": "diagram_trigger_and_clearance_en",
+      "group": "conceptual_quantity_roles",
+      "language": "en",
+      "history": [],
+      "text": "This is a diagram question, not a request to operate a device. Distance is measured from the cart's front edge to one fixed wall. The starting reading is 0.75 m, and the controller sends a stop signal when the reading reaches 0.50 m. Does 0.75 minus 0.50 tell me the gap left after the cart has stopped? Explain the idea in simple words."
+    },
+    {
+      "id": "paper_bridge_observation_and_plan_zh",
+      "group": "negative_and_unperformed_plan",
+      "language": "zh",
+      "history": [],
+      "text": "本次纸桥记录是：两个支座相距 15 厘米，我只试了单折纸桥，放上 4 枚相同硬币后没有塌，也没有继续加币。我没有测试双折纸桥，也没有称硬币的质量。我同意下次用相同纸张、跨度和硬币比较双折纸桥，但这一步还没做。请先分清已经观察到的事和下次计划，再给一个整理记录的下一步。"
+    },
+    {
+      "id": "ramp_distance_without_time_en",
+      "group": "negative_and_unperformed_plan",
+      "language": "en",
+      "history": [],
+      "text": "I used the same ball on two ramps. In one roll it travelled 0.4 m on ramp A, and in one roll it travelled 0.6 m on ramp B. I did not time either roll. I agreed to repeat each condition three times with a timer next time, but none of those repeats has happened. Does the longer distance show that the ball was faster on B? Explain briefly and give one next step for my notebook."
+    }
+  ]
+}

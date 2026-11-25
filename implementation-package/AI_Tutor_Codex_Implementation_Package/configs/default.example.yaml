@@ -1,0 +1,80 @@
+# AI Tutor应用配置草案，不是Kimi CLI配置；实现后才能由应用读取。
+app:
+  bind_host: "127.0.0.1"
+  default_language: "zh-CN"
+  theme: "hkustgz-navy-gold"
+  mode: "manual_report"
+  require_local_auth: true
+
+camera:
+  device_selection: "auto_then_confirm"
+  preferred_brand_hint: "OBSBOT"
+  stable_device_id: null
+  preferred_width: 1280
+  preferred_height: 720
+  preferred_fps: 30
+  frame_queue_size: 1
+  mirror_preview: true
+  store_raw_video: false
+
+vision:
+  enabled: true
+  detector_kind: "yolo_face"
+  model_manifest: "models/manifest.json"
+  require_face_class: true
+  tracker: "bytetrack"
+  reid_enabled: false
+  target_selection: "manual"
+  stable_candidate_seconds: 0.5
+  lost_stop_seconds: 0.4
+
+ptz:
+  mode: "off"
+  require_capability_probe: true
+  require_direction_calibration: true
+  dead_zone_normalized: 0.10
+  max_frame_age_ms: 300
+  automatic_zoom: false
+  stop_on_lost: true
+  require_verified_loss_of_control_stop: true
+
+chat:
+  provider: "kimi_cli"
+  detect_cli_generation: true
+  tools_allowed: false
+  independent_turns: true
+  reuse_user_coding_session: false
+  maximum_concurrent_generations: 1
+  initial_response_deadline_seconds: 60
+  max_format_repair_calls: 1
+  allow_direct_api_fallback: false
+  persist_provider_session_ownership: true
+
+audio:
+  input_mode: "push_to_talk"
+  asr_provider: "local_auto_probe"
+  tts_provider: "local_auto_probe"
+  maximum_record_seconds: 20
+  half_duplex: true
+  keep_raw_audio: false
+  cancel_speech_on_new_turn: true
+
+memory:
+  store: "sqlite"
+  recent_completed_turns: 6
+  recall_top_k: 5
+  consolidation_after_completed_turns: 8
+  consolidate_on_session_finish: true
+  require_source_event_ids: true
+  strict_learner_scope: true
+  simulation_namespace_separate: true
+
+tasks:
+  default_activity: "modular_rover"
+  evidence_mode: "manual_report"
+  actuator_execution: false
+  simulation_badge_required: true
+
+emotion:
+  enabled: false
+  provider: null

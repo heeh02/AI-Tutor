@@ -1,0 +1,93 @@
+[package]
+name = "ai-tutor"
+version = "0.2.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+axum = { version = "=0.8.9", features = ["ws", "macros"] }
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+cpal = "=0.16.0"
+edgefirst-tracker = { version = "=0.38.2", default-features = false }
+futures-util = "0.3"
+http = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+nokhwa = { version = "=0.10.11", default-features = false, features = ["input-msmf", "decoding"] }
+ort = { version = "=2.0.0-rc.10", default-features = false, features = ["std", "load-dynamic"] }
+rand = "0.9"
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+sonora = { version = "=0.2.0", default-features = false }
+sonora-agc2 = "=0.2.0"
+sonora-simd = "=0.2.0"
+sysinfo = "0.37"
+tokio = { version = "1", features = ["full"] }
+tokenizers = { version = "=0.22.2", default-features = false, features = ["fancy-regex"] }
+toml = "0.9"
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["fs", "limit"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+webbrowser = "1"
+whisper-rs = { version = "=0.16.0", default-features = false }
+windows = { version = "0.61", features = ["Win32_Foundation", "Win32_Security_Cryptography", "Win32_System_Com", "Win32_System_Ole", "Win32_Media_Speech", "Win32_Media_Audio", "Win32_System_Threading", "Win32_Media_Audio_Endpoints", "Win32_System_Com_StructuredStorage", "Win32_System_Variant", "Win32_UI_Shell_PropertiesSystem", "Win32_Devices_FunctionDiscovery", "Win32_Media_DirectShow"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Threading", "Win32_System_JobObjects"] }
+windows-core = "=0.61.2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[[bin]]
+name = "lexical-challenge-adapter"
+path = "../../scripts/memory-lab/lexical_challenge_adapter.rs"
+test = false
+
+[[bin]]
+name = "bge-store-probe"
+path = "../../scripts/memory-lab/bge_store_probe.rs"
+test = false
+
+[[bin]]
+name = "seed-bge-runtime"
+path = "../../scripts/validation/seed_bge_runtime.rs"
+test = false
+
+[[bin]]
+name = "typed-projection-probe"
+path = "../../scripts/memory-lab/typed_projection_probe.rs"
+
+[[bin]]
+name = "typed-store-probe"
+path = "../../scripts/memory-lab/typed_store_probe.rs"
+
+[[bin]]
+name = "typed48-projection-probe"
+path = "../../scripts/memory-lab/typed48_projection_probe.rs"
+
+[[bin]]
+name = "typed48-store-probe"
+path = "../../scripts/memory-lab/typed48_store_probe.rs"
+
+[[bin]]
+name = "tutor-evidence-probe"
+path = "../../scripts/memory-lab/tutor_evidence_probe.rs"
+
+[[bin]]
+name = "tutor-store-context-probe"
+path = "../../scripts/memory-lab/tutor_store_context_probe.rs"
+
+[[bin]]
+name = "scoped-semantic-probe"
+path = "../../scripts/memory-lab/scoped_semantic_probe.rs"
+
+[[bin]]
+name = "physical-instruction-probe"
+path = "../../scripts/validation/physical_instruction_probe.rs"
+
+[[bin]]
+name = "answer-fidelity-probe"
+path = "../../scripts/validation/answer_fidelity_probe.rs"

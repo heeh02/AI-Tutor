@@ -1,0 +1,14 @@
+{
+  "fixture_type":"synthetic_ui_acceptance_tasks",
+  "real_devices_or_models_required":false,
+  "tasks":[
+    {"id":"existing-draft","languages":["zh","en"],"status":"NOT_RUN","action":"Start from an existing draft and supply a matching synthetic final ticket/text.","expected":"Draft is unchanged; final appears in the separate transcript review card; no send occurs."},
+    {"id":"edit-clear-final","languages":["zh","en"],"status":"NOT_RUN","action":"Start with empty input, change input revision and clear it before final arrives.","expected":"Final remains in review rather than repopulating the input."},
+    {"id":"start-generation","languages":["zh","en"],"status":"NOT_RUN","action":"Observe generation N+1 before the start ACK for N+1; then deliver a pre-start state N.","expected":"Recording remains bound; guarded Send uses at least N+1."},
+    {"id":"stale-and-hidden","languages":["zh","en"],"status":"NOT_RUN","action":"Hide during pending start, then provide its ACK; separately change owner/language before a final reply.","expected":"ACK triggers only exact-ticket discard; stale final changes no draft; showing the page never starts capture."},
+    {"id":"language-aliases","languages":["zh-CN","en-US"],"status":"NOT_RUN","action":"Supply a legitimate four-field ACK using each supported language alias.","expected":"Stop/discard preserve the exact alias and all ticket fields."},
+    {"id":"two-cards","languages":["zh","en"],"status":"NOT_RUN","action":"Retain an unapplied transcript and an unconfirmed Send result while editing a new draft.","expected":"Both cards and the draft remain separate; transcript blocks new recording, unconfirmed Send blocks resending; neither action is automatic."},
+    {"id":"stop-late-send","languages":["zh","en"],"status":"NOT_RUN","action":"Send, invoke Stop or speech-only Stop, edit a new draft, then return the original Send transport error.","expected":"Original text is retained for review without replacing new edits or reviving audio; old completion does not take over current busy state."},
+    {"id":"navigation","languages":["zh","en"],"status":"NOT_RUN","action":"Attempt profile/activity changes with pending text; finish the activity externally and resolve text locally.","expected":"Navigation requires explicit text resolution; clear/dismiss still work after external finish; old-owner late results never enter the new profile."}
+  ]
+}

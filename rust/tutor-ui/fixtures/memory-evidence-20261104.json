@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "synthetic_only": true,
+  "execution_status": "NOT_RUN",
+  "scope": "Author-written evidence responses; no real learner data or browser acceptance claimed.",
+  "records": [
+    {
+      "id": "learner_plan",
+      "expected_original": "下次把墙移近一点再测试。还没有开始。",
+      "response": {
+        "memory": {
+          "memory_id": "fixture-memory-plan",
+          "learner_id": "fixture-learner-a",
+          "activity_scope": "modular_rover",
+          "kind": "pending_experiment",
+          "content": "下次把墙移近一点再测试。还没有开始。",
+          "source_event_ids": [
+            "fixture-memory-plan-source"
+          ],
+          "source_type": "learner_report",
+          "scope": "current_activity",
+          "created_at": "2026-11-04T08:30:00+00:00",
+          "updated_at": "2026-11-04T08:30:00+00:00",
+          "status": "active",
+          "supersedes": [],
+          "epoch": 0
+        },
+        "sources": [
+          {
+            "event_id": "fixture-memory-plan-source",
+            "learner_id": "fixture-learner-a",
+            "session_id": "fixture-session",
+            "source_type": "learner_report",
+            "event_kind": "plan",
+            "event_version": 1,
+            "event_status": "active",
+            "content": {
+              "text": "下次把墙移近一点再测试。还没有开始。",
+              "support_level": "unknown",
+              "internal_prompt": "fixture-only-hidden-prompt",
+              "lease": "fixture-only-hidden-lease"
+            },
+            "created_at": "2026-11-04T08:29:00+00:00"
+          }
+        ],
+        "source_links": [
+          {
+            "event_id": "fixture-memory-plan-source",
+            "event_version": 1
+          }
+        ],
+        "namespace": "real",
+        "education_metadata": {
+          "kind": "accepted_pending_experiment",
+          "claim_type": "accepted_plan",
+          "support_level": "unknown",
+          "importance": {
+            "goal_relevance": 3,
+            "continuity": 2,
+            "novel_change": 1,
+            "explicit_request": 0
+          },
+          "source_grade": "learner_report",
+          "source_count": 1
+        }
+      }
+    },
+    {
+      "id": "confirmed_correction",
+      "expected_original": "Correction: the rover has not stopped successfully.",
+      "response": {
+        "memory": {
+          "memory_id": "fixture-memory-correction",
+          "learner_id": "fixture-learner-a",
+          "activity_scope": "modular_rover",
+          "kind": "correction",
+          "content": "Correction: the rover has not stopped successfully.",
+          "source_event_ids": [
+            "fixture-memory-correction-source"
+          ],
+          "source_type": "operator_confirmed",
+          "scope": "current_activity",
+          "created_at": "2026-11-04T08:30:00+00:00",
+          "updated_at": "2026-11-04T08:30:00+00:00",
+          "status": "active",
+          "supersedes": [],
+          "epoch": 0
+        },
+        "sources": [
+          {
+            "event_id": "fixture-memory-correction-source",
+            "learner_id": "fixture-learner-a",
+            "session_id": "fixture-session",
+            "source_type": "operator_confirmed",
+            "event_kind": "correction",
+            "event_version": 1,
+            "event_status": "active",
+            "content": {
+              "text": "Correction: the rover has not stopped successfully.",
+              "support_level": "hinted",
+              "internal_prompt": "fixture-only-hidden-prompt",
+              "lease": "fixture-only-hidden-lease"
+            },
+            "created_at": "2026-11-04T08:29:00+00:00"
+          }
+        ],
+        "source_links": [
+          {
+            "event_id": "fixture-memory-correction-source",
+            "event_version": 1
+          }
+        ],
+        "namespace": "real",
+        "education_metadata": {
+          "kind": "correction",
+          "claim_type": "explicit_correction",
+          "support_level": "hinted",
+          "importance": {
+            "goal_relevance": 3,
+            "continuity": 2,
+            "novel_change": 1,
+            "explicit_request": 0
+          },
+          "source_grade": "operator_confirmed",
+          "source_count": 1
+        }
+      }
+    },
+    {
+      "id": "simulated_observation",
+      "expected_original": "Simulated trial: the green light turned on.",
+      "response": {
+        "memory": {
+          "memory_id": "fixture-sim-memory",
+          "learner_id": "fixture-sim-learner",
+          "activity_scope": "modular_rover",
+          "kind": "reported_progress",
+          "content": "Simulated trial: the green light turned on.",
+          "source_event_ids": [
+            "fixture-sim-memory-source"
+          ],
+          "source_type": "simulated",
+          "scope": "current_activity",
+          "created_at": "2026-11-04T08:30:00+00:00",
+          "updated_at": "2026-11-04T08:30:00+00:00",
+          "status": "active",
+          "supersedes": [],
+          "epoch": 0
+        },
+        "sources": [
+          {
+            "event_id": "fixture-sim-memory-source",
+            "learner_id": "fixture-sim-learner",
+            "session_id": "fixture-session",
+            "source_type": "simulated",
+            "event_kind": "observation",
+            "event_version": 1,
+            "event_status": "active",
+            "content": {
+              "text": "Simulated trial: the green light turned on.",
+              "support_level": "independent",
+              "internal_prompt": "fixture-only-hidden-prompt",
+              "lease": "fixture-only-hidden-lease"
+            },
+            "created_at": "2026-11-04T08:29:00+00:00"
+          }
+        ],
+        "source_links": [
+          {
+            "event_id": "fixture-sim-memory-source",
+            "event_version": 1
+          }
+        ],
+        "namespace": "simulator",
+        "education_metadata": {
+          "kind": "trial_observation",
+          "claim_type": "reported_observation",
+          "support_level": "independent",
+          "importance": {
+            "goal_relevance": 3,
+            "continuity": 2,
+            "novel_change": 1,
+            "explicit_request": 0
+          },
+          "source_grade": "simulated",
+          "source_count": 1
+        }
+      }
+    },
+    {
+      "id": "legacy_without_metadata",
+      "expected_original": "旧记录：还想再试一次。",
+      "response": {
+        "memory": {
+          "memory_id": "fixture-memory-legacy",
+          "learner_id": "fixture-learner-a",
+          "activity_scope": "modular_rover",
+          "kind": "pending_experiment",
+          "content": "旧记录：还想再试一次。",
+          "source_event_ids": [
+            "fixture-memory-plan-source"
+          ],
+          "source_type": "learner_report",
+          "scope": "current_activity",
+          "created_at": "2026-11-04T08:30:00+00:00",
+          "updated_at": "2026-11-04T08:30:00+00:00",
+          "status": "active",
+          "supersedes": [],
+          "epoch": 0
+        },
+        "sources": [
+          {
+            "event_id": "fixture-memory-plan-source",
+            "learner_id": "fixture-learner-a",
+            "session_id": "fixture-session",
+            "source_type": "learner_report",
+            "event_kind": "legacy_report",
+            "event_version": 1,
+            "event_status": "active",
+            "content": {
+              "report": "旧记录：还想再试一次。"
+            },
+            "created_at": "2026-11-04T08:29:00+00:00"
+          }
+        ],
+        "source_links": [
+          {
+            "event_id": "fixture-memory-plan-source",
+            "event_version": 1
+          }
+        ],
+        "namespace": "real",
+        "education_metadata": null
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "E01",
+      "zh": {
+        "task": "展开一条记忆，再收起并重新展开。",
+        "expected": "未展开时不请求详情；每次展开读取当前来源，一次至多一个请求在途。"
+      },
+      "en": {
+        "task": "Expand a memory, collapse it, then reopen it.",
+        "expected": "No evidence request before expansion; reopen loads current sources with one request in flight."
+      }
+    },
+    {
+      "id": "E02",
+      "zh": {
+        "task": "延迟来源回执，切换档案后再返回旧回执。",
+        "expected": "新档案不显示旧原句或来源说明。"
+      },
+      "en": {
+        "task": "Delay an evidence response, switch profiles, then return the old response.",
+        "expected": "The new profile never displays the old quote or explanation."
+      }
+    },
+    {
+      "id": "E03",
+      "zh": {
+        "task": "展开来源后更正或删除这条记忆；保留一个旧请求迟到返回。",
+        "expected": "编辑/删除一开始便清详情；旧回执不能恢复。沿用现有保存和删除确认。"
+      },
+      "en": {
+        "task": "Edit or delete an expanded memory, then deliver an old pending response.",
+        "expected": "Details clear when editing/deleting starts; stale results cannot restore them. Existing save/delete confirmation remains."
+      }
+    },
+    {
+      "id": "E04",
+      "zh": {
+        "task": "分别展开自述、已确认输入、模拟及无元数据旧记录。",
+        "expected": "来源等级有明确区分；计划不写成完成，未知帮助程度不推测；重要性不是可信度。"
+      },
+      "en": {
+        "task": "Open learner-report, confirmed-input, simulation and legacy records.",
+        "expected": "Source grades remain distinct; plans do not become accomplishments, unknown support stays unknown, and importance is not credibility."
+      }
+    },
+    {
+      "id": "E05",
+      "zh": {
+        "task": "英文界面查看中英原句；检查来源详情内容。",
+        "expected": "标签是英文，原句原样保留；不展示 event_id、lease 或 internal_prompt。"
+      },
+      "en": {
+        "task": "Use the English interface to view Chinese and English quotes.",
+        "expected": "Labels are English and quotes remain verbatim; event IDs, leases and internal prompts are not displayed."
+      }
+    },
+    {
+      "id": "E06",
+      "zh": {
+        "task": "来源请求失败或返回与当前记忆不同的快照，再刷新列表并重开；在窄屏查看。",
+        "expected": "显示可恢复状态而非旧详情或内部错误；长句换行，编辑删除仍可达。"
+      },
+      "en": {
+        "task": "Fail a request or return a different memory snapshot, then refresh and reopen; inspect a narrow viewport.",
+        "expected": "Show a recoverable status, not old details/internal errors; wrap long quotes and keep edit/delete reachable."
+      }
+    }
+  ]
+}

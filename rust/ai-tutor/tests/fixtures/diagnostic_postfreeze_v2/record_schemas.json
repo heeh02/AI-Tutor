@@ -1,0 +1,468 @@
+{
+  "$comment": "One JSONL record at a time. Cross-record links, scope, citation spans and counts use check_diagnostic_postfreeze.py; no automatic entailment claim.",
+  "$defs": {
+    "citation": {
+      "additionalProperties": false,
+      "properties": {
+        "end_char": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "quote": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "start_char": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "end_char",
+        "quote",
+        "source_id",
+        "start_char",
+        "version"
+      ],
+      "type": "object"
+    },
+    "claim_check": {
+      "additionalProperties": false,
+      "properties": {
+        "citations": {
+          "items": {
+            "$ref": "#/$defs/citation"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "type": "array"
+        },
+        "claim": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "citations",
+        "claim"
+      ],
+      "type": "object"
+    },
+    "context": {
+      "additionalProperties": false,
+      "properties": {
+        "activity_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "learner_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "namespace": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "session_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "activity_id",
+        "learner_id",
+        "namespace",
+        "scope",
+        "session_id"
+      ],
+      "type": "object"
+    },
+    "label": {
+      "additionalProperties": false,
+      "properties": {
+        "annotation_origin": {
+          "const": "method-aware_agent_authored_not_blind"
+        },
+        "answerable": {
+          "type": "boolean"
+        },
+        "claim_checks": {
+          "items": {
+            "$ref": "#/$defs/claim_check"
+          },
+          "maxItems": 6,
+          "minItems": 0,
+          "type": "array"
+        },
+        "context_only_ids": {
+          "items": {
+            "pattern": "^[a-z0-9_]+$",
+            "type": "string"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "distractor_reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "forbidden_claims": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "no_evidence_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "query_id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "sufficient_evidence_sets": {
+          "items": {
+            "items": {
+              "pattern": "^[a-z0-9_]+$",
+              "type": "string"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "maxItems": 4,
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "annotation_origin",
+        "answerable",
+        "claim_checks",
+        "context_only_ids",
+        "distractor_reason",
+        "forbidden_claims",
+        "no_evidence_reason",
+        "query_id",
+        "sufficient_evidence_sets"
+      ],
+      "type": "object"
+    },
+    "query": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_pool_ids": {
+          "items": {
+            "pattern": "^[a-z0-9_]+$",
+            "type": "string"
+          },
+          "maxItems": 60,
+          "minItems": 60,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "goal": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "zh",
+            "en",
+            "mixed"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "same_zh",
+            "same_en",
+            "zh_to_en",
+            "en_to_zh",
+            "mixed_single",
+            "mixed_multi",
+            "negative_zh",
+            "negative_en",
+            "negative_mixed"
+          ]
+        },
+        "pack_id": {
+          "enum": [
+            "germination",
+            "paper_bridge",
+            "fractions",
+            "reading",
+            "loops",
+            "evaporation"
+          ]
+        },
+        "tags": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_pool_ids",
+        "context",
+        "goal",
+        "id",
+        "language",
+        "mode",
+        "pack_id",
+        "tags",
+        "text"
+      ],
+      "type": "object"
+    },
+    "scope_control": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "additionalProperties": false,
+          "properties": {
+            "activity_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "expected_source_version": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "learner_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "namespace": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "scope": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "session_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "activity_id",
+            "expected_source_version",
+            "learner_id",
+            "namespace",
+            "scope",
+            "session_id"
+          ],
+          "type": "object"
+        },
+        "control_kind": {
+          "enum": [
+            "foreign_learner",
+            "foreign_namespace",
+            "wrong_activity",
+            "invalidated_source",
+            "version_mismatch",
+            "same_text_other_owner"
+          ]
+        },
+        "expected_eligible": {
+          "const": false
+        },
+        "id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "reference_source_id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "same_text_as_reference": {
+          "const": true
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        }
+      },
+      "required": [
+        "context",
+        "control_kind",
+        "expected_eligible",
+        "id",
+        "reference_source_id",
+        "same_text_as_reference",
+        "source"
+      ],
+      "type": "object"
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "activity_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "claim_type": {
+          "enum": [
+            "reported_observation",
+            "condition_limit",
+            "unaccepted_plan",
+            "accepted_plan",
+            "task_specific_response",
+            "temporary_request",
+            "explicit_correction",
+            "stated_goal"
+          ]
+        },
+        "event_kind": {
+          "enum": [
+            "observation",
+            "learner_statement",
+            "plan",
+            "learner_answer",
+            "correction"
+          ]
+        },
+        "hardware_verified": {
+          "const": false
+        },
+        "id": {
+          "pattern": "^[a-z0-9_]+$",
+          "type": "string"
+        },
+        "language": {
+          "enum": [
+            "zh",
+            "en"
+          ]
+        },
+        "learner_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "namespace": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "pack_id": {
+          "enum": [
+            "germination",
+            "paper_bridge",
+            "fractions",
+            "reading",
+            "loops",
+            "evaporation"
+          ]
+        },
+        "scope": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "session_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_type": {
+          "const": "simulated"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "invalidated"
+          ]
+        },
+        "support_level": {
+          "enum": [
+            "unknown",
+            "hinted",
+            "independent"
+          ]
+        },
+        "text": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "accepted",
+        "activity_id",
+        "claim_type",
+        "event_kind",
+        "hardware_verified",
+        "id",
+        "language",
+        "learner_id",
+        "namespace",
+        "pack_id",
+        "scope",
+        "session_id",
+        "source_type",
+        "status",
+        "support_level",
+        "text",
+        "version"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/source"
+    },
+    {
+      "$ref": "#/$defs/query"
+    },
+    {
+      "$ref": "#/$defs/label"
+    },
+    {
+      "$ref": "#/$defs/scope_control"
+    }
+  ],
+  "title": "education_memory_diagnostic_postfreeze_v2_20261104 record schemas"
+}

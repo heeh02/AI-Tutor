@@ -1,0 +1,43 @@
+{
+  "repo": "Systran/faster-whisper-base",
+  "revision": "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66",
+  "source": "https://huggingface.co/Systran/faster-whisper-base/tree/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66",
+  "model": "multilingual Whisper base (99 languages; not base.en)",
+  "runtime": "faster-whisper 1.2.1 / CTranslate2 CPU int8",
+  "license": "MIT (Whisper and Systran converted-model card)",
+  "date": "2026-11-01",
+  "sha256": {
+    "config.json": "56a6d8110d311f19c8f0471e562832c7527f146b567275bfca59fcf7c184da9a",
+    "model.bin": "d01c3014881c9c6f3133c182f3d2887eb6ca1c789a7538c5c007196857a0a6a9",
+    "tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+    "vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+  },
+  "pinned_files": {
+    "config.json": {
+      "size": 2309,
+      "git_sha1": "867cf1a0fece1394e01d55e287ba2f09a577c046"
+    },
+    "model.bin": {
+      "size": 145217532,
+      "sha256": "d01c3014881c9c6f3133c182f3d2887eb6ca1c789a7538c5c007196857a0a6a9"
+    },
+    "tokenizer.json": {
+      "size": 2203239,
+      "git_sha1": "7818adb6de9fa3064d3ff81226fdd675be1f6344"
+    },
+    "vocabulary.txt": {
+      "size": 459861,
+      "git_sha1": "c9074644d9d1205686f16d411564729461324b75"
+    }
+  },
+  "transport": {
+    "config.json": "https://hf-mirror.com",
+    "model.bin": "https://hf-mirror.com",
+    "tokenizer.json": "https://hf-mirror.com",
+    "vocabulary.txt": "https://hf-mirror.com"
+  },
+  "verification": {
+    "model_bin_sha256": "independently compared with original author's HF model.bin page",
+    "small_files": "pinned Git blob IDs from repository tree; SHA256 recorded locally"
+  }
+}

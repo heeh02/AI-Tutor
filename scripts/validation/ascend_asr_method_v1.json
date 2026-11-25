@@ -1,0 +1,80 @@
+{
+  "method": "ascend-owned-zipformer-service-v1-20261104",
+  "status": "proposal_requires_root_freeze_and_execution",
+  "dataset": {
+    "repository": "CAiRE/ASCEND",
+    "revision": "737e9800ae31be9932ba8464c80366559bd28424",
+    "split": "test",
+    "parquet_sha256": "a4c81d2b5ed6124f052089a695972808c16e0ce0c365ec9773c5d1a8fcf043a7",
+    "rows": 1315,
+    "original_language_counts": {"zh":685,"en":257,"mixed":373},
+    "test_anonymous_speakers": 2,
+    "license": "CC-BY-SA-4.0",
+    "author_annotated_test_ages": {"3":25,"17":24},
+    "age_provenance": "Root supplement from deleted speakers.csv at the same official format-conversion commit; no audio-based inference",
+    "population_limit": "Only two anonymous test speakers, author historical annotations24/25; one speaker per age cannot establish age effects. No child, present-day age/gender or general population claim; the full-corpus19-30 range is not this test's coverage."
+  },
+  "reference_partition": {
+    "rule": "Literal [UNK], case-insensitive, in the original reference only",
+    "complete_rows": 1279,
+    "uncertain_rows": 36,
+    "complete_reference_coverage": 0.9726235741444867,
+    "all_original_rows_and_hypotheses_retained": true,
+    "wildcard_or_result_based_exclusion": false,
+    "primary_scores": "Corpus-weighted CER/MER_project_v1 and original-language=en WER on the fixed complete-reference population, always with coverage and failures. No-marker does not guarantee perfect annotation.",
+    "uncertain_scores": "All36 rows retain original references, hypotheses and terminal status separately. Optional full1315 literal distances are diagnostics, not wholly verifiable accuracy."
+  },
+  "normalization": {
+    "config": "ascend_normalization_v1.json",
+    "scorer": "ascend_score.py",
+    "table": "Exact90 distinct codepoints extracted from author utils.py at8c50c2e2c65f8555eb1d7655310dd585dc1f6710",
+    "operations": ["delete exact ignore table symmetrically", "Unicode lower()", "collapse whitespace and trim"],
+    "raw_reference_and_hypothesis_preserved": true,
+    "hypothesis_removed_characters_reported": true,
+    "source_audit": "All1315 reference strings contain zero ignored characters; ASCII square brackets, straight apostrophes and hyphens remain. No traditional/simplified, Unicode NFKC, number/word or synonym rewrite.",
+    "not_author_score_reproduction": "Author labels pass through a model tokenizer and jieba MER; project raw-text symmetric normalization and deterministic ASCII-word/CJK-codepoint MER differ. No author-jieba or paper-score label is permitted."
+  },
+  "model": {
+    "name": "sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20",
+    "assets": "Reuse stage_asr fixed four model hashes and three service scripts; exact staged asset/source manifests required",
+    "runtime_environment": "Existing runtime/speech-lab/.venv; no install or changes",
+    "provider": "cpu",
+    "threads": 2,
+    "decoding_method": "greedy_search",
+    "language_hint": "auto for every row, no reference/source-language text is sent",
+    "enable_model_endpoint_detection": false,
+    "warmup": "Existing managed service synthetic one-second silence warmup once per fresh phase instance",
+    "final_right_context": "Existing recognizer.finish appends9600 zero samples (600ms of model right context) before input_finished; not source silence or a600ms wall-clock wait."
+  },
+  "input": {
+    "verified_format": "RIFF/WAVE, mono PCM16LE,16000Hz for all1315",
+    "source_pcm_transform": "none; no resampling, float roundtrip, gain, trim, transcript-guided edit or quiet-tail addition",
+    "wire_chunk_samples": 320,
+    "wire_chunk_ms": 20,
+    "maximum_duration_ms": 20000,
+    "maximum_verified_duration_metadata_seconds": 11.850000381469727,
+    "actual_media_duration_uses": "verified PCM sample count, not float duration metadata"
+  },
+  "execution_scope": "Windows ignored Rust diagnostic using the production AsrClient, response/identity/revision validator and new OwnedAsrService. Direct sequential authenticated HTTP streaming; no CaptureStream resampling/800ms queue, physical capture, VAD, Workstation/UI polling, TTS, camera or PTZ acceptance.",
+  "phases": [
+    {"mode":"accuracy","utterance_ceiling":1315,"order":"original parquet row ordinal","pacing":"no media-clock sleep; await each20ms chunk response before sending next","scope":"warm service/client full-file throughput and transcript quality, not realtime latency"},
+    {"mode":"realtime","utterance_ceiling":12,"order":"unchanged metadata-selected realtime-subset-draft IDs/order, frozen into prepared subset","pacing":"submit each20ms chunk only when its last sample would be available on the media clock; sequential response backpressure may delay later chunks","scope":"small paced service/client replay;12 samples are not a population P95 guarantee"}
+  ],
+  "phase_ownership": "Each explicitly invoked phase gets one new owned service/UUID/token on an ephemeral loopback port. No automatic restart, attach, public descriptor,18867 access or global process kill. New service preparation timing is recorded separately; OS cache is not reset.",
+  "attempts": {"per_row_per_phase":1,"total_corpus_utterance_ceiling":1327,"operator_or_automatic_retries":0,"whisper_fallback":false},
+  "deadlines": {"utterance_wall_seconds":60,"phase_accuracy_wall_seconds":7200,"phase_realtime_wall_seconds":600,"final_http_seconds":5,"cancel_http_ms":300},
+  "failure_policy": {
+    "valid_empty_final": "Successful empty hypothesis, kept and scored as deletions; no replacement or fallback",
+    "failed_row": "Keep finite failure code, last partial separately and empty final hypothesis for pipeline scoring",
+    "after_failure": "Always attempt only exact UUID/generation cancellation. Stop this phase on any request/protocol/timeout/instance failure, mark remaining declared rows not_run; do not poison or reset the managed client then continue",
+    "abrupt_process_or_systemic_abort": "Scorer synthesizes missing output statuses against frozen full denominator without modifying raw records; incomplete run cannot claim complete-model accuracy",
+    "phase_repeat_rule": "Realtime12 is a separately predeclared phase, not a retry or replacement for accuracy outputs; never use its hypotheses to fill accuracy failures"
+  },
+  "timing": {
+    "origins": ["utterance start", "start-response receipt", "media clock origin", "each chunk expected availability/start/response", "first nonempty partial receipt", "EOF final request start", "final receipt"],
+    "realtime_reports": ["first partial minus first PCM request", "EOF final request to final receipt", "last PCM request to final receipt", "pacing lateness", "wall time / verified media duration"],
+    "limits": "EOF is not physical button release. Presegmented files do not test long-thinking pauses or acoustic endpoint detection. Partial receipt is not UI subtitle presentation. Fast-phase times are not realtime claims."
+  },
+  "cleanup": "Always await OwnedAsrService.stop and retain exact instance, child/interpreter exit, launcher/interpreter empty Jobs and cleanup_confirmed. Forced cleanup remains explicitly marked; warm/closed/http_closed alone does not pass.",
+  "paraformer_comparison": "Pending a separately declared same-input comparison; this first Zipformer baseline does not complete model selection or broader bilingual/age requirements."
+}

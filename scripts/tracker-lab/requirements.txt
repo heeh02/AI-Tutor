@@ -1,0 +1,5 @@
+# Offline tracker oracle only; install --no-deps. FilterPy's plotting dependency
+# is not used by the imported Kalman/stats/common path. No Torch/model runtime.
+numpy==2.2.6
+scipy==1.15.3
+filterpy==1.4.5

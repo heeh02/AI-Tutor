@@ -1,0 +1,25 @@
+.robot-companion{position:relative;width:100%;color:#343447;font-family:inherit}
+.robot-topline{display:flex;align-items:center;justify-content:space-between;padding:0 4px;position:relative;z-index:1}
+.robot-presence{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:650;color:#726982;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);border-radius:99px;padding:7px 11px}
+.robot-presence i{display:block;width:6px;height:6px;border-radius:50%;background:#a799c0;box-shadow:0 0 0 3px rgba(167,153,192,.12)}
+.is-live .robot-presence i{background:#3b9c88;box-shadow:0 0 0 3px #3b9c8819}
+.is-demo .robot-presence i{background:#e78d69;box-shadow:0 0 0 3px #e78d6919}
+.robot-reset{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid #fff;background:#ffffffb8;color:#655773;font-size:23px;cursor:pointer;line-height:1}
+.robot-reset:hover{background:#fff;color:#3b2b59;transform:rotate(-12deg)}
+.robot-canvas-wrap{height:320px;min-height:0;margin:-18px -12px -12px;position:relative;isolation:isolate}
+.robot-canvas-wrap ai-tutor-robot{display:block;width:100%;height:100%;--robot-min-height:0px}
+.robot-view-hint{text-align:center;color:#8c829a;font-size:10px;letter-spacing:.05em;margin:0 0 13px;position:relative;pointer-events:none}
+.robot-pose-strip{display:flex;align-items:center;gap:22px;padding:11px 15px;border:1px solid #ffffffea;background:rgba(255,255,255,.62);backdrop-filter:blur(12px);border-radius:17px;max-width:430px;margin:0 auto}
+.robot-angle{display:flex;flex-direction:column;gap:2px;min-width:62px}
+.robot-angle span{font-size:10px;color:#8c8198;letter-spacing:.04em}
+.robot-angle strong{font-variant-numeric:tabular-nums;font-size:20px;line-height:1.25;letter-spacing:-.03em;font-weight:650;color:#494157}
+.robot-demo-toggle{margin-left:auto;padding:9px 12px;border-radius:11px;background:#e9e0f3;color:#685580;border:1px solid #ded1eb;font-size:11px;white-space:nowrap;font-weight:650;cursor:pointer}
+.robot-demo-toggle:hover,.robot-demo-toggle.selected{background:#d9cbe8;border-color:#cfbddf;color:#4e395f}
+.robot-source-note{font-size:10px;text-align:center;color:#8c8198;margin:9px 0 0;line-height:1.5;min-height:15px}
+.robot-demo-poses{display:flex;justify-content:center;gap:6px;margin:9px 0 0;flex-wrap:wrap}
+.robot-demo-poses button{border:1px solid #ded2eb;background:#fff9;color:#74617e;border-radius:9px;padding:6px 10px;font-size:11px;cursor:pointer}
+.robot-demo-poses button:hover{background:#fff;color:#46394f}
+.robot-companion button:focus-visible{outline:3px solid #a38cb6;outline-offset:3px}
+@media(min-width:1440px){.robot-canvas-wrap{height:345px}}
+@media(max-width:720px){.robot-canvas-wrap{height:260px;margin-top:-15px}.robot-pose-strip{gap:16px;padding:10px 12px}.robot-presence{font-size:11px}.robot-view-hint{margin-bottom:10px}.robot-angle strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.robot-companion *{transition:none!important}}

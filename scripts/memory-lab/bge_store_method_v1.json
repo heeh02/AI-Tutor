@@ -1,0 +1,26 @@
+{
+  "method": "frozen-vector-real-store-v1-20261104",
+  "synthetic_only": true,
+  "inference": false,
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "source_report_sha256": "b614aa9fcad3d12fb0ff6f4f3319eb0b73fbceac903a5aa967f7b76442a09cae",
+  "source_profiles": ["E5NativeFp32", "BgeM3NativeFp32"],
+  "admission": {
+    "reported_observation": "only event_kind observation, raw text unchanged -> reported_progress/current_activity",
+    "accepted_plan": "only event_kind plan and accepted=true, raw text unchanged -> pending_experiment/current_activity",
+    "other_claim_types": "not indexed; preserve original typed event and record reason; no SQL promotion or prefix substitution",
+    "expected_sources": 60,
+    "expected_admitted": 18,
+    "expected_excluded": 42
+  },
+  "activity_mapping": "Only the isolated synthetic Store session uses its existing modular_rover activity API; this is not equivalence to the original logical workshop scope or permission to widen production activities",
+  "conditions": ["current_query", "query_plus_goal"],
+  "goal_format": "{text} {goal} ",
+  "rankings": ["actual Store recall_candidates without embedding", "pure cosine over actual Store eligible_memory_embeddings", "actual Store recall_candidates with profile vector (existing legacy lexical plus RRF)"],
+  "tie_break": "Dense and final RRF use actual Store generated memory_id; legacy lexical retains its existing updated_at and row-order behavior. Preserve ID map and dense full-ranking/returned-RRF equal-score groups; Store does not expose RRF candidates beyond its five-row return, so boundary ties outside that return remain unobserved. No label-dependent tie changes.",
+  "budget": {"top_k": 5, "whole_source_unicode_codepoints": 2400},
+  "metrics": "Preserve original sufficient_evidence_sets; separately report original-positive denominator and positive cases with at least one whole set admitted to Store; no reclassification of original no-evidence labels",
+  "controls": ["actual source revision API", "source version trigger", "source deletion trigger", "learner epoch trigger", "actual forget API", "session deletion trigger", "learner deletion trigger", "cross learner read/forged receipt", "cross namespace receipt", "wrong dimension/profile rejection", "unknown profile rejection"],
+  "budget_boundary": "Natural frozen source texts may never fill 2400 chars; assert all selected text remains whole and in budget, and identify hard-overflow coverage as a separate fake-vector unit test",
+  "limits": ["This subset Store diagnosis does not inherit the original 60-source BGE quality gate", "Legacy Store lexical+RRF is not the frozen lexical method or pure BGE", "No default recall/context changes, model runs, user database reads, or source-label changes", "SQLite mutation controls are labeled distinctly from public Store API controls"]
+}

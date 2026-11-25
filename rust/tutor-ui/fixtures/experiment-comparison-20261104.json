@@ -1,0 +1,31 @@
+{
+  "synthetic_fixture": true,
+  "execution_status": "NOT_RUN",
+  "scope": "Isolated simulator fixture only. No camera, microphone, playback, model calls, PTZ or real learner data.",
+  "request": {
+    "submission_id": "comparison-synthetic-001",
+    "question": "停车阈值怎样影响停车位置？ / How does the threshold affect stopping?",
+    "changed_variable": "停车阈值 / Stop threshold",
+    "conditions": [{"name": "同一小车、速度和地面 / Same rover, speed and floor", "status": "reported_same"}],
+    "trials": [
+      {"label": "A", "setting": "20 cm", "status": "reported", "result": "碰到墙 / Hit the wall", "trial_count": null},
+      {"label": "B", "setting": "30 cm", "status": "not_tested", "result": null, "trial_count": null}
+    ],
+    "pending_plan": {"text": "保持其他条件，试 30 cm / Keep other conditions and try 30 cm", "accepted": false},
+    "source_type": "simulated"
+  },
+  "tasks": [
+    {"id": "activity-entry", "status": "NOT_RUN", "zh": "从活动页打开比较表，不需展开诊断；A/B 状态初始未选择，计划接受未选。", "en": "Open the comparison form on the activity page without diagnostics. A/B statuses are initially unselected and plan acceptance is unchecked."},
+    {"id": "reported-and-pending", "status": "NOT_RUN", "zh": "输入合成示例并保存。回看 A 的原始结果与未知次数，B 明确未测试；不触发提问、长期记忆或实验完成。", "en": "Save the synthetic example. A retains the original result and unknown count; B is explicitly untested. No question, memory promotion or completion is triggered."},
+    {"id": "status-edit-preserves-text", "status": "NOT_RUN", "zh": "有结果的 A 改为尚未测试。结果不被自动删除，保存提示清空或改回；明确清空后才发 null。", "en": "Change A with an existing result to untested. Keep its text and require explicit clearing or restoring the status before saving null."},
+    {"id": "plan-is-not-result", "status": "NOT_RUN", "zh": "明确接受待测计划后保存。只显示已接受且仍待实施，不声称完成或学会。", "en": "Explicitly accept and save a pending plan. Show accepted and still pending, without claiming completion or mastery."},
+    {"id": "retry-idempotency", "status": "NOT_RUN", "zh": "隔离 fixture 中延迟或丢弃 POST 响应，再原样重试。使用同一 submission_id，列表仅一条；不再次取消新的教学。", "en": "In the isolated fixture, delay or lose the POST response, then retry unchanged. Keep the submission ID and one record; do not cancel newer teaching again."},
+    {"id": "new-edits-survive", "status": "NOT_RUN", "zh": "提交后立即修改问题；延迟成功或失败回执均保留新编辑。再次保存实际新编辑使用新 ID。", "en": "Edit the question while saving. A delayed success or failure preserves newer edits; saving those edits uses a new ID."},
+    {"id": "navigation-guard", "status": "NOT_RUN", "zh": "未保存时尝试结束、新建活动、切换或创建档案。仍留当前活动，定位表单并提示保存或清空；输入框内容不丢。", "en": "With a dirty draft, try finishing, starting another session or switching/creating a profile. Stay in the session, focus the form and request save or clear; preserve the composer."},
+    {"id": "late-owner-and-list", "status": "NOT_RUN", "zh": "受控外部切会话后返回，旧 owner/epoch 回执不展示。旧列表 GET 不覆盖刚保存记录或恢复失效来源。", "en": "After a controlled external session switch and return, discard old owner/epoch replies. An older GET cannot erase a save or restore invalidated sources."},
+    {"id": "bilingual-reading", "status": "NOT_RUN", "zh": "有草稿时改界面英语、切换阅读程度。草稿和原始结果原文不变；不改变教学语言；technical 显示明确变量术语。", "en": "Change UI language and reading level with a draft. Preserve draft and result wording and teaching language; technical mode uses the variable label."},
+    {"id": "source-and-finished", "status": "NOT_RUN", "zh": "模拟档案仅显示模拟来源，所有记录未经硬件验证。结束后的会话只可回看最近 10 组；人工报告确认不标成客观验证。", "en": "Simulation shows only the simulated source; all records are not hardware verified. Finished sessions are read-only with at most 10 records; human report confirmation is not objective verification."},
+    {"id": "saving-display-gate", "status": "NOT_RUN", "zh": "保存期间不回执旧隐藏教学或自动读，停止仍可用。即使 POST 响应丢失，也等当前 state 刷新后再开放。", "en": "During saving, gate teaching display receipts and automatic reading while keeping Stop available. After a lost POST response, wait for current state before releasing the gate."},
+    {"id": "narrow-keyboard", "status": "NOT_RUN", "zh": "在窄宽布局逐项键盘操作。标签、错误、长英文和 A/B 卡片不溢出；定位未保存表单可见。草稿刷新会丢失的说明可见。", "en": "Use keyboard controls at narrow and wide widths. Check labels, errors, long English and A/B cards for overflow, focus visibility, and the page-refresh draft-loss notice."}
+  ]
+}

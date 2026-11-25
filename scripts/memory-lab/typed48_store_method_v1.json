@@ -1,0 +1,18 @@
+{
+  "method": "typed48-real-store-retrieval-v1-20261104",
+  "inputs": "Caller supplies exact lowercase SHA256 of the completed new48 projection and encoding reports. Reports bind input JSONL and FP32 vector bytes, exact registered profile, frozen methods and source files. No hash fallback or repairs.",
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "projection_method_sha256": "3e9a977488da598ab79b0daf3b5b98988a68249c26d9fe68b87aa4aaffa05b2c",
+  "encoding_method_sha256": "025115dcbcd7bac73e3c68d0811dfa85c14742de8d6c6a3a4f296c23c180903a",
+  "encoding_script_sha256": "4925d684b2b94dfa9650b2803945715d20c18d7dc96fcf686d0da4c065c2c9dd",
+  "reconstruction": "Reuse new typed48_common real Store reconstruction; compare every actual memory content/type/scope/grade/support/source content/version against the new encoded projection. Generated owner/event/memory IDs may differ and are reported.",
+  "index": "Real embedding_work batch32, commit CAS, batch16, verify all48 exact cached vectors and content with no remaining work",
+  "ranking": ["actual Store legacy lexical", "pure cosine over actual48 eligible vectors, exact score ties by actual memory ID", "actual Store BGE+legacy RRF, never called pure BGE"],
+  "query_conditions": ["current_query","query_plus_goal"],
+  "query_text": "All192 exact encoded queries from original frozen v2, goal concatenation includes trailing space",
+  "budget": "5 records / 2400 Unicode characters, whole records only; no truncation",
+  "metrics": "Original72 positive,24 negative and complete-set-available subset denominators, MRR@5, complete evidence@5, best minimal-set coverage; cross24 and multi11 separately; source sets never trimmed",
+  "negative_interpretation": "Returned candidates require relevance review. Candidate retrieval is not abstention or factual correctness.",
+  "control": "After ranking, revise one actual newly supported condition source with real Store API, verify evidence/cached vectors invalidated and old CAS rejected. Other owner/scope/forget controls are not rerun or claimed here.",
+  "limits": ["No production change", "No model inference", "No inherited old42 or raw60 quality gate", "Synthetic workshop still maps to existing modular_rover only", "No unseen RRF boundary tie claim"]
+}

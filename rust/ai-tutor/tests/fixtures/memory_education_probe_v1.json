@@ -1,0 +1,37 @@
+{
+  "fixture_version": "memory-education-probe-v1",
+  "synthetic_only": true,
+  "cases": {
+    "zh": {
+      "events": [
+        {"label":"goal","kind":"learner_statement","content":{"text":"我想比较两种停车距离阈值，让小车能够停在墙前，而不是碰到墙。","synthetic_fixture":true}},
+        {"label":"comparison","kind":"observation","content":{"text":"我报告了这一轮比较：使用同一辆小车、同一速度、同一地面和墙的位置。20厘米阈值试了一次，小车碰到墙；30厘米阈值试了一次，小车停在墙前。每个阈值只有一次观察，样本不足，还不能断言30厘米总是可靠。","synthetic_fixture":true,"comparison":{"thresholds_cm":[20,30],"trials_per_threshold":1,"unchanged_conditions":["rover","speed","surface","wall_position"],"sample_insufficient":true}}},
+        {"label":"pending_plan","kind":"plan","content":{"text":"我接受下一轮计划：固定30厘米阈值，只改变小车速度来比较停车位置。这一轮还没有开始，也没有结果。","synthetic_fixture":true,"accepted":true,"execution_status":"not_started"}},
+        {"label":"temporary_preference","kind":"learner_statement","content":{"text":"只在今天这次活动里，请给我短一点的提示；不要把它记作以后都适用的偏好。","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"temporary"}}
+      ]
+    },
+    "en": {
+      "events": [
+        {"label":"goal","kind":"learner_statement","content":{"text":"I want to compare two stopping-distance thresholds so the rover stops before the wall instead of hitting it.","synthetic_fixture":true}},
+        {"label":"comparison","kind":"observation","content":{"text":"I reported one comparison round using the same rover, speed, surface, and wall position. At a 20 cm threshold, one trial hit the wall. At a 30 cm threshold, one trial stopped before the wall. There is only one observation per threshold, so the sample is too small to conclude that 30 cm is always reliable.","synthetic_fixture":true,"comparison":{"thresholds_cm":[20,30],"trials_per_threshold":1,"unchanged_conditions":["rover","speed","surface","wall_position"],"sample_insufficient":true}}},
+        {"label":"pending_plan","kind":"plan","content":{"text":"I accept this next-round plan: keep the 30 cm threshold fixed and change only the rover's speed to compare stopping positions. This round has not started and has no result yet.","synthetic_fixture":true,"accepted":true,"execution_status":"not_started"}},
+        {"label":"temporary_preference","kind":"learner_statement","content":{"text":"Only for today's activity, please give me shorter hints. Do not treat this as a preference for future sessions.","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"temporary"}}
+      ]
+    }
+  },
+  "minimal_expectations": [
+    {"source_label":"goal","kind":"learning_goal","claim_type":"stated_goal","coverage":"expected"},
+    {"source_label":"comparison","kind":"trial_observation","claim_type":"reported_observation","coverage":"expected"},
+    {"source_label":"pending_plan","kind":"accepted_pending_experiment","claim_type":"accepted_plan","coverage":"expected"},
+    {"source_label":"temporary_preference","kind":"help_preference","claim_type":"explicit_preference","scope":"current_session","coverage":"optional_session_only"}
+  ],
+  "manual_review_criteria": [
+    "The actual goal is retained without inventing mastery or ability.",
+    "The comparison keeps the 20 cm versus 30 cm outcomes, unchanged conditions, and one observation per threshold.",
+    "A single comparison is not generalized into guaranteed reliability; sample insufficiency is retained where relevant.",
+    "The accepted next round remains unperformed, with a fixed 30 cm threshold and speed as the only planned change.",
+    "A temporary preference is omitted or explicitly session-limited, never made persistent.",
+    "Source quotations support the generated wording; presence of an exact quote alone does not prove that wording is faithful.",
+    "Any meaningful omission, contradiction, plan-as-completion claim, or unsupported inference is recorded manually."
+  ]
+}

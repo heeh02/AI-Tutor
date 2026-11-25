@@ -1,0 +1,937 @@
+{
+    "schema_version":  "2.0",
+    "date":  "2026-11-02",
+    "implementation":  "Rust native + Rust WebAssembly",
+    "application_binary":  "bin/ai-tutor.exe",
+    "application_sha256":  "2fbea30e1007f29b731f980eb54b4fe472afd0f4657cb141b0bbeff1425cf4c3",
+    "device_evidence_scope":  "Historical device probes retain original timestamps/binary scope. Product workflow release is recorded under product_workflow and ptz.current_deployment; software tests do not establish physical following.",
+    "runtime_languages":  [
+                              "Rust native",
+                              "Rust compiled to WebAssembly"
+                          ],
+    "application_python_runtime":  false,
+    "application_node_runtime":  false,
+    "external_teaching_backend":  "Official Kimi Code CLI",
+    "camera":  {
+                   "reopen":  "PASS",
+                   "raw_media_saved":  false,
+                   "face_model":  {
+                                      "id":  "yolov8n-face-lindevs",
+                                      "file":  "models/yolov8n-face-lindevs.onnx",
+                                      "purpose":  "face_detection_only",
+                                      "author":  "Lindevs; third-party face weights, not Ultralytics official face model",
+                                      "source":  "https://github.com/lindevs/yolov8-face",
+                                      "download_url":  "https://github.com/lindevs/yolov8-face/releases/latest/download/yolov8n-face-lindevs.onnx",
+                                      "sha256":  "8d0bfb0c3383c5bd7a78dd24ef79a21e2aa456619b6ab5e53867092d1c7dc414",
+                                      "downloaded_at":  "2026-11-01",
+                                      "export_date":  "2024-11-01T13:21:37.778463",
+                                      "exporter_version":  "Ultralytics 8.3.27",
+                                      "input":  {
+                                                    "name":  "images",
+                                                    "shape":  [
+                                                                  1,
+                                                                  3,
+                                                                  640,
+                                                                  640
+                                                              ],
+                                                    "dtype":  "float32",
+                                                    "range":  [
+                                                                  0,
+                                                                  1
+                                                              ],
+                                                    "channels":  "RGB",
+                                                    "preprocessing":  "center letterbox, RGB, NCHW"
+                                                },
+                                      "output":  {
+                                                     "name":  "output0",
+                                                     "shape":  [
+                                                                   1,
+                                                                   5,
+                                                                   8400
+                                                               ],
+                                                     "layout":  "cx,cy,w,h,face_confidence; before NMS"
+                                                 },
+                                      "classes":  {
+                                                      "0":  "face"
+                                                  },
+                                      "repository_license":  "MIT",
+                                      "weight_metadata_license":  "AGPL-3.0 (embedded ONNX model metadata)",
+                                      "licensing_note":  "Repository MIT is not treated as overriding embedded AGPL model metadata. No redistribution/commercial license clearance claimed.",
+                                      "training_data":  {
+                                                            "name":  "WIDER FACE",
+                                                            "source":  "http://shuoyang1213.me/WIDERFACE/",
+                                                            "license_status":  "Research dataset; exact current reuse terms not fully verified (official page timed out). No dataset downloaded or redistributed."
+                                                        },
+                                      "runtime":  {
+                                                      "implementation":  "Rust native",
+                                                      "ort":  "2.0.0-rc.10",
+                                                      "onnxruntime":  "1.23.2",
+                                                      "provider":  "CPUExecutionProvider",
+                                                      "camera":  "nokhwa 0.10.11 / Media Foundation",
+                                                      "tracker":  "edgefirst-tracker 0.38.2 / Apache-2.0",
+                                                      "native_dll_directory":  "models/native",
+                                                      "onnxruntime_dll_sha256":  "2bc04b05efbff97049132939640963772cc16225ba1c7f1388993487c8775492",
+                                                      "providers_shared_dll_sha256":  "6adee08db23ba190fd1061ee99c32a5a802cac1e3576defaac820c157294c138"
+                                                  },
+                                      "tracker":  {
+                                                      "name":  "ByteTrack",
+                                                      "implementation":  "edgefirst-tracker 0.38.2",
+                                                      "track_high_conf":  0.4,
+                                                      "track_iou":  0.25,
+                                                      "track_update":  0.25,
+                                                      "extra_lifespan_nanoseconds":  600000000,
+                                                      "confirmation_count":  3,
+                                                      "timestamps":  "actual monotonic nanoseconds",
+                                                      "reid":  false
+                                                  }
+                                  },
+                   "two_person_hardware_test":  "NOT_RUN",
+                   "discovered_devices":  {
+                                              "value":  [
+                                                            {
+                                                                "backend":  "Windows MediaFoundation / nokhwa",
+                                                                "device_id":  "\\\\?\\usb#vid_3564\u0026pid_ff02\u0026mi_00#6\u0026736750\u00260\u00260000#{e5323777-f976-4f5b-9b55-b94699c46e44}\\global",
+                                                                "formats":  "native formats negotiated on open",
+                                                                "id":  "\\\\?\\usb#vid_3564\u0026pid_ff02\u0026mi_00#6\u0026736750\u00260\u00260000#{e5323777-f976-4f5b-9b55-b94699c46e44}\\global",
+                                                                "name":  "OBSBOT Tiny 3 StreamCamera",
+                                                                "stable_id":  true,
+                                                                "virtual":  false
+                                                            }
+                                                        ],
+                                              "Count":  1
+                                          },
+                   "real_stream":  "PASS",
+                   "last_soak_snapshot":  {
+                                              "association_ambiguous":  false,
+                                              "camera_session_id":  "ec779b86-6462-4f3f-82bd-e69d1705557f",
+                                              "capture_fps":  29.974294867657864,
+                                              "captured_at_ms":  1793471357942,
+                                              "error":  null,
+                                              "face_class":  "face",
+                                              "face_model":  "lindevs/yolov8n-face ONNX / ort CPU",
+                                              "fps":  28.046787356198564,
+                                              "frame_age_ms":  77.0,
+                                              "frame_id":  32366,
+                                              "height":  720,
+                                              "inference_ms":  35.8302,
+                                              "kind":  "frame",
+                                              "negotiated":  {
+                                                                 "available_formats":  [
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  25,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  25,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  25,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  24,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  24,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  24,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  20,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  20,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  20,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  15,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  15,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  15,
+                                                                                               "height":  720,
+                                                                                               "width":  1280
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  30,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  60,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  50,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  25,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           },
+                                                                                           {
+                                                                                               "format":  "NV12",
+                                                                                               "fps":  25,
+                                                                                               "height":  1080,
+                                                                                               "width":  1920
+                                                                                           }
+                                                                                       ],
+                                                                 "available_formats_truncated":  true,
+                                                                 "driver_reported_fps":  1,
+                                                                 "fps_note":  "Native format metadata is separate from measured capture_fps",
+                                                                 "height":  720,
+                                                                 "pixel_format":  "MJPEG",
+                                                                 "requested_fps":  30,
+                                                                 "width":  1280
+                                                             },
+                                              "processing_ms":  35.8346,
+                                              "ptz":  {
+                                                          "cached_evidence_only":  true,
+                                                          "capabilities":  {
+                                                                               "interface_supported":  true,
+                                                                               "properties":  {
+                                                                                                  "pan":  {
+                                                                                                              "auto_supported":  false,
+                                                                                                              "capability_flags":  2,
+                                                                                                              "current":  7,
+                                                                                                              "current_flags":  2,
+                                                                                                              "default":  0,
+                                                                                                              "get_current_hresult":  "0x00000000",
+                                                                                                              "get_range_hresult":  "0x00000000",
+                                                                                                              "manual_supported":  true,
+                                                                                                              "maximum":  130,
+                                                                                                              "minimum":  -130,
+                                                                                                              "range_supported":  true,
+                                                                                                              "relative_flag":  false,
+                                                                                                              "step":  1,
+                                                                                                              "unit_documented":  "degrees for absolute pan/tilt; not physically calibrated"
+                                                                                                          },
+                                                                                                  "tilt":  {
+                                                                                                               "auto_supported":  false,
+                                                                                                               "capability_flags":  2,
+                                                                                                               "current":  10,
+                                                                                                               "current_flags":  2,
+                                                                                                               "default":  0,
+                                                                                                               "get_current_hresult":  "0x00000000",
+                                                                                                               "get_range_hresult":  "0x00000000",
+                                                                                                               "manual_supported":  true,
+                                                                                                               "maximum":  90,
+                                                                                                               "minimum":  -90,
+                                                                                                               "range_supported":  true,
+                                                                                                               "relative_flag":  false,
+                                                                                                               "step":  1,
+                                                                                                               "unit_documented":  "degrees for absolute pan/tilt; not physically calibrated"
+                                                                                                           }
+                                                                                              }
+                                                                           },
+                                                          "capabilities_source":  "historical read-only hardware probe; current device position is not asserted",
+                                                          "continuous_speed":  false,
+                                                          "external_follow":  "BLOCKED",
+                                                          "external_yolo_enabled":  false,
+                                                          "hardware_read_capable":  true,
+                                                          "hardware_stop_command_sent":  false,
+                                                          "low_amplitude_calibration":  "FAIL",
+                                                          "manual_driver_verified":  false,
+                                                          "manual_enabled":  false,
+                                                          "mode":  "off",
+                                                          "physical_follow_verified":  false,
+                                                          "reason":  "原生 Pan/Tilt 范围曾读取成功；单次1度 PAN 标定出现未命令的 TILT 漂移，全部物理运动保持禁用。停止仅作用于应用，不声称关闭厂商 AI 跟踪。",
+                                                          "runtime":  "Rust native; no physical command implementation enabled",
+                                                          "status":  "BLOCKED",
+                                                          "vendor_auto_state":  "unknown"
+                                                      },
+                                              "raw_media_saved":  false,
+                                              "runtime":  "Rust native / MediaFoundation",
+                                              "selected_status":  "unselected",
+                                              "selected_track_key":  null,
+                                              "state":  "running",
+                                              "tracker":  "ByteTrack / edgefirst-tracker 0.38.2 (Kalman + two-pass LAPJV)",
+                                              "tracks":  [
+
+                                                         ],
+                                              "width":  1280
+                                          },
+                   "current_service_pid":  88024
+               },
+    "audio":  {
+                  "raw_audio_saved":  false,
+                  "audible_output_confirmation":  "PASS",
+                  "audible_output_evidence_id":  "audio-user-confirmation-20261101-01",
+                  "basic_push_to_talk_e2e":  "PASS",
+                  "user_confirmation":  {
+                                            "evidence_id":  "audio-user-confirmation-20261101-01",
+                                            "source_type":  "user_confirmation",
+                                            "date":  "2026-11-01",
+                                            "timezone":  "Asia/Shanghai",
+                                            "content":  "转写与播报都正常",
+                                            "status":  "PASS",
+                                            "confirmed_scope":  [
+                                                                    "basic adult push-to-talk capture, check or edit transcription, send and hear teaching reply",
+                                                                    "audible speech output"
+                                                                ],
+                                            "language":  "not separately specified",
+                                            "new_automated_device_probe":  false,
+                                            "scope_note":  "User confirmation only; does not alter historical native_probe observations or establish English natural speech, interruption, echo rejection, profile switching during speech, or two-person tracking."
+                                        },
+                  "asr_model":  {
+                                    "model":  "Whisper base multilingual / ggml",
+                                    "file":  "models/ggml-base.bin",
+                                    "source":  "https://huggingface.co/ggerganov/whisper.cpp",
+                                    "revision":  "5359861c739e955e79d9a303bcbc70fb988958b1",
+                                    "download_transport":  "https://hf-mirror.com/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base.bin",
+                                    "sha256":  "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+                                    "bytes":  147951465,
+                                    "license":  "MIT (upstream Whisper/whisper.cpp model card)",
+                                    "runtime":  "whisper-rs 0.16.0 / whisper.cpp, CPU, 4 threads",
+                                    "remote_audio":  false,
+                                    "verified_at":  "2026-11-01"
+                                },
+                  "natural_speech_e2e":  "NOT_RUN",
+                  "natural_speech_e2e_scope":  "full Chinese and English natural-speech acceptance (G01); English adult microphone input not explicitly confirmed",
+                  "pending_manual_audio_checks":  {
+                                                      "g01_full_bilingual_acceptance":  "NOT_RUN",
+                                                      "english_natural_speech":  "NOT_RUN",
+                                                      "push_to_talk_interruption":  "NOT_RUN",
+                                                      "acoustic_echo_rejection":  "NOT_RUN",
+                                                      "profile_switch_during_speech":  "NOT_RUN"
+                                                  },
+                  "native_probe":  {
+                                       "ambient_capture_stop":  {
+                                                                    "elapsed_ms":  4,
+                                                                    "message":  "录音太短或声音过轻，请重录",
+                                                                    "recorded_ms":  1980,
+                                                                    "reliable_speech":  false,
+                                                                    "rms":  0.0,
+                                                                    "sample_count":  95040,
+                                                                    "sample_rate":  48000,
+                                                                    "status":  "PASS",
+                                                                    "text_characters":  0
+                                                                },
+                                       "at":  "2026-11-01T02:07:48.589571400+08:00",
+                                       "audible_output_confirmed":  false,
+                                       "capture_start":  {
+                                                             "device":  {
+                                                                            "device_id":  0,
+                                                                            "sample_rate":  48000
+                                                                        },
+                                                             "elapsed_ms":  22,
+                                                             "status":  "PASS"
+                                                         },
+                                       "devices":  [
+                                                       {
+                                                           "device_id":  0,
+                                                           "hostapi":  "WASAPI",
+                                                           "input_channels":  2,
+                                                           "name":  "OBSBOT Tiny 3 Microphone (OBSBOT Tiny 3 Audio)",
+                                                           "sample_rate":  48000
+                                                       }
+                                                   ],
+                                       "final_status":  {
+                                                            "asr_local":  true,
+                                                            "asr_ms":  null,
+                                                            "asr_provider":  "whisper-rs / whisper.cpp / multilingual base / CPU",
+                                                            "asr_ready":  true,
+                                                            "device_id":  0,
+                                                            "error":  null,
+                                                            "max_record_seconds":  20,
+                                                            "raw_audio_saved":  false,
+                                                            "recorded_ms":  1980,
+                                                            "recorded_samples":  95040,
+                                                            "recording":  false,
+                                                            "rms":  0.0,
+                                                            "speech_ms":  480,
+                                                            "state":  "idle",
+                                                            "tts_local":  true,
+                                                            "tts_provider":  "Windows SAPI / Rust COM",
+                                                            "voices":  [
+                                                                           "Microsoft Huihui Desktop - Chinese (Simplified)",
+                                                                           "Microsoft Zira Desktop - English (United States)",
+                                                                           "Microsoft David Desktop - English (United States)"
+                                                                       ]
+                                                        },
+                                       "half_duplex":  {
+                                                           "speech_rejected":  true,
+                                                           "status":  "PASS"
+                                                       },
+                                       "implementation":  "Rust / CPAL WASAPI / whisper-rs / SAPI COM",
+                                       "initial_status":  {
+                                                              "asr_local":  true,
+                                                              "asr_ms":  null,
+                                                              "asr_provider":  "whisper-rs / whisper.cpp / multilingual base / CPU",
+                                                              "asr_ready":  true,
+                                                              "error":  null,
+                                                              "max_record_seconds":  20,
+                                                              "raw_audio_saved":  false,
+                                                              "recording":  false,
+                                                              "speech_ms":  null,
+                                                              "state":  "idle",
+                                                              "tts_local":  true,
+                                                              "tts_provider":  "Windows SAPI / Rust COM",
+                                                              "voices":  [
+                                                                             "Microsoft Huihui Desktop - Chinese (Simplified)",
+                                                                             "Microsoft Zira Desktop - English (United States)",
+                                                                             "Microsoft David Desktop - English (United States)"
+                                                                         ]
+                                                          },
+                                       "natural_speech_verified":  false,
+                                       "raw_audio_saved":  false,
+                                       "stale_speech":  {
+                                                            "status":  "PASS"
+                                                        },
+                                       "synthetic_bilingual_asr":  {
+                                                                       "model_load_ms":  109,
+                                                                       "network_calls":  0,
+                                                                       "provider":  "native whisper-rs / whisper.cpp / base multilingual / CPU",
+                                                                       "results":  [
+                                                                                       {
+                                                                                           "content_status":  "PASS",
+                                                                                           "expected_terms":  [
+                                                                                                                  "电机",
+                                                                                                                  "测距",
+                                                                                                                  "停车"
+                                                                                                              ],
+                                                                                           "inference_status":  "PASS",
+                                                                                           "input":  "电机让小车动起来，测距模块告诉主控离墙有多远。停车距离应该大一点。",
+                                                                                           "language":  "zh",
+                                                                                           "matched_terms":  [
+                                                                                                                 "电机",
+                                                                                                                 "测距",
+                                                                                                                 "停车"
+                                                                                                             ],
+                                                                                           "model_inference_ms":  958,
+                                                                                           "sample_count":  144640,
+                                                                                           "sample_rate":  16000,
+                                                                                           "source":  "fixed local SAPI synthesis to temporary file",
+                                                                                           "speaker_output":  false,
+                                                                                           "temporary_wav_removed":  true,
+                                                                                           "transcript":  "电机让小车动起来,测距模块告诉主控离强有多远。停车距离应该大一点。"
+                                                                                       },
+                                                                                       {
+                                                                                           "content_status":  "PASS",
+                                                                                           "expected_terms":  [
+                                                                                                                  "car",
+                                                                                                                  "wall",
+                                                                                                                  "green"
+                                                                                                              ],
+                                                                                           "inference_status":  "PASS",
+                                                                                           "input":  "I want the car to stop before the wall and turn the green light on.",
+                                                                                           "language":  "en",
+                                                                                           "matched_terms":  [
+                                                                                                                 "car",
+                                                                                                                 "wall",
+                                                                                                                 "green"
+                                                                                                             ],
+                                                                                           "model_inference_ms":  872,
+                                                                                           "sample_count":  68240,
+                                                                                           "sample_rate":  16000,
+                                                                                           "source":  "fixed local SAPI synthesis to temporary file",
+                                                                                           "speaker_output":  false,
+                                                                                           "temporary_wav_removed":  true,
+                                                                                           "transcript":  "I want the car to stop before the wall and turn the green light on."
+                                                                                       }
+                                                                                   ],
+                                                                       "status":  "PASS",
+                                                                       "synthetic_samples_only":  true
+                                                                   },
+                                       "test_type":  "native_ambient_audio_probe",
+                                       "tts_chinese_stop":  {
+                                                                "error":  null,
+                                                                "heard_by_adult":  null,
+                                                                "interrupted":  true,
+                                                                "status":  "PASS",
+                                                                "stop_response_ms":  48
+                                                            },
+                                       "tts_english_completion":  {
+                                                                      "elapsed_ms":  3181,
+                                                                      "heard_by_adult":  null,
+                                                                      "sapi_reported_complete":  true,
+                                                                      "status":  "PASS"
+                                                                  }
+                                   },
+                  "read_only_endpoint_probe":  {
+                                                   "active_capture_endpoints":  [
+                                                                                    {
+                                                                                        "channels":  [
+                                                                                                         {
+                                                                                                             "channel":  0,
+                                                                                                             "scalar":  1.0
+                                                                                                         }
+                                                                                                     ],
+                                                                                        "default_communications":  true,
+                                                                                        "default_console":  true,
+                                                                                        "default_multimedia":  true,
+                                                                                        "device_state":  1,
+                                                                                        "endpoint_volume_interface":  "available",
+                                                                                        "friendly_name":  "OBSBOT Tiny 3 Microphone (OBSBOT Tiny 3 Audio)",
+                                                                                        "hardware_support_flags":  3,
+                                                                                        "master_volume_db":  0.0,
+                                                                                        "master_volume_scalar":  1.0,
+                                                                                        "muted":  false,
+                                                                                        "obsbot_match":  true,
+                                                                                        "stable_endpoint_id":  "{0.0.1.00000000}.{3778503c-21ff-4d7e-9b91-95765551aa2b}"
+                                                                                    }
+                                                                                ],
+                                                   "at":  "2026-11-01T02:19:06.472458100+08:00",
+                                                   "audio_played":  false,
+                                                   "capture_started":  false,
+                                                   "default_communications_endpoint":  "{0.0.1.00000000}.{3778503c-21ff-4d7e-9b91-95765551aa2b}",
+                                                   "default_console_endpoint":  "{0.0.1.00000000}.{3778503c-21ff-4d7e-9b91-95765551aa2b}",
+                                                   "default_multimedia_endpoint":  "{0.0.1.00000000}.{3778503c-21ff-4d7e-9b91-95765551aa2b}",
+                                                   "scope_note":  "Windows endpoint mute and gain only; does not prove microphone hardware/vendor DSP state or speech audibility.",
+                                                   "settings_changed":  false,
+                                                   "test_type":  "read_only_native_audio_endpoint_query"
+                                               }
+              },
+    "kimi":  {
+                 "agent_sha256":  "886b779e473ad6d71e1079798a28dcd49dec1511bfcd13ed703ef92594d2a7c6",
+                 "app_cli_history_cleared":  true,
+                 "remote_model":  true,
+                 "subagents":  [
+
+                               ],
+                 "version":  "2.3.1",
+                 "usage":  null,
+                 "native_canary":  "PASS",
+                 "binary_sha256":  "93878ac2bd12a8cf21b4e148e7f7705a7a6252c1398fd34eb50f8998ba0bf795",
+                 "tools":  [
+
+                           ]
+             },
+    "ptz":  {
+                "documentation_claims_support":  true,
+                "vendor_auto_state":  "operator_confirmed_master_off; live unlocked query required before motion",
+                "current_position_asserted":  false,
+                "low_amplitude_calibration":  "PASS_DIRECTION_ONLY",
+                "historical_uvc_calibration":  {
+                                                   "result":  "FAIL",
+                                                   "evidence":  "runtime/ptz_motion_probe.json",
+                                                   "reason":  "uncommanded TILT drift during historical one-degree PAN test; retained without replacement"
+                                               },
+                "all_application_motion_enabled":  false,
+                "report":  "docs/PTZ_REPORT.md",
+                "physical_follow":  "PASS_LIMITED_CONTROLLER; HUMAN_CONFIRMATION_PENDING",
+                "physical_stop":  "PASS_LOCAL_CANCEL_READBACK_ONLY; EMERGENCY_STOP_NOT_RUN",
+                "native_read_interface_test":  "PASS",
+                "official_osc":  {
+                                     "center_version":  "2.0.15.186",
+                                     "application_path":  "runtime/vendor/center/app/bin/OBSBOT_Main.exe",
+                                     "setup_evidence":  "runtime/vendor/setup-evidence.json",
+                                     "installer_signature":  "Valid",
+                                     "installer_publisher":  "REMO TECH Co., Ltd.",
+                                     "installer_sha256":  "fe0a97e9ebfc2d09dfc20e1f6a1cde99a46ad3c301da781c4df3f9d466f40617",
+                                     "setup_mode":  "extracted application only; no installer, driver or firmware tasks executed",
+                                     "server_port":  16284,
+                                     "observed_os_bind":  "0.0.0.0:16284",
+                                     "application_transport":  "127.0.0.1 UDP only; exact source port checked",
+                                     "read_only_profile_test":  "PASS",
+                                     "read_only_evidence":  "runtime/osc-read-rust-profile.json",
+                                     "device_info_query":  "DeviceInfoViaHandshake / explicit Connected(1)",
+                                     "unique_connected_slot":  0,
+                                     "selected_device_index":  0,
+                                     "exact_device_name":  "Tiny 3",
+                                     "device_type_code":  18,
+                                     "explicit_gimbal_profile":  "Tiny3Center2015PanPitch",
+                                     "gimbal_profile_source":  "local read-only native/OSC correlation; two ints map to yaw,pitch,roll=0; Set direction not verified",
+                                     "correlation_evidence":  [
+                                                                  "runtime/osc-read-rust-correlate.json",
+                                                                  "runtime/ptz-read-rust-correlate.json"
+                                                              ],
+                                     "operator_confirmation":  {
+                                                                   "source_type":  "user_confirmation",
+                                                                   "at":  "2026-11-01T12:35:10.5567586+08:00",
+                                                                   "quote":  "两个总开关均已关闭",
+                                                                   "vendor_ai_tracking_master_off":  true,
+                                                                   "vendor_ai_mode_master_off":  true,
+                                                                   "evidence":  "runtime/ptz-osc-config.json"
+                                                               },
+                                     "finite_motion_gate":  "implemented and fixture tested; actual v2-final attempt rejected before nonzero encoding/send",
+                                     "follow_actor":  "implemented with explicit arm, target/intent generations and persistent stop-fault lock; physical follow not verified",
+                                     "new_direction_calibration":  "NOT_RUN",
+                                     "calibration_attempt":  {
+                                                                 "result":  "FAIL_NO_RETRY",
+                                                                 "error":  "osc_motion_pose_changed_reverify",
+                                                                 "evidence":  "runtime/ptz-calibration-rust.json",
+                                                                 "journal":  "runtime/ptz-calibration-rust.journal.jsonl",
+                                                                 "latch":  "runtime/ptz-calibration-rust.latch.json",
+                                                                 "failure_evidence_preserved":  true,
+                                                                 "automatic_retry_allowed":  false,
+                                                                 "nonzero_commands_sent":  0,
+                                                                 "nonzero_count_basis":  "failure branch precedes target encoding and UDP send; not inferred only from absent receipt",
+                                                                 "synchronous_zero_submissions":  4,
+                                                                 "asynchronous_zero_submissions":  4,
+                                                                 "physical_stop_verified":  false,
+                                                                 "original_baseline_current_numbers_recorded":  false
+                                                             },
+                                     "later_read_only_observation":  {
+                                                                         "osc_samples":  20,
+                                                                         "osc_raw_pose":  [
+                                                                                              17,
+                                                                                              84
+                                                                                          ],
+                                                                         "osc_ai_lock_value":  0,
+                                                                         "osc_evidence":  "runtime/osc-read-only-samples-20261101-01.json",
+                                                                         "native_samples":  12,
+                                                                         "native_pan":  17,
+                                                                         "native_tilt":  -83,
+                                                                         "native_evidence":  "runtime/ptz-read-after-predispatch-fail.json",
+                                                                         "handshake_at":  "2026-11-01T13:10:20.389533600+08:00",
+                                                                         "handshake_evidence":  "runtime/osc-device-state-after-samples.json",
+                                                                         "connected":  true,
+                                                                         "selected_device_running":  false,
+                                                                         "documented_run_state":  "Sleep",
+                                                                         "caused_original_failure":  "UNCONFIRMED",
+                                                                         "boundary_jitter_hypothesis":  "UNCONFIRMED"
+                                                                     },
+                                     "later_camera_status":  {
+                                                                 "source_type":  "root_existing_application_status_observation",
+                                                                 "state":  "error",
+                                                                 "frame_age_ms":  340525,
+                                                                 "stale_preview_invalidated":  true,
+                                                                 "queried_again_for_documentation":  false
+                                                             },
+                                     "wake_confirmation":  "PENDING_USER_CONFIRMATION",
+                                     "new_nonzero_actions_allowed":  false,
+                                     "software_regression":  {
+                                                                 "evidence":  "runtime/rust-ptz-workspace-tests.json",
+                                                                 "passed":  140,
+                                                                 "failed":  0,
+                                                                 "ignored":  1,
+                                                                 "paid_kimi_repeated":  false,
+                                                                 "native_library":  112,
+                                                                 "calibration_safety":  10,
+                                                                 "native_read_probe_and_cli":  6,
+                                                                 "resource_monitor":  2,
+                                                                 "http_sqlite_integration":  2,
+                                                                 "rust_ui":  8,
+                                                                 "stale_preview_backend_tests_included":  2,
+                                                                 "physical_follow_verified":  false
+                                                             },
+                                     "v1_visual_preflight":  {
+                                                                 "result":  "BLOCKED_NO_MOTION",
+                                                                 "source_type":  "historical_read_only_observation",
+                                                                 "observed_at":  "2026-11-01T12:45:23.972128+08:00",
+                                                                 "evidence":  "historical observation of runtime/ptz-visual-preflight.json; latest snapshot was replaced by v2, not an archived v1 file",
+                                                                 "device_commands_sent":  0,
+                                                                 "latch_created":  false,
+                                                                 "scope":  "fixed mask did not establish sufficient independent background information"
+                                                             },
+                                     "dynamic_visual_preflight":  {
+                                                                      "result":  "PASS_NO_MOTION_ONLY",
+                                                                      "evidence":  "runtime/ptz-dynamic-preflight.json",
+                                                                      "at":  "2026-11-01T12:57:54.400901400+08:00",
+                                                                      "frame_before":  3873,
+                                                                      "frame_after":  3881,
+                                                                      "device_commands_sent":  0,
+                                                                      "latch_created":  false,
+                                                                      "scope":  "two distinct frames and fixed independent background ROIs; not physical direction, follow or stop verification"
+                                                                  }
+                                 },
+                "current_deployment":  {
+                                           "pid":  115048,
+                                           "sha256":  "2fbea30e1007f29b731f980eb54b4fe472afd0f4657cb141b0bbeff1425cf4c3",
+                                           "report":  "runtime/ptz-follow-release-manifest.json",
+                                           "mode_at_snapshot":  "off"
+                                       },
+                "stage_deployment":  {
+                                         "pid":  90324,
+                                         "application_sha256":  "c368c4ef5231ccba1d69a5085da21918ad2ed7bc3ba91b7570eaf462d0d37579",
+                                         "scope":  "historical intermediate deployment; replaced by F493 release/PID87904",
+                                         "historical_30minute_tested_sha256":  "469960ec7c441cb69fc254215e126457b9d814547a7008fe95f9e434f80b990c",
+                                         "historical_30minute_report":  "docs/RUST_STABILITY_REPORT.md"
+                                     }
+            },
+    "task_state":  {
+                       "manual_report":  true,
+                       "simulator":  true,
+                       "actuator_execution":  false,
+                       "simulation_database_separate":  true,
+                       "real_hardware_connected":  false
+                   },
+    "emotion":  {
+                    "enabled":  false
+                },
+    "privacy":  {
+                    "teaching_text_sent_remote":  true,
+                    "protected_http_websocket_video":  true,
+                    "audio_sent_remote":  false,
+                    "listen_host":  "127.0.0.1",
+                    "camera_frames_sent_remote":  false
+                },
+    "verification":  {
+                         "resources_log":  "runtime/rust-resources.jsonl",
+                         "browser_automation":  "BLOCKED: tool could not confidently determine browser URL",
+                         "soak_log":  "runtime/soak-rust.jsonl",
+                         "browser_manual":  "NOT_RUN",
+                         "native_release_soak":  "PASS",
+                         "native_release_soak_sha256":  "469960ec7c441cb69fc254215e126457b9d814547a7008fe95f9e434f80b990c",
+                         "current_build_soak":  "NOT_RUN",
+                         "continuous_run_seconds":  1803,
+                         "stability_report":  "docs/RUST_STABILITY_REPORT.md",
+                         "actual_shutdown_and_restart":  "PASS"
+                     },
+    "control_cli":  {
+                        "implementation":  "Rust",
+                        "binary":  "bin/tutorctl.exe",
+                        "sha256":  "e8c9127fe5795b5148a2b3d7491c295e2eff237309e8e1afa952379f155695fa",
+                        "documentation":  "docs/CLI.md",
+                        "computer_ui_automation":  false,
+                        "api_transport":  "authenticated loopback HTTP",
+                        "automatic_delivery_ack":  false,
+                        "unit_tests":  14,
+                        "process_contract_tests":  4
+                    },
+    "product_workflow":  {
+                             "status":  "PASS",
+                             "software_tests_passed":  191,
+                             "software_tests_failed":  0,
+                             "ignored_opt_in_probe":  1,
+                             "real_kimi_calls":  4,
+                             "live_checks":  7,
+                             "namespace":  "simulator",
+                             "live_evidence":  [
+                                                   "runtime/product-workflow-live-20261101T091709Z.json",
+                                                   "runtime/product-recall-live-v2.json",
+                                                   "runtime/product-restart-check.json"
+                                               ],
+                             "report":  "docs/PRODUCT_WORKFLOW_REPORT.md",
+                             "new_device_or_voice_test":  false,
+                             "raw_media_sent":  false,
+                             "process_restart":  "PASS; persisted IDs and simulation grade unchanged; corrected memory recalled; current modules unknown"
+                         },
+    "tracking_repair":  {
+                            "recorded_at":  "2026-11-01T17:59:07.9751359+00:00",
+                            "pid":  115048,
+                            "application_sha256":  "2fbea30e1007f29b731f980eb54b4fe472afd0f4657cb141b0bbeff1425cf4c3",
+                            "cli_sha256":  "52a16b329eea73565539e6d69ef7d5782d71626d03830ef61730a7d85103e22a",
+                            "calibrator_sha256":  "ffb19f814694d4f83f01ab63bb35c4491d13266411230bfc4786a7f3134c7b71",
+                            "native_probe_sha256":  "2be3c346b8683d99ba6534c0b550c52a087825a98e5cd38759140f966136d2c2",
+                            "tests":  {
+                                          "passed":  242,
+                                          "failed":  0,
+                                          "ignored":  1,
+                                          "log":  "runtime/ptz-pause-workspace-tests.log"
+                                      },
+                            "calibration":  {
+                                                "pan_sign":  -1,
+                                                "direction_verified":  true,
+                                                "tilt_sign":  1,
+                                                "report":  "runtime/ptz-calibration-rust.json",
+                                                "status":  "PASS_DIRECTION_ONLY",
+                                                "run_id":  "65b33c8c-e8c3-4cb2-bc47-8c279abf313b"
+                                            },
+                            "canonical_reader":  "capture_owner",
+                            "pose_readonly_evidence":  "runtime/ptz-owner-hardware-fresh-readonly.json",
+                            "parameters":  {
+                                               "settling_deadline_check_seconds":  4,
+                                               "maximum_finite_step_degrees_per_axis":  3,
+                                               "arrival_integer_band":  1,
+                                               "transit_endpoint_integer_band":  2,
+                                               "initial_guarded_settling_ms":  500,
+                                               "deadline_note":  "Arrival is rechecked after each bounded read and cannot be accepted after 4 seconds; this does not establish hard realtime stopping.",
+                                               "unchanged_axis_integer_band":  1,
+                                               "official_speed_parameter":  4,
+                                               "arrival_deadline_rechecked_after_read":  true,
+                                               "visual_pause_max_ms":  600,
+                                               "maximum_dispatch_frame_age_ms":  250
+                                           },
+                            "camera_state":  "running",
+                            "mode":  "off",
+                            "physical_follow":  "HUMAN_CONFIRMATION_PENDING",
+                            "latest_binary_live_follow":  "PASS_LIMITED_CONTROLLER_AND_READBACK",
+                            "user_feedback":  {
+                                                  "scope":  "prior finite follow trials",
+                                                  "content":  "仍然没有转动",
+                                                  "source":  "user_confirmation"
+                                              },
+                            "view_motion":  {
+                                                "independent_patches":  2,
+                                                "physical_gimbal_verified":  false,
+                                                "minimum_ncc":  0.98921237258984274,
+                                                "report":  "runtime/ptz-settled-background-20261101T161159Z.json",
+                                                "dy_source_pixels":  18.009287869567089,
+                                                "status":  "PASS_VIEW_CHANGE_ONLY"
+                                            },
+                            "failed_follow_reports":  [
+                                                          "runtime/ptz-follow-live-20261101T143543Z.json",
+                                                          "runtime/ptz-owner-follow-live-20261101T153200Z.json",
+                                                          "runtime/ptz-production-follow-20261101T160513Z.json",
+                                                          "runtime/ptz-settled-follow-20261101T161159Z.json",
+                                                          "runtime/ptz-final-follow-20261101T162522Z.json",
+                                                          "runtime/ptz-buffer-live-20261101T164653Z.json",
+                                                          "runtime/ptz-jpeg-live-20261101T165552Z.json"
+                                                      ],
+                            "physical_emergency_stop":  "NOT_RUN",
+                            "new_remote_model_calls":  0,
+                            "ui_automation_used":  false,
+                            "profile_restored":  true,
+                            "old_failures_preserved":  true,
+                            "ui_wasm_sha256":  "57de5e720f78b9b5f8345b0b37a11f5af8efa03527900619156a8b4f7f718c55",
+                            "current_phase":  "BLOCKED",
+                            "current_operational_evidence":  "runtime/ptz-final-operational-snapshot.json",
+                            "camera_stability":  {
+                                                     "status":  "PASS_CAPTURE_ONLY",
+                                                     "evidence":  "runtime/camera-jpeg-soak-summary.json",
+                                                     "duration_s":  300.247854,
+                                                     "scope":  "Separate previous binary with same Rust JPEG path; not a 5 minute PTZ claim"
+                                                 },
+                            "controller_verification":  {
+                                                            "continuity_report":  "runtime/ptz-pause-live-20261101T172155Z.json",
+                                                            "duration_s":  237.0929256,
+                                                            "ended":  "Expected hard stop after more than 600ms target loss; no camera error",
+                                                            "stop_report":  "runtime/ptz-final-stop-20261101T172708Z.json",
+                                                            "stop_scope":  "Local cancellation and readback hold only",
+                                                            "rearm_report":  "runtime/ptz-final-rearm-20261101T172759Z.json",
+                                                            "short_pause_resume":  "PASS_ACTUAL",
+                                                            "pause_count":  2,
+                                                            "resume_count":  2,
+                                                            "last_horizontal_target_start":  24,
+                                                            "last_horizontal_target":  26.0,
+                                                            "native_horizontal_readback":  26,
+                                                            "human_physical_confirmation":  "PENDING",
+                                                            "full_physical_emergency_stop":  "NOT_RUN",
+                                                            "usb_unplug":  "NOT_RUN",
+                                                            "longer_30minute_run":  "NOT_RUN"
+                                                        },
+                            "local_vendor_patch":  "vendor/nokhwa-bindings-windows/LOCAL_PATCH.md",
+                            "local_video_decoder":  "image 0.25 / Rust zune-jpeg with bounded allocation and exact negotiated dimensions",
+                            "ui_pause_stop_available":  true,
+                            "live_testing_status":  "DEFERRED_BY_USER",
+                            "latest_user_testing_response":  "现在不方便继续测试",
+                            "latest_control_evidence":  "runtime/ptz-user-deferred-20261101T175907Z.json",
+                            "automatically_rearm":  false
+                        }
+}

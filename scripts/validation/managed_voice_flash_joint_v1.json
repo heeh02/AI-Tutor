@@ -1,0 +1,103 @@
+{
+  "method": "managed-workstation-camera-qwen-flash-joint-v1-20261109",
+  "test": "server::voice_memory_managed_diagnostic::real_managed_voice_camera_memory_flash_joint",
+  "language": "zh_then_en",
+  "teaching_rounds": 2,
+  "foreground": {
+    "policy": {
+      "protocol_version": 1,
+      "provider": "deepseek_flash",
+      "thinking": "non_thinking"
+    },
+    "stream_contract": "metadata_v2",
+    "reply_text_origin": "server_segment_concatenation",
+    "maximum_requests": 2,
+    "automatic_retries": 0,
+    "replacement_calls": 0,
+    "per_request_output_token_cap": 8192,
+    "request_deadline_seconds": 90,
+    "credential_source": "existing production credential loader; no credential copied into fixture or report"
+  },
+  "background_provider": "existing verified Kimi default profile through the same provider registry and gate",
+  "memory_jobs": 2,
+  "limits": {
+    "max_pending": 2,
+    "max_attempts": 2,
+    "daily_reservations": 4,
+    "session_reservations": 2,
+    "lease_seconds": 120
+  },
+  "maximum_background_starts": 4,
+  "maximum_remote_generations": 6,
+  "automatic_teaching_retry": false,
+  "memory_second_attempt_is_declared_recovery": true,
+  "service_ready_budget_seconds": 380,
+  "camera_ready_budget_seconds": 30,
+  "initial_real_idle_seconds": 10,
+  "background_start_budget_seconds": 45,
+  "preemption_coordination_budget_seconds": 90,
+  "preemption_observation_budget_seconds": 5,
+  "recovery_observation_budget_seconds": 110,
+  "teaching_and_playback_budget_seconds_per_round": 180,
+  "language_transition_budget_seconds": 5,
+  "operation_budget_seconds": 1200,
+  "child_budget_seconds": 1320,
+  "cooperative_stop_grace_seconds": 90,
+  "model_service_retry_limit": 0,
+  "managed_service_starts_max_each": 1,
+  "final_asr_formal_calls": 2,
+  "final_asr_silent_warm_calls": 1,
+  "tts_bilingual_warm_calls": 2,
+  "tts_formal_segment_calls_max": 24,
+  "cpu_partial_asr": "one existing managed lifecycle, normal streaming partial updates for exactly two capture streams; no new transcript retry",
+  "gpu_policy_mode": "qwen_pair_12gb_v1",
+  "service_ownership": "same Workstation production local-speech, local-ASR and final-ASR lifecycles; one WSL distribution for both GPU roles; outer Python runner owns no model service",
+  "sequence": [
+    "stage isolated fixture policies and hash-bound cached assets, then create normal Workstation with its fixture-owned provider",
+    "require Flash local readiness plus current verified Kimi probe; no remote verification/canary generation",
+    "start each managed service once, await existing readiness gates, open exact saved camera once, arm zh WAV without capture",
+    "real idle >=10s; start unmodified production shadow scheduler; seed A and observe first started attempt",
+    "round1 zh Start causes A preemption; observe pending/released lease/no candidates; finish actual ASR -> Flash -> native CPAL with simulated display ACK",
+    "wait for A same-job attempt2 recovery with nonempty source-bound shadow candidates",
+    "one normal settings/enable zh->en transition <=5s while capture is closed; replace heartbeat tag; retain camera and managed service owners",
+    "round2 en capture and actual Qwen final; seed B at before-submit hook and observe first started attempt under unchanged idle gate",
+    "round2 Submit causes B preemption; observe pending/released lease/no candidates; finish Flash/native CPAL and rearm",
+    "wait for B same-job attempt2 recovery; audit exact counters, all final memory records and per-request metrics; run unchanged owned cleanup"
+  ],
+  "sources": [
+    {
+      "language": "zh",
+      "id": "zh_short",
+      "path": "runtime/goal-baselines/20261103/sapi-corpus/zh_short.wav",
+      "sha256": "ad72efd95a1abc540737554f9ccb63b7a9933effb75e5e458824a90363bb9a33",
+      "reference": "先让小车停下来。"
+    },
+    {
+      "language": "en",
+      "id": "en_short",
+      "path": "runtime/goal-baselines/20261103/sapi-corpus/en_short.wav",
+      "sha256": "670191397605e3f21f2b0e331852b665f91e5ee21cb9573f2ffdd93aff825a9f",
+      "reference": "First, stop the car."
+    }
+  ],
+  "asr_gate": "actual captured Qwen3-ASR-1.7B / local GPU final, no fallback, normalized fixed reference equality, submit exact captured text unchanged once",
+  "provider_gate": "exactly2 last_foreground_segments records bound to respective request_id/generation, transport deepseek_http, metadata_v2, server_segment_concatenation, succeeded; final requests6, deepseek_segment_requests2, acp_segment_requests0, consolidation_requests4, retries0",
+  "preemption_observation_scope": "owned Kimi process started; remote request acceptance, generation in flight and remote compute stop are not proven",
+  "no_coverage": "natural completion before observed pending gap, empty shadow candidates, missed preemption or extra attempts stop the single run; no replacement job or rerun",
+  "foreground_memory_application": "normal production apply in isolated simulator; retain complete final memory content/provenance and per-round audit for independent review; no forced zero threshold",
+  "camera": "exact saved camera plus SHA-bound worker; scalar metadata only; one camera epoch, fresh frames and <=3000ms sample/tail gaps",
+  "output": "real native CPAL callback and matching terminal playback receipts for every segment; simulated display ACK and heartbeat explicitly recorded",
+  "cleanup": "existing Rust close sequence and exact-owned child fallback; any forced termination, missing process/WSL/lease/capture/provider receipt or protected-file change fails mechanical acceptance",
+  "not_covered": [
+    "microphone",
+    "browser",
+    "measured acoustic speaker output",
+    "physical PTZ",
+    "release-main listener/auth/lock startup",
+    "30-minute stability",
+    "teaching quality across varied real learner turns",
+    "remote generation in-flight proof"
+  ],
+  "semantic_acceptance": "pending independent review; fixed stop WAVs only establish integration. A mechanical PASS never implies teaching quality PASS.",
+  "expected_final_provider": "Qwen3-ASR-1.7B / local GPU final"
+}

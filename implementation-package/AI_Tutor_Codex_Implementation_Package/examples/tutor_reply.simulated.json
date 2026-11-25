@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "request_id": "demo_request_003",
+  "reply_text": "已经能停下并亮绿灯了，这一步成功了。这次我们只改停车距离，你想让它更早停还是更晚停？",
+  "teaching_move": "compare_trials",
+  "task_update_candidates": [
+    {
+      "field": "reported_result",
+      "value": "学习者报告停车和亮绿灯成功，希望留出更大间隙。",
+      "source_event_ids": [
+        "demo_event_003"
+      ]
+    }
+  ],
+  "memory_candidates": [],
+  "used_evidence_ids": [
+    "demo_event_003"
+  ],
+  "needs_clarification": true
+}

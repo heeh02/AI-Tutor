@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "synthetic_only": true,
+  "scope": "memory retrieval and context contracts; no generated teaching or learning-outcome evaluation",
+  "recall_cases": [
+    {"id":"zh_observation", "language":"zh", "content":"学习者报告第二次停车间隙变大，尚未移动墙。", "query":"第二次停车间隙", "expected_recall":true, "required":true},
+    {"id":"en_observation", "language":"en", "content":"The learner reported a larger parking gap on the second trial; the wall was not moved.", "query":"second trial parking gap", "expected_recall":true, "required":true},
+    {"id":"en_case", "language":"en", "content":"The distance sensor measured the wall gap.", "query":"DISTANCE SENSOR", "expected_recall":true, "required":true},
+    {"id":"mixed_observation", "language":"zh-en", "content":"第二次 trial 的停车间隙更大，绿灯 green light 正常。", "query":"第二次 green light", "expected_recall":true, "required":true},
+    {"id":"en_to_zh", "language":"en-to-zh", "content":"学习者报告第二次停车间隙更大，尚未移动墙。", "query":"What happened on the second attempt?", "expected_recall":true, "required":false, "known_gap":"Lexical bigrams do not translate English questions into Chinese evidence."},
+    {"id":"zh_to_en", "language":"zh-to-en", "content":"The learner reported a larger parking gap on the second trial; the wall was not moved.", "query":"第二次尝试有什么变化？", "expected_recall":true, "required":false, "known_gap":"Lexical bigrams do not translate Chinese questions into English evidence."},
+    {"id":"zh_unrelated", "language":"zh", "content":"测距模块测量墙面间隙。", "query":"太阳系火山地貌", "expected_recall":false, "required":true},
+    {"id":"explicit_activity", "language":"zh", "content":"第二次试验的观察已纠正，下一次尚未开始。", "query":"继续小车活动", "expected_recall":true, "required":true}
+  ],
+  "revision_cases": [
+    {"id":"zh_revision", "language":"zh", "original":"停车成功", "correction":"刚才说错了，停车尚未成功", "stored_correction":"据学习者更正：停车尚未成功", "query":"停车"},
+    {"id":"en_revision", "language":"en", "original":"The rover stopped successfully", "correction":"I was wrong: the rover has not stopped successfully", "stored_correction":"Learner correction: stopping has not succeeded", "query":"stopping"}
+  ],
+  "plan_cases": [
+    {"id":"zh_plan", "language":"zh", "plan":"下次移动墙后再测试", "suggestion":"现在移动墙，再观察停车间隙。"},
+    {"id":"en_plan", "language":"en", "plan":"Next time we will move the wall and test again", "suggestion":"Move the wall now and compare the parking gap."}
+  ]
+}

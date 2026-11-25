@@ -1,0 +1,13 @@
+{
+  "ACCEPTANCE.md": "18dfc8c00f9dece52c5af18d716bc5df01ce3fb3f90298c3352ae54f4408310e",
+  "CODEX_EXECUTION_PROMPT.md": "c0cf532fb33a7c89fc288ee59aa5da8b4610cf192482f5e929f7fdfb83b33fe6",
+  "IMPLEMENTATION_SPEC.md": "0f1abc22cf4bb44d3f2951f395326a97a60b3f9be05c5e028f5498b1900ed7a5",
+  "README.md": "db6258a747098a6430c6f607b2e98c5be882dfa4b40004a3c7863085c4891072",
+  "SOURCES_AND_DECISIONS.md": "daf233b2e94da863cba7d71af90f5f7ef81d6d60d254806fd25531fcc94dfd18",
+  "configs/default.example.yaml": "abe092e321fd0ee950260cf5a9735dcb61ebfdb7607d0274662b1af05e1b6f7c",
+  "examples/acceptance_scenarios.yaml": "c34eb5ae5f4a956631870ab28d3c6686b5e366b686c444e36f52897433ef8d61",
+  "examples/tutor_reply.simulated.json": "6f42c3e2ab6fa85158b40ec4877b0116d93db0502df3aab02b14113b9a85eaa1",
+  "examples/tutor_request.simulated.json": "b52ac179c16bd267ed01b3357a1eaf3fa93f0e0d6cc4c9df0dc3cfa3823f51ca",
+  "prompts/tutor_core.example.md": "cff38f427f9c8d1c51eaa2bd0d9af72cd2e0195dfb40b82dfe944749fdce2f6e",
+  "schemas/tutor_reply.schema.json": "631bfc85dcdb83e6340e4950a5475ffd0c89b873f93582c33bf4abe4d469b954"
+}

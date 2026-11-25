@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ai-tutor:tutor-reply:1",
+  "title": "Proposed TutorReply contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "reply_text",
+    "teaching_move",
+    "task_update_candidates",
+    "memory_candidates",
+    "used_evidence_ids",
+    "needs_clarification"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "reply_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1600
+    },
+    "teaching_move": {
+      "enum": [
+        "clarify_goal",
+        "ask_inventory",
+        "explain_module",
+        "give_hint",
+        "ask_observation",
+        "compare_trials",
+        "reflect",
+        "resume",
+        "pause",
+        "answer"
+      ]
+    },
+    "task_update_candidates": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field",
+          "value",
+          "source_event_ids"
+        ],
+        "properties": {
+          "field": {
+            "enum": [
+              "goal",
+              "stage",
+              "reported_result",
+              "pending_step"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 800
+          },
+          "source_event_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "field": {
+                  "const": "stage"
+                }
+              },
+              "required": [
+                "field"
+              ]
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "enum": [
+                    "goal_setting",
+                    "inventory_check",
+                    "capability_gap",
+                    "build_guidance",
+                    "test_preparation",
+                    "observation",
+                    "comparison",
+                    "reflection",
+                    "paused",
+                    "completed"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "memory_candidates": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "content",
+          "scope",
+          "source_event_ids"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "reported_progress",
+              "help_preference",
+              "pending_experiment",
+              "correction"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          },
+          "scope": {
+            "enum": [
+              "current_session",
+              "current_activity",
+              "cross_session_explicit"
+            ]
+          },
+          "source_event_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "used_evidence_ids": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "needs_clarification": {
+      "type": "boolean"
+    }
+  }
+}

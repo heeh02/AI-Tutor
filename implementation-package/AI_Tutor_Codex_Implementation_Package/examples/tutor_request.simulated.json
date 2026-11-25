@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "mode": "simulation",
+  "request_id": "demo_request_003",
+  "learner_id": "demo_learner_A",
+  "session_id": "demo_session_01",
+  "generation": 3,
+  "activity": {
+    "id": "demo_activity_rover",
+    "goal": "在墙前停车并亮绿灯",
+    "stage": "comparison"
+  },
+  "input": {
+    "text": "它能停下来，也亮绿灯了，但我想让它离墙更远一点。",
+    "event_id": "demo_event_003"
+  },
+  "vision": {
+    "source_type": "vision_tracking",
+    "face_visible": true,
+    "selected_track_key": "demo_camera_01:7:1",
+    "frame_age_ms": 85
+  },
+  "task_evidence": [
+    {
+      "event_id": "demo_event_003",
+      "source_type": "simulated",
+      "simulated_role": "learner_report",
+      "text": "首次停车亮灯成功，希望更大间隙。"
+    }
+  ],
+  "emotion": {
+    "enabled": false
+  },
+  "memory": {
+    "fast": {
+      "latest_report": "首次停车和亮灯成功，希望更大间隙。",
+      "last_delivered_hint": "测试后告诉我发生了什么。"
+    },
+    "recalled": []
+  },
+  "policy": {
+    "language": "zh-CN",
+    "help_granularity": "one_step",
+    "actuator_execution": false
+  },
+  "expected_reply_schema": "urn:ai-tutor:tutor-reply:1"
+}

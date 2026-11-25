@@ -1,0 +1,64 @@
+{
+  "method": "ascend-zipformer-failure-prefix-v2-20261104",
+  "status": "predeclared_new_diagnostic_not_executed",
+  "purpose": "Observe numeric request-send error metadata after the independently retained first prefix failed at ordinal114/sequence55; no asserted root cause or transport policy change.",
+  "original_ordinals": {
+    "first": 0,
+    "last_inclusive": 362,
+    "count": 363
+  },
+  "attempts_per_row": 1,
+  "maximum_corpus_attempts": 363,
+  "service_instances": 1,
+  "automatic_retries": 0,
+  "automatic_restart": false,
+  "continue_after_failure": false,
+  "input": "Reuse original verified ASCEND input manifest and exact PCM files in original order. No reselection, correction, trimming, resampling or text hints.",
+  "model": "Original Zipformer int8 CPU, two threads, greedy search, auto language, model endpoint detection disabled; four model asset hashes and staged service scripts must be recorded.",
+  "transport": "Same production AsrClient, response function and validator. Unpaced20ms/320-sample chunks with response backpressure, final5-second request timeout; do not copy or weaken production response logic.",
+  "right_context": "Unchanged existing recognizer final flush of9600 zero samples/600ms model context; no source silence added.",
+  "deadlines": {
+    "utterance_seconds": 60,
+    "phase_seconds": 600
+  },
+  "diagnostics": {
+    "failure_detail": "Existing local static error string or numeric HTTP-status string, bounded to240 Unicode characters; no raw reqwest error, header, bearer token or response body",
+    "failure_origin": [
+      "response",
+      "validate",
+      "operator_stop",
+      "deadline"
+    ],
+    "failure_sequence": "Current attempted chunk index, or next sequence for final; null when no sequence-bearing request is attempted",
+    "failure_payload_bytes": "Current chunk payload length; null for start/final or no request",
+    "failure_last_valid_revision": "Revision before a rejected response; the validator remains authoritative",
+    "client_unavailable_after_error": "Existing managed-client flag, observed without resetting it",
+    "network_limit": "Existing response transport errors remain coarse; do not infer socket error or port exhaustion from a generic unavailable message.",
+    "request_send_error": {
+      "fields": [
+        "is_timeout",
+        "is_connect",
+        "is_request",
+        "is_body",
+        "is_decode",
+        "is_builder",
+        "http_status",
+        "source_chain_depth",
+        "source_chain_truncated",
+        "io_errors.kind",
+        "io_errors.raw_os_error"
+      ],
+      "source_chain_maximum": 8,
+      "capture_scope": "request.send() failure only; null after HTTP-status, JSON or validator rejection",
+      "excluded": "No raw error/source strings, URL, headers, tokens or request/response body"
+    }
+  },
+  "output": "Explicit prepare_failure_prefix then failure_prefix in a fresh isolated output. Exclusive manifests/run-start/results remain separate from original accuracy/realtime outputs. Retain all363 statuses; remaining rows become not_run after failure.",
+  "cleanup": "Unchanged exact owned service stop and launcher/interpreter/Job receipts on every path; no18867 attach or global kill.",
+  "original_accuracy_completion_credit": false,
+  "no_old_result_replacement": true,
+  "success_interpretation": "A successful prefix neither completes the original1315 accuracy run nor proves the old unknown cause was repaired; a new full baseline would need its own declaration.",
+  "software_checks": "Existing fake HTTP status/JSON/identity/revision/stop cases plus closed ephemeral port to verify numeric connect metadata and private URL/token/body exclusion.",
+  "previous_prefix": "ascend-failure-prefix-first:115 attempted,114 final,1 send failure,248 not_run; never filled or regraded",
+  "new_separate_budget": "One newly prepared phase, original ordinals0..362 once each, at most363 corpus attempts; no repeat on failure, no original accuracy credit"
+}

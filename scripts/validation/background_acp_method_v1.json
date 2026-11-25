@@ -1,0 +1,37 @@
+{
+  "method": "background-acp-generation-preemption-v1-20261104",
+  "status": "predeclared_next_experiment_not_executed_harness_not_yet_implemented",
+  "purpose": "Observe a new memory attempt after nonempty ACP thought output, preempt through the real foreground path, then recover the same job with a new lease and review its complete shadow response.",
+  "scope": "Fresh synthetic fixture and a new run directory. Do not rerun the two checkpoint22 jobs or replace their outcomes. This method is not the earlier camera/voice workload and does not claim acoustic, camera, PTZ or 30-minute acceptance.",
+  "model_call_ceiling": {"foreground_teaching": 1, "background_memory": 2, "total": 3},
+  "limits": {"max_pending": 1, "max_attempts": 2, "daily_reservations": 2, "session_reservations": 2, "lease_seconds": 120},
+  "automatic_retries": 0,
+  "fixed_source": {
+    "event_kind": "observation",
+    "source_type": "simulated",
+    "content": {
+      "text": "Without help, I counted 8 swings in the first 10 seconds and 11 in the second 10 seconds of my pendulum experiment. I kept the string length at 20 cm. I have not yet repeated the runs.",
+      "synthetic_fixture": true,
+      "support_level": "independent"
+    }
+  },
+  "foreground_question": "Why do repeated trials help us compare measurements?",
+  "required_sequence": [
+    "Create the fixed source in a fresh simulator learner/activity and finish it before normal production discovery. Keep the voice/foreground learner distinct; do not seed these observations into its context.",
+    "Use the production scheduler and real continuous idle gate without changing clocks. Observe job attempt1 and a live active_acp_memory snapshot with matching job_id, attempt_no=1 and fresh request_id/observation_id.",
+    "Wait at most 45 seconds for nonempty_thought_event_observed=true with prompt_pending=true. A process-start receipt, local write, metadata update or message-only chunk is insufficient for this branch. If no qualifying event occurs, fail/not-covered and stop; do not add a replacement job or call.",
+    "Immediately submit the fixed foreground question via the normal foreground API. Record the timestamp, exact background observation identity, first attempt preemption status, lease release and absence of late committed candidates.",
+    "The background transport may read the matching prompt terminal for at most 500 ms after sending session/cancel, before close/kill. Record agent_cancel_terminal_observed separately from local cleanup. end_turn/EOF/timeout/write success are not cancellation acknowledgements.",
+    "Finish the one foreground reply without substituting an acknowledgement or retry. Allow the existing scheduler to recover the same background job on attempt2 after the real idle requirement; verify new lease identity, unchanged sources and complete validated shadow candidates.",
+    "Review every nonempty memory candidate against 8/11 swings, the two 10-second intervals, the 20 cm condition and the explicit no-repeat report. Empty candidates count as completed invocation but insufficient substantive coverage, with no extra sampling. Review foreground content for cross-learner leakage.",
+    "Close the actual owned provider and scheduler; record real process wait/directory cleanup and preserved source versions. Neither local cleanup nor ACP cancelled proves remote compute has physically stopped."
+  ],
+  "cancellation_receipt_budget_ms": 500,
+  "existing_worker_cancel_grace_ms": 2000,
+  "agent_output_claim": "A matching nonempty ACP thought event is observed generation output from the agent protocol. It is not direct supplier-compute telemetry or an exact model-token timestamp.",
+  "remote_compute_stop_confirmed": false,
+  "memory_response_acceptance": "Only a complete single JSON object after the appropriate prompt terminal, verified no-tools profile and owned cleanup can return. Existing Store source/version/lease/candidate validation remains authoritative. No partial response or cancellation tail may be staged.",
+  "acceptance_dimensions": ["generation_output_observed_before_preemption", "agent_cancel_terminal_observed", "owned_process_cleanup", "foreground_success", "same_job_recovery", "nonempty_shadow_semantics", "no_cross_learner_leak", "budget_respected"],
+  "artifacts_required_before_calls": ["new_fixture_source_ids_and_versions", "method_sha256", "all_relevant_source_hashes", "exact_binary_hash", "owned_provider_identity", "fresh_attempt_denominator"],
+  "notes": "This file fixes a future experiment and budgets; it is not an implemented/approved passing harness or evidence of any model call. Application and compilation are root-managed. A separate future unified camera/voice/ACP-memory run remains necessary for that broader scope."
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "purpose": "Four-call ACP latency screen with manual educational and grounding review",
+  "arms": {
+    "regular": {"alias": "kimi-code/k3.1-pro", "model_id": "k3.1-pro"},
+    "highspeed": {"alias": "kimi-code/k3.1-pro-highspeed", "model_id": "k3.1-pro-highspeed"}
+  },
+  "cases": [
+    {"id": "zh", "language": "zh", "text": "测距模块报告前方距离是 30 厘米。我还没有让小车行驶，想先确认 20 厘米的停车阈值是否合适。请给一个下一步，并把已报告的事实与建议分开。"},
+    {"id": "en", "language": "en", "text": "The distance sensor reports 30 cm. I have not driven the rover yet. I want to check whether a 20 cm stopping threshold is suitable. Give one next step and distinguish what I reported from your suggestion."}
+  ],
+  "schedule": [
+    {"case": "zh", "arm": "regular"},
+    {"case": "zh", "arm": "highspeed"},
+    {"case": "en", "arm": "highspeed"},
+    {"case": "en", "arm": "regular"}
+  ],
+  "maximum_inference_requests": 4,
+  "request_budget_scope": "At most four application ACP session/prompt submissions; no additional verification or fallback prompts",
+  "automatic_retries": 0,
+  "thinking_effort": "low",
+  "auth": "Existing official managed Kimi file OAuth, through unchanged ACP transport",
+  "quota_notice": "Highspeed is documented as approximately twice the regular quota usage. Local catalog presence does not prove entitlement; no fallback or retry is allowed.",
+  "equality": "Within each language pair, application-supplied/materialized user and system prompts and source records must match. Opaque server scaffolding is not claimed equal.",
+  "stop_rule": "Any preparation, model identity, protocol, contract, authentication or cleanup failure ends the run; remaining scheduled slots are NOT_ATTEMPTED, never pass.",
+  "semantic_review": [
+    "First useful segment must contain meaningful teaching, a relevant question or the requested next step; greetings/filler do not qualify.",
+    "30 cm is a simulated learner report, not a verified measurement; 20 cm is a proposed threshold, not a tested result.",
+    "Do not claim that the rover was driven, stopped successfully, or that any experiment was completed.",
+    "Keep tutor advice distinct from an accepted learner plan; review task candidate application and any rejected candidate.",
+    "Two samples per arm are an initial screen, not a p95 estimate, benchmark or end-to-end goal acceptance."
+  ]
+}

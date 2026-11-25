@@ -1,0 +1,28 @@
+{
+  "method": "typed48-real-store-projection-v1-20261104",
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "baseline42_report_sha256": "5feb84ddc072b05a8bc9106082bfec096f8f5ec3208403f0ca9c018cca19e426",
+  "baseline234_inputs_sha256": "d93cfa39f184e51359837ad6ed67f31688ada1a54a8c8d5f57df447df38e2368",
+  "expected": {"sources":60,"projected":48,"excluded":12,"queries":96,"encoder_inputs":240},
+  "candidate_author": "deterministic original source-type mapping, no model extraction or inference",
+  "mapping": {
+    "reported_observation/observation": "trial_observation (12)",
+    "task_specific_response/learner_answer": "concept_evidence (12: hinted 6 and independent 6, not mastery or measured hint effectiveness)",
+    "accepted_plan/plan/accepted=true": "accepted_pending_experiment (6)",
+    "explicit_correction/correction": "correction (6, no invented superseded event)",
+    "stated_goal/learner_statement": "learning_goal (6)",
+    "condition_limit/learner_statement/support=unknown": "context_constraint (6, current_activity only)"
+  },
+  "excluded": {"unaccepted_plan":"6 not accepted or completed","temporary_request":"6 not persistent preferences"},
+  "content": "entire original text plus exact production type prefix; no translation, summary, query rewrite, invented field, source merge or label changes",
+  "event_import": "original event_kind, text, support and non-null accepted; all sources simulated, no fabricated preference markers",
+  "importance": {"goal_relevance":0,"continuity":0,"novel_change":0,"explicit_request":0},
+  "api": ["record_education_event","enqueue_memory_job","claim_memory_job","stage_memory_candidates","apply_memory_candidate","memory_evidence","embedding_work"],
+  "batching": "six actual synthetic Store sessions, eight candidates each in batches of five and three, default job limits, no model-start receipt",
+  "scope": "original logical_cross_topic_workshop is mapped only in this fixture to existing modular_rover; no real multi-activity authorization claim",
+  "baseline_control": "all previous 42 exact encoding texts/typed metadata and 192 exact query inputs must match frozen baseline artifacts",
+  "availability": "original 72 positive and 24 negative labels untouched; available only when a complete original minimal alternative set fits, never trim missing members; availability is not ranking success",
+  "encoder": "registered BgeM3NativeFp32, exact actual memory.content; source48 + current query96 + exact question-space-goal-space96",
+  "vector_phase": "not executed here; only first bounded32 work snapshots inspected, all48 live evidence rechecked, future index phase must complete32+16 actual CAS",
+  "limits": ["No inherited 55/60 or quality gate", "No model/embedding/retrieval run", "Not production promotion enablement", "No new label versions", "12 original scope controls retained by hash but not claimed executed"]
+}

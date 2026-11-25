@@ -1,0 +1,35 @@
+{
+  "fixture_version":"e5-retrieval-probe-v1",
+  "synthetic_only":true,
+  "documents":[
+    {"id":"zh_second","text":"学习者报告第二次停车间隙更大，尚未移动墙。"},
+    {"id":"zh_lamp","text":"本次报告是绿色指示灯已经亮起，未进行停车比较。"},
+    {"id":"zh_plan","text":"已接受下一次移动墙再测试的计划，但实验尚未开始，也没有新结果。"},
+    {"id":"en_second","text":"The learner reported a larger parking gap on the second trial; the wall was not moved."},
+    {"id":"en_lamp","text":"The learner reported that the green indicator light turned on. No stopping comparison was performed."},
+    {"id":"en_plan","text":"The learner accepted a plan to move the wall and test next time. That experiment has not started and has no result."},
+    {"id":"en_threshold20","text":"At the 20 cm stopping threshold, the single trial hit the wall. The speed and wall position were unchanged."},
+    {"id":"en_threshold30","text":"At the 30 cm stopping threshold, the single trial stopped before the wall. The speed and wall position were unchanged."},
+    {"id":"en_correction","text":"The learner corrected the earlier success report: the rover had not stopped before the wall; it hit the wall."},
+    {"id":"en_success","text":"A learner reported that the rover stopped successfully before the wall during a separate activity."}
+  ],
+  "cases":[
+    {"id":"original_en_to_zh","group":"original_cross_language_gap","query":"What happened on the second attempt?","candidates":["zh_second","zh_lamp","zh_plan"],"relevant":["zh_second"]},
+    {"id":"original_zh_to_en","group":"original_cross_language_gap","query":"第二次尝试有什么变化？","candidates":["en_second","en_lamp","en_plan"],"relevant":["en_second"]},
+    {"id":"zh_monolingual","group":"monolingual","query":"第二次停车间隙发生了什么变化？","candidates":["zh_second","zh_lamp","zh_plan"],"relevant":["zh_second"]},
+    {"id":"en_monolingual","group":"monolingual","query":"How did the parking gap change in the second trial?","candidates":["en_second","en_lamp","en_plan"],"relevant":["en_second"]},
+    {"id":"zh_to_en_pending","group":"cross_language_holdout","query":"下次移动墙的实验是否已经开始？","candidates":["en_plan","en_second","en_lamp"],"relevant":["en_plan"]},
+    {"id":"en_to_zh_pending","group":"cross_language_holdout","query":"What experiment was accepted but has not begun?","candidates":["zh_plan","zh_second","zh_lamp"],"relevant":["zh_plan"]},
+    {"id":"en_numbers","group":"hard_negative","query":"What happened at the 30 cm stopping threshold?","candidates":["en_threshold20","en_threshold30","en_lamp"],"relevant":["en_threshold30"]},
+    {"id":"zh_to_en_correction","group":"hard_negative","query":"对先前停车成功的说法作了什么更正？","candidates":["en_correction","en_success","en_plan"],"relevant":["en_correction"]},
+    {"id":"unrelated_en","group":"no_relevant_memory","query":"How does a volcanic island form?","candidates":["zh_second","en_lamp","en_plan"],"relevant":[],"expected_abstention":true},
+    {"id":"unrelated_zh","group":"no_relevant_memory","query":"太阳系中木星的卫星如何形成？","candidates":["zh_plan","en_second","en_threshold30"],"relevant":[],"expected_abstention":true}
+  ],
+  "evaluation_notes":[
+    "The two original cross-language gaps are unchanged questions, with only opposite-language candidates and topical distractors.",
+    "No bilingual lookup table or query rewriting is used.",
+    "Dense and RRF rankings have no tuned acceptance threshold in this probe. Negative cases report scores, not a false claim of abstention.",
+    "Numeric and negation cases are diagnostic; a semantic embedding is not authority for changing factual values or treating a plan as completed.",
+    "This fixture is small. Passing it does not establish broad multilingual quality or quantization parity with FP32."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "fixture_type": "synthetic_ui_acceptance_tasks",
+  "real_devices_or_models_required": false,
+  "tasks": [
+    {"id":"legacy-disabled","languages":["zh","en"],"status":"NOT_RUN","action":"Inspect a missing local_speech field, then disabled phase.","expected":"No local-voice activation or retry prompt; existing composer remains usable."},
+    {"id":"stages","languages":["zh","en"],"status":"NOT_RUN","action":"Provide starting, checking, ready_cold, warming, warm_ready_pending_install and active snapshots.","expected":"Each stage has distinct copy; only active:true claims enabled, never current speaker sound."},
+    {"id":"retry-gates","languages":["zh","en"],"status":"NOT_RUN","action":"Provide degraded/stopped/configuration_error with explicit permission, then toggle busy/shutting_down or omit either flag.","expected":"Retry appears only for an explicitly available idle lifecycle; clicking sends one empty POST, never a policy write or automatic retry."},
+    {"id":"cleanup-failure","languages":["zh","en"],"status":"NOT_RUN","action":"Return a local stop HTTP error and cleanup_failed state.","expected":"Cleanup is unconfirmed, no stopped-success message and no retry button; original main Stop remains separate."},
+    {"id":"private-details","languages":["zh","en"],"status":"NOT_RUN","action":"Include synthetic token/path/instance/error fields, a known model and preparation timing; open details.","expected":"Only known model name, safe flags and preparation duration render; no private values or latency claim."}
+  ]
+}

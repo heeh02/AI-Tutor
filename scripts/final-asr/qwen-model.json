@@ -1,0 +1,122 @@
+{
+    "status":  "source_metadata_only_no_weights_downloaded_or_inference",
+    "review_date":  "2026-11-06",
+    "model_id":  "Qwen/Qwen3-ASR-1.7B",
+    "model_revision":  "7278e1e70fe206f11671096ffdd38061171dd6e5",
+    "official_api":  "https://huggingface.co/api/models/Qwen/Qwen3-ASR-1.7B/revision/7278e1e70fe206f11671096ffdd38061171dd6e5?blobs=true",
+    "sdk_repository":  "https://github.com/QwenLM/Qwen3-ASR",
+    "sdk_commit":  "7c6daf77a2421100f5fb066495372c00129d39ff",
+    "sdk_archive_url":  "https://github.com/QwenLM/Qwen3-ASR/archive/7c6daf77a2421100f5fb066495372c00129d39ff.tar.gz",
+    "weight_license":  "Apache-2.0 as declared in model card",
+    "sdk_license":  "Apache-2.0",
+    "files":  [
+                  {
+                      "path":  "README.md",
+                      "runtime_required":  false,
+                      "purpose":  "retain model card license and provenance",
+                      "size_bytes":  57456,
+                      "git_blob_sha1":  "3a67d43f21febda213ff36efdb60ef10019af7f3",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/README.md"
+                  },
+                  {
+                      "path":  "chat_template.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  1161,
+                      "git_blob_sha1":  "c44736493efd71ec96218cc626904698cdb13235",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/chat_template.json"
+                  },
+                  {
+                      "path":  "config.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  6194,
+                      "git_blob_sha1":  "2bc16c9d4ca08963715cfb94d879799b9adbd0e9",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/config.json"
+                  },
+                  {
+                      "path":  "generation_config.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  142,
+                      "git_blob_sha1":  "7382a4d347c0a865b76bb1b8277f66a5ac312854",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/generation_config.json"
+                  },
+                  {
+                      "path":  "merges.txt",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  1671853,
+                      "git_blob_sha1":  "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/merges.txt"
+                  },
+                  {
+                      "path":  "model-00001-of-00002.safetensors",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  4220320824,
+                      "git_blob_sha1":  "1522f6592ff361cdc8b95692bbd8c513d68fc40a",
+                      "lfs_sha256":  "a4cd1f1a04d90b757dc7f7dd26254e69a013b19e80efe590a83c6a3bde8608d6",
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/model-00001-of-00002.safetensors"
+                  },
+                  {
+                      "path":  "model-00002-of-00002.safetensors",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  478200688,
+                      "git_blob_sha1":  "5a13bd2988d1368745384b4acb6e8bab73f98a75",
+                      "lfs_sha256":  "6e0b9d9e09e2e0238e7ef3cc8a484ab387e91b90f1900bedf88bc92d7929ccfc",
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/model-00002-of-00002.safetensors"
+                  },
+                  {
+                      "path":  "model.safetensors.index.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  64821,
+                      "git_blob_sha1":  "1048a4eb4f21fef9aea06d8568a784b2b5595689",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/model.safetensors.index.json"
+                  },
+                  {
+                      "path":  "preprocessor_config.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  330,
+                      "git_blob_sha1":  "8f7f07346466d5d494ec0d4969d1c3d0190eed72",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/preprocessor_config.json"
+                  },
+                  {
+                      "path":  "tokenizer_config.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  12487,
+                      "git_blob_sha1":  "b93109843922a40c6654c5449d3bf95372267c66",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/tokenizer_config.json"
+                  },
+                  {
+                      "path":  "vocab.json",
+                      "runtime_required":  true,
+                      "purpose":  "local AutoModel or AutoProcessor load",
+                      "size_bytes":  2776833,
+                      "git_blob_sha1":  "4783fe10ac3adce15ac8f358ef5462739852c569",
+                      "lfs_sha256":  null,
+                      "url":  "https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5/vocab.json"
+                  }
+              ],
+    "runtime_total_bytes":  4703055333,
+    "including_model_card_bytes":  4703112789,
+    "checksum_policy":  "LFS SHA-256 is an official content digest. Non-LFS git_blob_sha1 hashes the Git blob header plus exact bytes, not ordinary file SHA-1; it must not be mislabeled as SHA-256.",
+    "not_included":  [
+                         "ForcedAligner weights",
+                         "VAD models",
+                         "vLLM",
+                         "ONNX/community conversion"
+                     ]
+}

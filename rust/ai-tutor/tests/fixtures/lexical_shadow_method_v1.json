@@ -1,0 +1,45 @@
+{
+  "method_version": "lexical-shadow-v1-20261104",
+  "frozen_before_first_execution": true,
+  "production_enabled": false,
+  "diagnostic_fixture_sha256": "0392be52062844b0dd0e558c500d5afe9c4f38b1cad923a6092e5fda125f89d7",
+  "features": {
+    "latin": "complete consecutive Unicode Latin letters, lowercased; internal ASCII or curly apostrophe retained and normalized to ASCII",
+    "number": "ASCII decimal digit run, optional decimal point between digits; optional leading ASCII +/- only after a non-alphanumeric boundary; exact spelling retained",
+    "han": "bigrams within a consecutive Unicode Han run; a one-character Han run retains one singleton feature",
+    "boundaries": "whitespace, punctuation and script/type boundaries never join words or Han runs; internal apostrophe and decimal/sign syntax are the declared exceptions",
+    "deduplication": "set per query and document; repeated features do not increase score",
+    "unsupported": "no stemming, synonyms, translation, Unicode compatibility folding, spelled-number conversion or unit conversion"
+  },
+  "english_function_words": ["a", "an", "and", "are", "as", "at", "be", "been", "being", "by", "did", "do", "does", "for", "from", "had", "has", "have", "how", "i", "in", "is", "it", "its", "me", "my", "of", "on", "or", "our", "that", "the", "their", "them", "there", "these", "they", "this", "those", "to", "us", "was", "we", "were", "what", "which", "who", "whom", "whose", "why", "with", "would", "you", "your"],
+  "negation_and_numbers": "not, no, never, neither, nor, without, cannot and contractions are retained; numeric literals are never function-word filtered",
+  "ranking": {
+    "idf": "ln(1 + (N - df + 0.5) / (df + 0.5))",
+    "score": "sum IDF for unique exact query/document feature intersections",
+    "N": "number of source-valid, scope-eligible documents in this case, including documents without matching features",
+    "df": "number of eligible documents containing the feature, counted once per document",
+    "tie_break": "stable supplied document id ascending; probe uses fixture id, independent of relevance labels",
+    "candidate_gate": "at least one feature intersection; no tuned score/confidence threshold",
+    "top_k": 5,
+    "content_budget_chars": 2400,
+    "kind_bonus": false,
+    "source_grade_bonus": false,
+    "activity_name_bypass": false,
+    "status": "candidate_requires_relevance_review"
+  },
+  "conditions": [
+    {"id": "current_query", "query": "original case query verbatim", "goal": ""},
+    {"id": "query_plus_goal", "goal": "弄明白停止距离和车速的关系", "goal_source_document": "zh_goal", "goal_is_exact_substring": true, "query_format": "{text} {goal} ", "context_reference": "context.rs build_context query construction with a nonempty session.state.goal; no empty-goal continuation fallback in this condition"}
+  ],
+  "metrics": ["hit_at_1", "hit_at_3", "recall_at_3", "all_required_at_3", "reciprocal_rank_at_5", "negative_cases_with_candidates", "goal_only_matched_candidates"],
+  "baseline": "real Store::recall on an isolated simulator for both conditions, plus unchanged lexical results from e5-education-first for current_query",
+  "evaluation_limits": [
+    "v2 is a previously observed diagnostic set, never a new holdout",
+    "Report all 25 queries under both conditions, including worse rows and multi-evidence coverage",
+    "Query-plus-goal uses the original question's relevance labels; it diagnoses goal-driven candidate inclusion, not whether historical activity context is useful",
+    "No feature overlap is a lexical outcome, not a calibrated model abstention or proof that no relevant evidence exists",
+    "Sources and kind remain typed provenance, never similarity-derived truth or completion claims",
+    "The temporary drawing request stays the original diagnostic topical report, not a persistent preference",
+    "Independent future test texts must be authored only after this method is frozen; do not tune on v2 and relabel it as held out"
+  ]
+}

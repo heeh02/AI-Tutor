@@ -1,0 +1,31 @@
+{
+  "method": "typed-store-projection-v1-20261104",
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "synthetic_only": true,
+  "candidate_author": "deterministic declared source-type mapping; no model extraction or inference",
+  "expected": {"sources":60,"projected":42,"excluded":18,"queries":96,"encoder_inputs":234},
+  "mapping": {
+    "reported_observation/observation": "trial_observation (12)",
+    "task_specific_response/learner_answer": "concept_evidence (12: hinted 6, independent 6; task-specific, not mastery or measured hint effectiveness)",
+    "accepted_plan/plan/accepted=true": "accepted_pending_experiment (6)",
+    "explicit_correction/correction": "correction (6; no invented superseded event)",
+    "stated_goal/learner_statement": "learning_goal (6)"
+  },
+  "excluded": {
+    "condition_limit": "6 learner statements have no matching production typed memory kind; never reclassify as learner answers, observations or goals",
+    "unaccepted_plan": "6 proposals are not accepted pending experiments",
+    "temporary_request": "6 session-only requests are not persistent help preferences"
+  },
+  "persistent_preference_coverage": 0,
+  "event_import": "Copy original text, event_kind, support_level and accepted when non-null; retain all original metadata in fixture provenance. Never manufacture explicit_preference, preference_scope, acceptance or support.",
+  "candidate_content": "Entire original text verbatim; no summary, translation, domain synonym or source merging",
+  "importance": {"goal_relevance":0,"continuity":0,"novel_change":0,"explicit_request":0},
+  "api_path": ["record_education_event","enqueue_memory_job","claim_memory_job","stage_memory_candidates","apply_memory_candidate","memory_evidence","embedding_work"],
+  "batching": "Six synthetic Store sessions, one per original topic/session. Each has seven supported candidates in batches of at most five; default job limits, no model started receipt.",
+  "activity_mapping": "Original logical_cross_topic_workshop maps only in this fixture to existing modular_rover Store activity; no production scope widening or equivalence claim",
+  "encoder": "Fixed registered BgeM3NativeFp32 profile; actual Store memory.content including policy prefix, unchanged current query and exact question+goal with trailing space",
+  "query_conditions": ["current_query","query_plus_goal"],
+  "goal_format": "{text} {goal} ",
+  "output": "All 60 decisions with live source/version/grade/support provenance; exact 42 projected texts and 192 queries with hashes; no encoding or ranking",
+  "limits": ["Not model extraction accuracy", "Not the original raw-60 experiment", "No quality-gate inheritance", "No production configuration or recall changes", "No invented evidence for unsupported types", "No source relabeling or changed original query labels"]
+}

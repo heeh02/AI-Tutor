@@ -1,0 +1,23 @@
+{
+  "method":"typed-vector-real-store-v1-20261104",
+  "synthetic_only":true,
+  "inference":false,
+  "inputs":{
+    "projection_report":"5feb84ddc072b05a8bc9106082bfec096f8f5ec3208403f0ca9c018cca19e426",
+    "encoder_inputs":"d93cfa39f184e51359837ad6ed67f31688ada1a54a8c8d5f57df447df38e2368",
+    "encoding_report":"a1545f053fc843ff6aeee0c274790b83e66aeb6032d15a4bd04845b11b2a5a7d",
+    "vectors":"925fffa9bb29737fcaa6014edb42a55a010c38d7276859e2981aa578a37ea6f2",
+    "fixture_manifest":"858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81"
+  },
+  "rebuild":"New temporary simulator Store; same six topic sessions, original 60 events, existing typed stage/apply for 42 frozen supported candidates. Compare exact resulting memory text, kind, scope, source grade, full education metadata, source content/type/version and links to frozen projection. Random IDs/timestamps differ and are mapped, not forced.",
+  "cache":"Registered BgeM3NativeFp32 only; embedding_work maximum 32, real CAS commits, then next 10; assert 42 unique matching content/profile receipts and zero remaining work. Never reuse raw-source vectors.",
+  "conditions":["current_query","query_plus_goal"],
+  "queries":"All 192 frozen encoded query texts/vectors; exact original v2 question or question + space + goal + trailing space",
+  "ranking_methods":["actual Store recall_candidates without embedding","pure cosine over actual eligible_memory_embeddings","actual Store BGE plus existing legacy lexical RRF"],
+  "budget":{"top_k":5,"whole_memory_unicode_codepoints":2400,"truncate":false},
+  "metrics":"Unchanged original minimal complete evidence sets including alternatives; original 72 positive denominator and separately cases with at least one ENTIRE set contained by projected sources. Never trim an unavailable source out of a set. MRR@5, complete evidence@5, coverage, original cross-language 24 and mixed_multi 11, topic strata, all 192 rows.",
+  "negative_policy":"Original 24 negatives retain labels; report candidate return only, no answer/refusal test or acceptance threshold",
+  "ties":"Actual random memory ID for dense and final RRF ties; legacy timestamp/row-order unchanged. Record full dense ties and returned RRF ties; unseen RRF boundary candidates not exposed.",
+  "controls":["actual source revision API rejects previous vector receipt and candidate","actual forget API removes its source-backed vector and candidate","same namespace two nonempty learners with identical text and distinct live sources; no cross-owner vector/recall or forged receipt","wrong dimension separately; wrong profile uses a valid normalized synthetic E5 384-dimensional unit vector with E5 key against BGE receipt/cache, never mixed into BGE quality scoring; unknown profile rejected"],
+  "limits":["Activity mapping remains synthetic logical workshop to existing modular_rover","No raw60/raw18 gate inheritance","No production/default recall changes","No semantic acceptance or refusal conclusion","Natural texts may not fill hard budget; separate selection test covers overflow","All controls use temporary owned data; no devices or inference"]
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "execution_status": "NOT_RUN",
+  "scope": "isolated UI fixture; synthetic status replies or separately authorized microphone session",
+  "languages": [
+    "zh",
+    "en"
+  ],
+  "cases": [
+    {
+      "id": "C01",
+      "requires_live_microphone": false,
+      "zh": {
+        "task": "录音中观察临时字幕，再松开并编辑最终结果。",
+        "expected": "字幕标明未发送；临时文字不改变草稿；最终结果进入输入框且无自动教学请求。"
+      },
+      "en": {
+        "task": "Observe temporary captions during recording, then release and edit the final transcript.",
+        "expected": "Captions are marked as not sent; partial text does not change the draft; the final text enters the composer without an automatic tutor request."
+      }
+    },
+    {
+      "id": "C02",
+      "requires_live_microphone": false,
+      "zh": {
+        "task": "同一录音返回revision 2后返回revision 1，再停止或切换档案并返回旧字幕。",
+        "expected": "不回退到旧revision；停止或切换后字幕清空，迟到回执不能恢复。"
+      },
+      "en": {
+        "task": "Return revision 2 followed by revision 1, then stop or switch profiles and return a late caption.",
+        "expected": "Reject old revisions; clear captions after stop or profile switch and do not restore them from late responses."
+      }
+    },
+    {
+      "id": "C03",
+      "requires_live_microphone": false,
+      "zh": {
+        "task": "流式字幕途中返回fallback与原始原因，再返回最终本地转写。",
+        "expected": "明确显示结束后本地转写及可展开原因；不把未完成字幕当作最终结果或自动发送。"
+      },
+      "en": {
+        "task": "Return a streaming fallback and its reason, followed by the final local transcript.",
+        "expected": "Show local transcription after release with an expandable reason; never treat partial captions as final or send them automatically."
+      }
+    },
+    {
+      "id": "C04",
+      "requires_live_microphone": false,
+      "zh": {
+        "task": "录音时切换界面语言或单独调整语速；保持教学设置不变。",
+        "expected": "录音票据与临时原话保留；标签改变但不翻译字幕；主工作台仍按原低频状态刷新。"
+      },
+      "en": {
+        "task": "Change interface language or speech speed during recording, leaving teaching settings unchanged.",
+        "expected": "Keep the recording ticket and verbatim captions; only interface labels change, while the main workbench keeps its existing low-frequency state polling."
+      }
+    }
+  ]
+}

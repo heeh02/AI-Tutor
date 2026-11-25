@@ -1,0 +1,28 @@
+{
+    "repository":  "https://github.com/noahcao/OC_SORT",
+    "commit":  "8462e7e729a93ccd3bd995c0a79a890336cb3a0b",
+    "files":  [
+                  {
+                      "path":  "trackers/ocsort_tracker/ocsort.py",
+                      "source_url":  "https://github.com/noahcao/OC_SORT/blob/8462e7e729a93ccd3bd995c0a79a890336cb3a0b/trackers/ocsort_tracker/ocsort.py",
+                      "sha256":  "27175c0ce5d8d6188a4c3ef4da77555ff49ea51900adc06ad5b36ce2e448729b"
+                  },
+                  {
+                      "path":  "trackers/ocsort_tracker/association.py",
+                      "source_url":  "https://github.com/noahcao/OC_SORT/blob/8462e7e729a93ccd3bd995c0a79a890336cb3a0b/trackers/ocsort_tracker/association.py",
+                      "sha256":  "c622c44855dec1843048da2428f5661202441ea3506c154fd1f2cb96af1a8186"
+                  },
+                  {
+                      "path":  "trackers/ocsort_tracker/kalmanfilter.py",
+                      "source_url":  "https://github.com/noahcao/OC_SORT/blob/8462e7e729a93ccd3bd995c0a79a890336cb3a0b/trackers/ocsort_tracker/kalmanfilter.py",
+                      "sha256":  "96c859ec913640e3e6ebb1e5cdc2c6f0b94bdb140a6d54c3a8586868e5dc374a"
+                  },
+                  {
+                      "path":  "LICENSE",
+                      "source_url":  "https://github.com/noahcao/OC_SORT/blob/8462e7e729a93ccd3bd995c0a79a890336cb3a0b/LICENSE",
+                      "sha256":  "034dd352af190b6037e784ecc4874bcd224248290493fd22bf1d82ed101a4309"
+                  }
+              ],
+    "license":  "MIT",
+    "purpose":  "Offline reference only; no model weights"
+}

@@ -1,0 +1,139 @@
+{
+  "arithmetic_policy": {
+    "allowed": "Deterministic arithmetic over explicitly reported completed actions or measurements; identify the answer as derived.",
+    "examples": [
+      "50 mL - 42 mL = 8 mL",
+      "reported initial 0 and three actual additions of 2 imply counter 6"
+    ],
+    "forbidden": "Do not infer execution, observed results, mastery, units or missing measurements from a plan, code intention or absence of evidence.",
+    "id": "reported_fact_deterministic_arithmetic_v1",
+    "new_observation": false
+  },
+  "authoring_source_sha256": "fdac40171d822979e138fca73492b6fdb041190bd234ecbe6311db611afc6c27",
+  "authorship": "agent authored after observing frozen methods and v2; not human, blind, independent random sampling or real learner data",
+  "citation_span_unit": "Unicode code points; end exclusive",
+  "created_at_utc": "2026-11-03T21:11:57.185173+00:00",
+  "errata": {
+    "file": "errata.json",
+    "sha256": "bc63aaace182af23772f167b8b1a57e5030080f9cb3d3dc4de2f69bd194203ad"
+  },
+  "evaluation": {
+    "complete_evidence_at_5_minimum": 65,
+    "conditions": [
+      "current_query",
+      "query_plus_goal"
+    ],
+    "content_budget_chars": 2400,
+    "goal_query_format": "{text} {goal} ",
+    "multi_evidence_at_5_minimum": 10,
+    "overall_complete_evidence_regression_allowed": 0,
+    "per_topic_complete_evidence_regression_allowed": 1,
+    "single_cross_language_at_5_minimum": 20,
+    "source_control_leaks_allowed": 0,
+    "top_k": 5
+  },
+  "expected_languages": {
+    "en": 30,
+    "mixed": 36,
+    "zh": 30
+  },
+  "expected_modes": {
+    "en_to_zh": 12,
+    "mixed_multi": 11,
+    "mixed_single": 13,
+    "negative_en": 6,
+    "negative_mixed": 12,
+    "negative_zh": 6,
+    "same_en": 12,
+    "same_zh": 12,
+    "zh_to_en": 12
+  },
+  "files": {
+    "labels.jsonl": {
+      "records": 96,
+      "sha256": "8735e034bd764ea42052cdcc34266de3d693bc2f39afbf13813a8a17a44d34fb"
+    },
+    "queries.jsonl": {
+      "records": 96,
+      "sha256": "726a967f59fb03fe2fec47a9c888ed409f7608578fc16acf01b10d66ed7e2541"
+    },
+    "scope_controls.jsonl": {
+      "records": 12,
+      "sha256": "7fffe45855e063a5e5e35748ee9e118d9e57ab24b2fe017acbe132d2459238cf"
+    },
+    "sources.jsonl": {
+      "records": 60,
+      "sha256": "b96d0232e8927ae676345f9463e87a641160c0256a0d16a0c3aad60005da55fd"
+    }
+  },
+  "fixture_version": "education_memory_diagnostic_postfreeze_v2_20261104",
+  "limitations": [
+    "Full-source citations include limitations; checker verifies text spans, not semantic entailment",
+    "Alternative evidence sets can refer to a report and its correction; repetition never raises independent credibility",
+    "All 60 eligible sources share the logical workshop; topics are not used to prefilter candidates",
+    "No retrieval scores were consulted to alter questions or labels",
+    "Static checks do not establish educational usefulness",
+    "This review identifies semantic corrections, not a human/blind benchmark or automatic proof of exhaustive natural-language alternatives.",
+    "Same-language primary categories can include the five reviewed cross-language alternatives; the 24 mandatory cross-language cases retain strict target-language checks.",
+    "mixed_single denotes existence of a singleton sufficient set; loops_q11 retains incomparable two-source alternatives without claiming they are necessary."
+  ],
+  "method_sha256": "5296ca5b5116e213b020b9aabe68f6d524926e8ba4b69649bf6e706fce65e18c",
+  "model_called": false,
+  "packs": [
+    {
+      "id": "germination",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "种子发芽条件"
+    },
+    {
+      "id": "paper_bridge",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "纸桥承重"
+    },
+    {
+      "id": "fractions",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "分数与配方比例"
+    },
+    {
+      "id": "reading",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "阅读证据与推断"
+    },
+    {
+      "id": "loops",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "循环程序调试"
+    },
+    {
+      "id": "evaporation",
+      "negative_queries": 4,
+      "positive_queries": 12,
+      "sources": 10,
+      "topic": "蒸发与测量"
+    }
+  ],
+  "parent_fixture": {
+    "fixture_version": "education_memory_diagnostic_postfreeze_v1_20261104",
+    "manifest_sha256": "a0af509b5ae8a5cd25b12b4ad7491c42104239f563e8e3627959d73bb3aabbc6"
+  },
+  "production_default_changed": false,
+  "record_schema": {
+    "file": "record_schemas.json",
+    "sha256": "75946f114835b7604fce61dd841a96638f97d2b700458580d4cae79cd1a17f05"
+  },
+  "retrieval_run": false,
+  "scope": "offline logical workshop, not production modular_rover mapping or Store integration proof",
+  "spec_sha256": "14d04db43e70cd24e84063d53756baa64bda4e9e7736a592f2c0e34d67cb982c",
+  "synthetic_only": true
+}

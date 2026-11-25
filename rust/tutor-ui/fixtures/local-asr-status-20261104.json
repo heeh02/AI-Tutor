@@ -1,0 +1,11 @@
+{
+  "fixture_type": "synthetic_ui_acceptance_tasks",
+  "real_devices_or_models_required": false,
+  "tasks": [
+    {"id":"missing-disabled","languages":["zh","en"],"status":"NOT_RUN","action":"Provide missing local_asr, empty status and disabled phase.","expected":"No preparation card or activation prompt; no request is sent on mount or refresh."},
+    {"id":"separate-milestones","languages":["zh","en"],"status":"NOT_RUN","action":"Provide starting, loading, warming and active snapshots; inspect ready, warmup_completed and active independently.","expected":"Distinct phase labels and details; active is for future recordings, never a claim that the microphone is open or the transcript is accurate."},
+    {"id":"explicit-retry-stop","languages":["zh","en"],"status":"NOT_RUN","action":"Use degraded/stopped/configuration_error with explicit flags, then managed active+busy. Click one action and hold its response.","expected":"Only permitted actions appear; one empty POST is sent, repeat clicks are blocked, active busy can stop; no automatic retries or recording actions."},
+    {"id":"uncertain-cleanup","languages":["zh","en"],"status":"NOT_RUN","action":"Return a stop error/timeout followed by cleanup_failed; inspect fallback wording.","expected":"Result and cleanup remain unconfirmed; no success or retry claim, no guarantee of Whisper availability; text editing remains possible."},
+    {"id":"safe-details","languages":["zh","en"],"status":"NOT_RUN","action":"Include synthetic token, path, raw process error and ownership_stop fields; inspect advanced details.","expected":"Only ready/warm/active milestones are rendered, and no private diagnostic values appear."}
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "synthetic_fixture": true,
+  "execution_status": "NOT_RUN",
+  "snapshots": {
+    "generating": {
+      "protocol_version": 1,
+      "session_id": "sim-session",
+      "request_id": "synthetic-request",
+      "generation": 3,
+      "turn_id": "synthetic-assistant",
+      "revision": 1,
+      "phase": "generating",
+      "final_validated": false,
+      "shown_through": null,
+      "segments": [
+        {
+          "sequence": 0,
+          "text": "先记录这次观察。"
+        },
+        {
+          "sequence": 1,
+          "text": "Then change only one condition."
+        }
+      ]
+    },
+    "failed_prefix": {
+      "protocol_version": 1,
+      "session_id": "sim-session",
+      "request_id": "synthetic-request",
+      "generation": 3,
+      "turn_id": "synthetic-assistant",
+      "revision": 3,
+      "phase": "failed",
+      "final_validated": false,
+      "shown_through": 0,
+      "segments": [
+        {
+          "sequence": 0,
+          "text": "先记录这次观察。"
+        }
+      ]
+    },
+    "completed": {
+      "protocol_version": 1,
+      "session_id": "sim-session",
+      "request_id": "synthetic-request",
+      "generation": 3,
+      "turn_id": "synthetic-assistant",
+      "revision": 4,
+      "phase": "completed",
+      "final_validated": true,
+      "shown_through": 1,
+      "segments": [
+        {
+          "sequence": 0,
+          "text": "先记录这次观察。"
+        },
+        {
+          "sequence": 1,
+          "text": "Then change only one condition."
+        }
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "id": "default",
+      "zh": "未启用配置时使用原完整回复流程。",
+      "en": "Without configuration, use the existing whole-reply flow.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "prefix",
+      "zh": "显式启用后，一次只显示一条未确认分句，确认后追加下一句。",
+      "en": "With opt-in streaming, reveal at most one unconfirmed segment, then append the next after confirmation.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "hidden",
+      "zh": "切到后台标签页时不得产生新显示确认；返回后从快照继续。",
+      "en": "A hidden tab must not send new display receipts; resume from a snapshot on return.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "history",
+      "zh": "进入历史时保持草稿、停止新分句确认；返回后继续原气泡。",
+      "en": "History preserves the draft and pauses new display receipts; returning continues the same bubble.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "switch",
+      "zh": "切换会话后，旧轮询和旧显示回执不得改变新会话。",
+      "en": "Old polls and receipts cannot alter the new session after switching.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "failure",
+      "zh": "已显示前缀保留并标未完成，未显示缓冲尾部不出现。",
+      "en": "Keep the displayed prefix with an incomplete label; never reveal an unshown buffered tail after failure.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "retry",
+      "zh": "模拟最后显示确认响应丢失，重试不追加重复文字或重复最终提交。",
+      "en": "Drop a final display receipt response; retry without duplicate text or duplicate final application.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "final",
+      "zh": "最终状态只升级原气泡；不自动播放全文，完整后可主动朗读。",
+      "en": "Final upgrades the existing bubble; no automatic full-text speech, with manual read available once complete.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "scroll",
+      "zh": "上翻阅读时新分句不拉到底部；主动查看最新后恢复跟随。",
+      "en": "New segments do not force the viewport down while reading earlier text; explicitly jump to latest to resume following.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "narrow",
+      "zh": "窄屏下中英混合文本、未完成标签及输入草稿均可阅读。",
+      "en": "Mixed Chinese/English text, the incomplete label and the draft remain readable on a narrow screen.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "page_offscreen",
+      "zh": "聊天面板在整页视口外时不确认新分句；滚回面板可见后恢复。",
+      "en": "Do not acknowledge a new segment while the conversation panel is outside the page viewport; resume when it is visible again.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "same_turn_growth",
+      "zh": "保持跟随底部，多段同一气泡增高时先跟随滚动再确认；主动上翻后停止确认，查看最新后恢复。",
+      "en": "While following the bottom, growing segments in the same bubble align before confirmation; explicitly scrolling up pauses receipts, and returning to latest resumes them.",
+      "status": "NOT_RUN"
+    }
+  ]
+}

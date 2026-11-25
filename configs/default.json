@@ -1,0 +1,59 @@
+{
+    "configuration_type":  "documented defaults and integration template",
+    "note":  "Use the teacher panel for learner settings and --port for the service port; this template does not override safety locks.",
+    "bind_host":  "127.0.0.1",
+    "default_port":  8765,
+    "language":  "zh",
+    "help_style":  "one_step",
+    "camera":  {
+                   "backend":  "Windows Media Foundation",
+                   "capture_fps_target":  30,
+                   "width":  1280,
+                   "stable_device_path":  null,
+                   "latest_frame_slots":  1,
+                   "height":  720
+               },
+    "vision":  {
+                   "runtime":  "ort 2.0.0-rc.10 / ONNX Runtime 1.23.2 CPU",
+                   "tracker":  "edgefirst-tracker 0.38.2 ByteTrack",
+                   "reid":  false,
+                   "model":  "models/yolov8n-face-lindevs.onnx",
+                   "identity_recognition":  false
+               },
+    "ptz":  {
+                "calibration":  "FAIL",
+                "require_vendor_auto_off_verification":  true,
+                "external_yolo":  false,
+                "manual_enabled":  false,
+                "mode":  "off"
+            },
+    "audio":  {
+                  "tts":  "Windows SAPI / Rust COM",
+                  "asr":  "whisper-rs 0.16.0 / whisper.cpp",
+                  "cpu_threads":  4,
+                  "maximum_record_seconds":  20,
+                  "model":  "models/ggml-base.bin",
+                  "raw_recording_saved":  false
+              },
+    "memory":  {
+                   "recall_top_k":  5,
+                   "simulator_database":  "runtime/data/simulator.sqlite3",
+                   "real_database":  "runtime/data/real.sqlite3"
+               },
+    "kimi":  {
+                 "subagents":  [
+
+                               ],
+                 "remote_model":  true,
+                 "tools":  [
+
+                           ],
+                 "reuse_sessions":  false,
+                 "required_version":  "2.3.1",
+                 "timeout_seconds":  90
+             },
+    "emotion":  {
+                    "enabled":  false
+                },
+    "actuator_execution":  false
+}

@@ -1,0 +1,14 @@
+[workspace]
+members = ["rust/ai-tutor", "rust/tutor-ui"]
+default-members = ["rust/ai-tutor"]
+resolver = "2"
+
+[patch.crates-io]
+# Keep each successful Media Foundation buffer Lock paired with Unlock.
+nokhwa-bindings-windows = { path = "vendor/nokhwa-bindings-windows" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+

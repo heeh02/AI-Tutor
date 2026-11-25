@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "A", "language": "zh",
+      "events": [{"kind":"learner_statement","content":{"text":"以后讲解科学概念时，请先给一个具体例子，再给简短定义。","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"persistent","support_level":"unknown"}}],
+      "expected": {"kind":"help_preference","claim_type":"explicit_preference","scope":"cross_session_explicit","support_level":"unknown"},
+      "semantic_review": "Preserve future science explanations, concrete example before a short definition. Do not infer age, ability or an immutable preference. Review every candidate."
+    },
+    {
+      "id": "B", "language": "en",
+      "events": [{"kind":"plan","content":{"text":"I accepted a plan to compare paper bridges with one fold and two folds. I will use one A4 sheet for each bridge, a 10 cm gap, and the same coins. I have not performed the comparison and have no results.","synthetic_fixture":true,"accepted":true,"support_level":"unknown"}}],
+      "expected": {"kind":"accepted_pending_experiment","claim_type":"accepted_plan","scope":"current_activity","support_level":"unknown"},
+      "semantic_review": "Preserve one versus two folds, one A4 sheet per bridge, 10 cm gap and the same coins. The comparison is accepted but not performed and has no results. Review every candidate."
+    }
+  ]
+}

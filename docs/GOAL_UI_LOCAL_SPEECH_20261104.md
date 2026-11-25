@@ -1,0 +1,13 @@
+# Local voice status UI
+
+The independent `rust/tutor-ui/src/local_speech_status.rs` component sits beside the dialogue composer and consumes `state.local_speech`. Missing status from an older backend, or `phase: disabled`, renders no activation prompt. It never writes a speech policy or starts an automatic retry loop.
+
+Chinese and English copy distinguishes configured, starting, checking, service ready, bilingual warming, prepared but waiting for installation, active, degraded, stopping, stopped, configuration error and cleanup unconfirmed. A transient `cancelled` preparation is shown as stopping, not confirmed shutdown. `active` means the voice client is enabled for subsequent reading; the UI does not claim that a speaker is currently producing sound. Other states offer continued text interaction without claiming that fallback speech or client deactivation has been verified.
+
+Retry uses `POST /api/audio/local-speech/retry {}` only for degraded/stopped/configuration-error states with explicit `retry_available: true`, `busy: false`, and `shutting_down: false`. Missing flags disable the action. Cleanup unconfirmed never offers retry, even if a stale or inconsistent snapshot says otherwise. Active lifecycle tasks can offer the separate `POST /api/audio/local-speech/stop {}` action while busy; shutdown and stopping suppress it. These controls also require an online, otherwise-idle frontend and allow only one component request in flight.
+
+POST completion triggers the existing sequenced App state refresh. Its result is not merged into the lifecycle snapshot, and an action acknowledgement does not claim successful startup or cleanup. Failure shows fixed bilingual recovery copy rather than raw response text. The existing main Stop action and speech-intent flow are unchanged. The dedicated local-voice stop request has a 40-second frontend timeout to accommodate the backend's bounded lifecycle drain.
+
+Advanced details project only reviewed Qwen3-TTS/CosyVoice3 names, readiness/preparation/activation flags and the measured bilingual preparation duration. They do not render token, instance, path, lease, ownership-event or arbitrary error fields. Preparation duration is explicitly distinguished from playback latency and measured speaker output.
+
+Five pure logic regressions cover absent/legacy backend behavior, readiness versus activation, explicit retry permission and lifecycle gates, stopping while active versus shutdown, and restricted diagnostic projection/bilingual copy. `rustfmt --edition 2021 --check rust/tutor-ui/src/main.rs` passed. Native/WASM tests and browser behavior remain for root validation; this UI slice did not run Cargo, a browser, a model or an audio device.

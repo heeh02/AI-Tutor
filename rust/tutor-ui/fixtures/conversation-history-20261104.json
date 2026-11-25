@@ -1,0 +1,849 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04",
+  "synthetic_only": true,
+  "execution_status": "NOT_RUN",
+  "scope": "Temporary UI fixture only; no production learner data, devices or model calls.",
+  "synthetic_messages": [
+    {
+      "ordinal": 0,
+      "role": "user",
+      "content": "合成历史消息 0：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 1,
+      "role": "assistant",
+      "content": "Synthetic history message 1: the next experiment has not started."
+    },
+    {
+      "ordinal": 2,
+      "role": "user",
+      "content": "Synthetic history message 2: the next experiment has not started."
+    },
+    {
+      "ordinal": 3,
+      "role": "assistant",
+      "content": "合成历史消息 3：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 4,
+      "role": "user",
+      "content": "Synthetic history message 4: the next experiment has not started."
+    },
+    {
+      "ordinal": 5,
+      "role": "assistant",
+      "content": "Synthetic history message 5: the next experiment has not started."
+    },
+    {
+      "ordinal": 6,
+      "role": "user",
+      "content": "合成历史消息 6：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 7,
+      "role": "assistant",
+      "content": "Synthetic history message 7: the next experiment has not started."
+    },
+    {
+      "ordinal": 8,
+      "role": "user",
+      "content": "Synthetic history message 8: the next experiment has not started."
+    },
+    {
+      "ordinal": 9,
+      "role": "assistant",
+      "content": "合成历史消息 9：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 10,
+      "role": "user",
+      "content": "Synthetic history message 10: the next experiment has not started."
+    },
+    {
+      "ordinal": 11,
+      "role": "assistant",
+      "content": "Synthetic history message 11: the next experiment has not started."
+    },
+    {
+      "ordinal": 12,
+      "role": "user",
+      "content": "合成历史消息 12：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 13,
+      "role": "assistant",
+      "content": "Synthetic history message 13: the next experiment has not started."
+    },
+    {
+      "ordinal": 14,
+      "role": "user",
+      "content": "Synthetic history message 14: the next experiment has not started."
+    },
+    {
+      "ordinal": 15,
+      "role": "assistant",
+      "content": "合成历史消息 15：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 16,
+      "role": "user",
+      "content": "Synthetic history message 16: the next experiment has not started."
+    },
+    {
+      "ordinal": 17,
+      "role": "assistant",
+      "content": "Synthetic history message 17: the next experiment has not started."
+    },
+    {
+      "ordinal": 18,
+      "role": "user",
+      "content": "合成历史消息 18：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 19,
+      "role": "assistant",
+      "content": "Synthetic history message 19: the next experiment has not started."
+    },
+    {
+      "ordinal": 20,
+      "role": "user",
+      "content": "Synthetic history message 20: the next experiment has not started."
+    },
+    {
+      "ordinal": 21,
+      "role": "assistant",
+      "content": "合成历史消息 21：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 22,
+      "role": "user",
+      "content": "Synthetic history message 22: the next experiment has not started."
+    },
+    {
+      "ordinal": 23,
+      "role": "assistant",
+      "content": "Synthetic history message 23: the next experiment has not started."
+    },
+    {
+      "ordinal": 24,
+      "role": "user",
+      "content": "合成历史消息 24：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 25,
+      "role": "assistant",
+      "content": "Synthetic history message 25: the next experiment has not started."
+    },
+    {
+      "ordinal": 26,
+      "role": "user",
+      "content": "Synthetic history message 26: the next experiment has not started."
+    },
+    {
+      "ordinal": 27,
+      "role": "assistant",
+      "content": "合成历史消息 27：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 28,
+      "role": "user",
+      "content": "Synthetic history message 28: the next experiment has not started."
+    },
+    {
+      "ordinal": 29,
+      "role": "assistant",
+      "content": "Synthetic history message 29: the next experiment has not started."
+    },
+    {
+      "ordinal": 30,
+      "role": "user",
+      "content": "合成历史消息 30：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 31,
+      "role": "assistant",
+      "content": "Synthetic history message 31: the next experiment has not started."
+    },
+    {
+      "ordinal": 32,
+      "role": "user",
+      "content": "Synthetic history message 32: the next experiment has not started."
+    },
+    {
+      "ordinal": 33,
+      "role": "assistant",
+      "content": "合成历史消息 33：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 34,
+      "role": "user",
+      "content": "Synthetic history message 34: the next experiment has not started."
+    },
+    {
+      "ordinal": 35,
+      "role": "assistant",
+      "content": "Synthetic history message 35: the next experiment has not started."
+    },
+    {
+      "ordinal": 36,
+      "role": "user",
+      "content": "合成历史消息 36：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 37,
+      "role": "assistant",
+      "content": "Synthetic history message 37: the next experiment has not started."
+    },
+    {
+      "ordinal": 38,
+      "role": "user",
+      "content": "Synthetic history message 38: the next experiment has not started."
+    },
+    {
+      "ordinal": 39,
+      "role": "assistant",
+      "content": "合成历史消息 39：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 40,
+      "role": "user",
+      "content": "Synthetic history message 40: the next experiment has not started."
+    },
+    {
+      "ordinal": 41,
+      "role": "assistant",
+      "content": "Synthetic history message 41: the next experiment has not started."
+    },
+    {
+      "ordinal": 42,
+      "role": "user",
+      "content": "合成历史消息 42：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 43,
+      "role": "assistant",
+      "content": "Synthetic history message 43: the next experiment has not started."
+    },
+    {
+      "ordinal": 44,
+      "role": "user",
+      "content": "Synthetic history message 44: the next experiment has not started."
+    },
+    {
+      "ordinal": 45,
+      "role": "assistant",
+      "content": "合成历史消息 45：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 46,
+      "role": "user",
+      "content": "Synthetic history message 46: the next experiment has not started."
+    },
+    {
+      "ordinal": 47,
+      "role": "assistant",
+      "content": "Synthetic history message 47: the next experiment has not started."
+    },
+    {
+      "ordinal": 48,
+      "role": "user",
+      "content": "合成历史消息 48：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 49,
+      "role": "assistant",
+      "content": "Synthetic history message 49: the next experiment has not started."
+    },
+    {
+      "ordinal": 50,
+      "role": "user",
+      "content": "Synthetic history message 50: the next experiment has not started."
+    },
+    {
+      "ordinal": 51,
+      "role": "assistant",
+      "content": "合成历史消息 51：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 52,
+      "role": "user",
+      "content": "Synthetic history message 52: the next experiment has not started."
+    },
+    {
+      "ordinal": 53,
+      "role": "assistant",
+      "content": "Synthetic history message 53: the next experiment has not started."
+    },
+    {
+      "ordinal": 54,
+      "role": "user",
+      "content": "合成历史消息 54：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 55,
+      "role": "assistant",
+      "content": "Synthetic history message 55: the next experiment has not started."
+    },
+    {
+      "ordinal": 56,
+      "role": "user",
+      "content": "Synthetic history message 56: the next experiment has not started."
+    },
+    {
+      "ordinal": 57,
+      "role": "assistant",
+      "content": "合成历史消息 57：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 58,
+      "role": "user",
+      "content": "Synthetic history message 58: the next experiment has not started."
+    },
+    {
+      "ordinal": 59,
+      "role": "assistant",
+      "content": "Synthetic history message 59: the next experiment has not started."
+    },
+    {
+      "ordinal": 60,
+      "role": "user",
+      "content": "合成历史消息 60：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 61,
+      "role": "assistant",
+      "content": "Synthetic history message 61: the next experiment has not started."
+    },
+    {
+      "ordinal": 62,
+      "role": "user",
+      "content": "Synthetic history message 62: the next experiment has not started."
+    },
+    {
+      "ordinal": 63,
+      "role": "assistant",
+      "content": "合成历史消息 63：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 64,
+      "role": "user",
+      "content": "Synthetic history message 64: the next experiment has not started."
+    },
+    {
+      "ordinal": 65,
+      "role": "assistant",
+      "content": "Synthetic history message 65: the next experiment has not started."
+    },
+    {
+      "ordinal": 66,
+      "role": "user",
+      "content": "合成历史消息 66：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 67,
+      "role": "assistant",
+      "content": "Synthetic history message 67: the next experiment has not started."
+    },
+    {
+      "ordinal": 68,
+      "role": "user",
+      "content": "Synthetic history message 68: the next experiment has not started."
+    },
+    {
+      "ordinal": 69,
+      "role": "assistant",
+      "content": "合成历史消息 69：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 70,
+      "role": "user",
+      "content": "Synthetic history message 70: the next experiment has not started."
+    },
+    {
+      "ordinal": 71,
+      "role": "assistant",
+      "content": "Synthetic history message 71: the next experiment has not started."
+    },
+    {
+      "ordinal": 72,
+      "role": "user",
+      "content": "合成历史消息 72：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 73,
+      "role": "assistant",
+      "content": "Synthetic history message 73: the next experiment has not started."
+    },
+    {
+      "ordinal": 74,
+      "role": "user",
+      "content": "Synthetic history message 74: the next experiment has not started."
+    },
+    {
+      "ordinal": 75,
+      "role": "assistant",
+      "content": "合成历史消息 75：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 76,
+      "role": "user",
+      "content": "Synthetic history message 76: the next experiment has not started."
+    },
+    {
+      "ordinal": 77,
+      "role": "assistant",
+      "content": "Synthetic history message 77: the next experiment has not started."
+    },
+    {
+      "ordinal": 78,
+      "role": "user",
+      "content": "合成历史消息 78：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 79,
+      "role": "assistant",
+      "content": "Synthetic history message 79: the next experiment has not started."
+    },
+    {
+      "ordinal": 80,
+      "role": "user",
+      "content": "Synthetic history message 80: the next experiment has not started."
+    },
+    {
+      "ordinal": 81,
+      "role": "assistant",
+      "content": "合成历史消息 81：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 82,
+      "role": "user",
+      "content": "Synthetic history message 82: the next experiment has not started."
+    },
+    {
+      "ordinal": 83,
+      "role": "assistant",
+      "content": "Synthetic history message 83: the next experiment has not started."
+    },
+    {
+      "ordinal": 84,
+      "role": "user",
+      "content": "合成历史消息 84：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 85,
+      "role": "assistant",
+      "content": "Synthetic history message 85: the next experiment has not started."
+    },
+    {
+      "ordinal": 86,
+      "role": "user",
+      "content": "Synthetic history message 86: the next experiment has not started."
+    },
+    {
+      "ordinal": 87,
+      "role": "assistant",
+      "content": "合成历史消息 87：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 88,
+      "role": "user",
+      "content": "Synthetic history message 88: the next experiment has not started."
+    },
+    {
+      "ordinal": 89,
+      "role": "assistant",
+      "content": "Synthetic history message 89: the next experiment has not started."
+    },
+    {
+      "ordinal": 90,
+      "role": "user",
+      "content": "合成历史消息 90：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 91,
+      "role": "assistant",
+      "content": "Synthetic history message 91: the next experiment has not started."
+    },
+    {
+      "ordinal": 92,
+      "role": "user",
+      "content": "Synthetic history message 92: the next experiment has not started."
+    },
+    {
+      "ordinal": 93,
+      "role": "assistant",
+      "content": "合成历史消息 93：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 94,
+      "role": "user",
+      "content": "Synthetic history message 94: the next experiment has not started."
+    },
+    {
+      "ordinal": 95,
+      "role": "assistant",
+      "content": "Synthetic history message 95: the next experiment has not started."
+    },
+    {
+      "ordinal": 96,
+      "role": "user",
+      "content": "合成历史消息 96：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 97,
+      "role": "assistant",
+      "content": "Synthetic history message 97: the next experiment has not started."
+    },
+    {
+      "ordinal": 98,
+      "role": "user",
+      "content": "Synthetic history message 98: the next experiment has not started."
+    },
+    {
+      "ordinal": 99,
+      "role": "assistant",
+      "content": "合成历史消息 99：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 100,
+      "role": "user",
+      "content": "Synthetic history message 100: the next experiment has not started."
+    },
+    {
+      "ordinal": 101,
+      "role": "assistant",
+      "content": "Synthetic history message 101: the next experiment has not started."
+    },
+    {
+      "ordinal": 102,
+      "role": "user",
+      "content": "合成历史消息 102：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 103,
+      "role": "assistant",
+      "content": "Synthetic history message 103: the next experiment has not started."
+    },
+    {
+      "ordinal": 104,
+      "role": "user",
+      "content": "Synthetic history message 104: the next experiment has not started."
+    },
+    {
+      "ordinal": 105,
+      "role": "assistant",
+      "content": "合成历史消息 105：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 106,
+      "role": "user",
+      "content": "Synthetic history message 106: the next experiment has not started."
+    },
+    {
+      "ordinal": 107,
+      "role": "assistant",
+      "content": "Synthetic history message 107: the next experiment has not started."
+    },
+    {
+      "ordinal": 108,
+      "role": "user",
+      "content": "合成历史消息 108：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 109,
+      "role": "assistant",
+      "content": "Synthetic history message 109: the next experiment has not started."
+    },
+    {
+      "ordinal": 110,
+      "role": "user",
+      "content": "Synthetic history message 110: the next experiment has not started."
+    },
+    {
+      "ordinal": 111,
+      "role": "assistant",
+      "content": "合成历史消息 111：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 112,
+      "role": "user",
+      "content": "Synthetic history message 112: the next experiment has not started."
+    },
+    {
+      "ordinal": 113,
+      "role": "assistant",
+      "content": "Synthetic history message 113: the next experiment has not started."
+    },
+    {
+      "ordinal": 114,
+      "role": "user",
+      "content": "合成历史消息 114：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 115,
+      "role": "assistant",
+      "content": "Synthetic history message 115: the next experiment has not started."
+    },
+    {
+      "ordinal": 116,
+      "role": "user",
+      "content": "Synthetic history message 116: the next experiment has not started."
+    },
+    {
+      "ordinal": 117,
+      "role": "assistant",
+      "content": "合成历史消息 117：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 118,
+      "role": "user",
+      "content": "Synthetic history message 118: the next experiment has not started."
+    },
+    {
+      "ordinal": 119,
+      "role": "assistant",
+      "content": "Synthetic history message 119: the next experiment has not started."
+    },
+    {
+      "ordinal": 120,
+      "role": "user",
+      "content": "合成历史消息 120：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 121,
+      "role": "assistant",
+      "content": "Synthetic history message 121: the next experiment has not started."
+    },
+    {
+      "ordinal": 122,
+      "role": "user",
+      "content": "Synthetic history message 122: the next experiment has not started."
+    },
+    {
+      "ordinal": 123,
+      "role": "assistant",
+      "content": "合成历史消息 123：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 124,
+      "role": "user",
+      "content": "Synthetic history message 124: the next experiment has not started."
+    },
+    {
+      "ordinal": 125,
+      "role": "assistant",
+      "content": "Synthetic history message 125: the next experiment has not started."
+    },
+    {
+      "ordinal": 126,
+      "role": "user",
+      "content": "合成历史消息 126：尚未开始下一次实验。"
+    },
+    {
+      "ordinal": 127,
+      "role": "assistant",
+      "content": "Synthetic history message 127: the next experiment has not started."
+    },
+    {
+      "ordinal": 128,
+      "role": "user",
+      "content": "Synthetic history message 128: the next experiment has not started."
+    },
+    {
+      "ordinal": 129,
+      "role": "assistant",
+      "content": "合成历史消息 129：尚未开始下一次实验。"
+    }
+  ],
+  "expected_initial_history_ordinals": [
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "expected_current_ordinals": [
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129
+  ],
+  "tasks": [
+    {
+      "id": "H01",
+      "zh": {
+        "task": "输入草稿后打开更早消息，翻页再返回当前。",
+        "expected": "草稿原文保持；当前活动不被切换，历史不会进入提交。"
+      },
+      "en": {
+        "task": "Type a draft, open history, page through it and return.",
+        "expected": "Keep the draft verbatim and the current session; never submit history as new input."
+      }
+    },
+    {
+      "id": "H02",
+      "zh": {
+        "task": "在第一页滚到中间，去更早一页再返回。",
+        "expected": "第一页重新读取同一游标并恢复scroll_top，不追加多页正文。"
+      },
+      "en": {
+        "task": "Scroll midway through the first history page, open an older page, then return.",
+        "expected": "Refetch the same cursor and restore the saved scroll position; do not append pages."
+      }
+    },
+    {
+      "id": "H03",
+      "zh": {
+        "task": "查看历史期间让当前24条窗口持续收到新消息。",
+        "expected": "历史页不变、不强制滚底；出现有新回复入口，返回最新后能看到新消息。"
+      },
+      "en": {
+        "task": "Receive new messages while history is open and the latest-24 window rolls forward.",
+        "expected": "Keep the history page and scroll position; show a new-reply entry and display the latest messages on request."
+      }
+    },
+    {
+      "id": "H04",
+      "zh": {
+        "task": "延迟历史请求后关闭/重开，或切换另一档案/会话。",
+        "expected": "迟到旧回执不恢复旧页或跨档案显示。"
+      },
+      "en": {
+        "task": "Delay a request, close/reopen history or switch profiles/sessions.",
+        "expected": "Late replies cannot restore old pages or cross profile/session boundaries."
+      }
+    },
+    {
+      "id": "H05",
+      "zh": {
+        "task": "浏览已结束活动的记录。",
+        "expected": "只能读取；不resume、不投递、不播报、不写入教学上下文。"
+      },
+      "en": {
+        "task": "Browse records of a finished session.",
+        "expected": "Read only: no resume, delivery, speech or teaching-context write."
+      }
+    },
+    {
+      "id": "H06",
+      "zh": {
+        "task": "播报时进入历史，并延迟进入前的shown回执至返回当前之后。",
+        "expected": "进入历史停止播报；旧shown回执不能重启TTS；隐藏新回复不发shown。"
+      },
+      "en": {
+        "task": "Open history during speech; deliver a prior shown receipt only after returning to current messages.",
+        "expected": "Stop speech on entry; old receipts cannot restart TTS and hidden new replies do not send shown."
+      }
+    },
+    {
+      "id": "H07",
+      "zh": {
+        "task": "历史请求失败、重试，再切换界面语言。",
+        "expected": "失败可恢复、草稿不变；原句不翻译，不把错误页当更早历史。"
+      },
+      "en": {
+        "task": "Fail and retry a history request, then change the interface language.",
+        "expected": "Recover without changing the draft; retain original message wording and do not treat an error as a history page."
+      }
+    },
+    {
+      "id": "H08",
+      "zh": {
+        "task": "导入大量合成消息并连续翻超过64页，检查窄屏。",
+        "expected": "每页最多50条，回退栈最多64个游标；始终可返回当前消息，编辑框和导航可达。"
+      },
+      "en": {
+        "task": "Use a large synthetic conversation and browse beyond 64 pages; inspect a narrow viewport.",
+        "expected": "At most 50 history messages and 64 back-page cursors; current messages, composer and navigation stay reachable."
+      }
+    },
+    {
+      "id": "H09",
+      "zh": {
+        "task": "历史展开时更正或删除相关学习记忆。",
+        "expected": "旧历史组件被清除，不保留被撤销的旧对话页。"
+      },
+      "en": {
+        "task": "Correct or delete related learning memories while history is open.",
+        "expected": "Clear the history component rather than retaining a revoked conversation page."
+      }
+    },
+    {
+      "id": "H10",
+      "zh": {
+        "task": "让当前新回复的shown请求连续失败两次，打开历史后返回当前；另保留一个成功回执和一个在途回执。",
+        "expected": "只重开当前未shown且非在途回复的重试额度；成功/在途不重复投递或TTS，重试成功后不再重开。"
+      },
+      "en": {
+        "task": "Fail a new reply shown request twice, open history and return; retain one successful receipt and one in-flight receipt.",
+        "expected": "Rearm only the current unshown, nonpending reply. Do not duplicate successful/in-flight delivery or TTS; do not rearm after retry succeeds."
+      }
+    }
+  ]
+}

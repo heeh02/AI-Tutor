@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "model": "deepseek-flash",
+  "max_tokens": 8192,
+  "request_deadline_seconds": 90,
+  "maximum_calls": 4,
+  "automatic_retries": 0,
+  "archive_relative": "runtime/goal-baselines/20261106/kimi-highspeed-first/actual-first",
+  "input_sha256": {
+    "request-zh.json": "9ad586eb6dcef8290c13fa4e29151813e9f3f44c8d289cbb24bd6d2a73310b94",
+    "request-en.json": "1cf768d52da4246748d605ae6880fdfcf445bf09be9d8d06ddd36bb21d896e55",
+    "source-zh.sqlite3": "6228988ad2fff9c9b7b634402600736c3e8e1150d2485afe6e9fbfb4a4a4081e",
+    "source-en.sqlite3": "7c2dd1bf0376ebfa7460f6010b836d31654d378b13b7a7e3bc51acdb3d87033b",
+    "regular/prompts/tutor-agent.md": "752d5df0341472638eeb5d4dea7a0fe4216ccc015c06fbc32fa52d9b6f1dcfd0",
+    "regular/prompts/tutor_core.md": "d4e1aa8eade0eefeae24ebfc20fa81cff748e5f9f366c74f1f6ef6b58a5b5c46",
+    "regular/implementation-package/AI_Tutor_Codex_Implementation_Package/schemas/tutor_reply.schema.json": "5ee8922b12011944abd0f67c70efe0d42168908cfa6714fed9990b9cfdb252eb"
+  },
+  "pairs": {
+    "zh": {
+      "source_sha256": "a4a1e3f8c02402510399dcf8e121f432db060293b2669bc45008021ae584398f",
+      "user_prompt_sha256": "a413411409aab8c7057f88a823eb92a871fc6e5cda4ab6bf5548909571c74197"
+    },
+    "en": {
+      "source_sha256": "f5e2dd4098a1517a81aae4f93d383e0d3ef2c5352db9802d0b4096e12259595e",
+      "user_prompt_sha256": "fdc08b18f2b8bf77fafcee2a735bd7a5cc1b004ba0453599adbba375d6755d97"
+    }
+  },
+  "schedule": [
+    {
+      "case": "zh",
+      "arm": "non_thinking"
+    },
+    {
+      "case": "zh",
+      "arm": "thinking_low"
+    },
+    {
+      "case": "en",
+      "arm": "thinking_low"
+    },
+    {
+      "case": "en",
+      "arm": "non_thinking"
+    }
+  ],
+  "arms": {
+    "non_thinking": {
+      "thinking": {
+        "type": "disabled"
+      }
+    },
+    "thinking_low": {
+      "thinking": {
+        "type": "enabled"
+      },
+      "reasoning_effort": "low"
+    }
+  },
+  "credential": "Fixed CurrentUser DPAPI file outside repository; never in plan, environment, argv or logs.",
+  "comparison_scope": "Archived request/core policy/schema unchanged. Direct API uses the archived agent body without the unavailable Kimi profile-marker suffix. No exact cross-provider materialized-system equality claim. Off/low pairs share exact system and user strings.",
+  "application_scope": "Current evaluator applies candidates in independent copies of archived source databases. This includes the new memory guard and differs from the archived Kimi evaluator; raw candidate semantics and application effects must be compared separately.",
+  "output_scope": "Validated segments are collected, not UI/audio delivered. Raw reasoning is discarded; only counters/timestamps may be retained. First useful segment requires manual content review.",
+  "stop_rule": "Stop on the first transport, protocol, final-contract or application failure. No retries, fallback calls, repairs, graders or devices."
+}

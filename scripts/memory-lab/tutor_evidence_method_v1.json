@@ -1,0 +1,26 @@
+{
+  "method": "typed48-tutor-evidence-sufficiency-v1-20261104",
+  "snapshot_sha256": "b058a6922b0790090ea8003607ca8be1ed5a3803952c1a3552e55c542d54d6bd",
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "selection": "Frozen actual Store snapshot current_query / pure_bge; exact original top5 order; whole records <=2400 Unicode characters. No new ranking, encoding, model selection or label edits.",
+  "batches": [
+    {"id": 1, "query_ids": ["germination_q06", "germination_q07", "germination_q13", "germination_q14", "germination_q15", "germination_q16"]},
+    {"id": 2, "query_ids": ["paper_bridge_q02", "paper_bridge_q11", "paper_bridge_q13", "paper_bridge_q14", "paper_bridge_q15", "paper_bridge_q16"]},
+    {"id": 3, "query_ids": ["fractions_q08", "fractions_q12", "fractions_q13", "fractions_q14", "fractions_q15", "fractions_q16"]},
+    {"id": 4, "query_ids": ["reading_q01", "reading_q09", "reading_q13", "reading_q14", "reading_q15", "reading_q16"]},
+    {"id": 5, "query_ids": ["loops_q07", "loops_q12", "loops_q13", "loops_q14", "loops_q15", "loops_q16"]},
+    {"id": 6, "query_ids": ["evaporation_q06", "evaporation_q08", "evaporation_q13", "evaporation_q14", "evaporation_q15", "evaporation_q16"]}
+  ],
+  "expected_counts": {"total": 36, "negative_original_label": 24, "positive_sufficient_retrieved": 9, "positive_insufficient_retrieved": 3},
+  "context": "Snapshot replay, not a new live Store run. Preserve actual opaque memory/event IDs, source type/version and common synthetic owner; new isolated request/session/current-question event. Compact slow_memory and evidence content_reference follow production context shape. Goal remains in task only, goal_source=synthetic_fixture_context with empty field_evidence: attached teaching context, not a new learner statement, sensor fact or invented source ID. Recent dialogue empty, hardware unknown. English queries use en output; zh and mixed use zh. Never send labels, expected answers, source_id aliases, retrieval scores, omitted sources or review instructions to the model.",
+  "provider": "Existing verified KimiProvider::generate then close; production tutor_core policy and TutorReply schema, hashes frozen at preparation. No alternate agent, tools, retries, delivery, audio, database writes or candidate application.",
+  "execution": "Default prepare-only; explicit --real-synthetic, approved prepared-manifest SHA256 and one --case / --batch / --all selector. Fixed batch/order above. Durable create_new attempt receipt before each generate; a previous attempt blocks repeats even if no result survived. A provider/protocol error is retained and stops the current batch. Later unattempted cases may be selected explicitly. Repeating an experiment requires a new preparation directory and must be reported as a repeat.",
+  "review": {
+    "automatic_only": ["TutorReply structure and in-request IDs", "complete original minimal evidence set covered by cited retrieved sources", "candidate/source references retained", "provider close result and remaining running count"],
+    "semantic_review_required": ["Whether each historical claim is supported by cited content", "Correct number/unit/entity and conditions", "Prompted versus independent response", "Plan versus execution and observation", "Correction versus another trial", "No unsupported task/memory candidate or persistent preference"],
+    "insufficient_group": "24 original negatives plus 3 positive-label retrieval misses: all27 must avoid invented history and communicate the actual evidential limit. Do not relabel retrieval misses as corpus negatives; do not require needs_clarification=true or empty citations when explaining an evidential limit.",
+    "sufficient_group": "All9 must answer correctly and completely with a complete original minimal supporting set; blanket refusal does not pass.",
+    "decision": "Any severe unsupported historical/update claim blocks default enablement. Even all36 reviewed passes only justify the next controlled shadow step, not full96/online/child/long-term-memory safety. No automatic semantic_quality_pass.",
+    "reviewer_origin": "Agent review of synthetic, method-aware authored data; not human or blind evaluation. Leave conclusions null until explicit semantic review."
+  }
+}

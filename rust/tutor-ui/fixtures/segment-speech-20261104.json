@@ -1,0 +1,22 @@
+{
+  "synthetic_fixture": true,
+  "execution_status": "NOT_RUN",
+  "scope": "Isolated simulator service with synthetic speech receipts; no real devices, production data or browser automation performed by this change.",
+  "submit": {"text": "先记录一个观察 / Record one observation", "auto_speak": true, "client_submission_id": "speech-synthetic-001"},
+  "head": {"protocol_version": 1, "session_id": "sim-session", "request_id": "sim-request", "generation": 4, "turn_id": "sim-turn", "client_submission_id": "speech-synthetic-001", "revision": 1, "phase": "generating", "final_validated": false, "shown_through": null, "speech_gate": "open", "speech_close_reason": null, "speech_completed_through": null, "speech_complete": false},
+  "close": {"generation": 4, "reason": "hidden"},
+  "tasks": [
+    {"id":"default-disabled","status":"NOT_RUN","zh":"缺省 disabled 或旧 state 缺字段时，分句界面仅文字，不发逐段朗读；whole_reply 原流程保持。","en":"With disabled or missing capability fields, segments remain text-only with no per-segment playback request; whole-reply behavior is unchanged."},
+    {"id":"captured-choice","status":"NOT_RUN","zh":"after_display 下分别勾选/不勾选发送。每次提交携当时的 auto_speak 与独立 nonce，后台 gate 对应 open/disabled。","en":"Send with the option on and off in after_display mode. Each submission captures its choice and unique nonce, producing open or disabled gates."},
+    {"id":"lost-submit","status":"NOT_RUN","zh":"提交后取消勾选并丢弃响应；随后仅从 state head 匹配 nonce，先关闭本流再允许首段 ACK。","en":"Turn the option off after submitting and lose the response. Match the nonce from state alone, close that stream, then allow its first display ACK."},
+    {"id":"new-request","status":"NOT_RUN","zh":"旧提交取消勾选后重新勾选并发送新请求，即使文本相同，旧 nonce/回执也不能关闭新流。","en":"After turning off an older submission, re-enable and send another request with the same text. The old nonce or response must not close the new stream."},
+    {"id":"late-state","status":"NOT_RUN","zh":"新 generation 提交回执之后交付旧 generation 的迟到 state，再让 close 失败；新流关闭意图仍保留、ACK 仍暂停。","en":"Deliver an older-generation state after the new submission response, then fail close. Keep the new stream's closing intent and ACK gate."},
+    {"id":"hidden-return","status":"NOT_RUN","zh":"隐藏页面发绑定 hidden close；返回可见仅恢复文字，不恢复声音。状态旧 open 也不能重开。","en":"Hide the page and send its bound hidden close. Returning restores text only; even a stale open state cannot restart speech."},
+    {"id":"history-return","status":"NOT_RUN","zh":"明确进入历史页关闭本流，返回实时窗后不自动恢复。普通内容增长不被当成用户停声。","en":"Explicitly open history to close this stream. Returning to live messages does not resume it. Content growth is not treated as a stop command."},
+    {"id":"single-close-retry","status":"NOT_RUN","zh":"关闭失败保留提示并按状态轮询重试，始终最多一个 close 在途；文字和已显示前缀不清空。","en":"Keep the close-failure notice and retry on state polling, with at most one close in flight. Preserve text and the displayed prefix."},
+    {"id":"manual-read","status":"NOT_RUN","zh":"completed 流手动朗读只发原 playback API；后端先关闭自动队列。迟到重复 close 不停止新手动播放。","en":"Manually read a completed stream using the existing playback API only; the server first closes its automatic queue. A late duplicate close must not stop manual playback."},
+    {"id":"text-audio-independent","status":"NOT_RUN","zh":"文字 completed 但音频尚未完成时不显示播报完成；单独关闭声音不改变文字 final、前缀或教学完成事实。","en":"Do not label speech complete merely because text is completed. Closing speech alone preserves final text, the displayed prefix and teaching state."},
+    {"id":"failure-prefix","status":"NOT_RUN","zh":"provider/final 失败由后端立即停当前段并关闭后续；显示已发生的收据，不把尾段补播或全篇重播。","en":"On provider/final failure, the server stops the current segment and closes the remainder. Keep actual receipts without playing the tail or replaying the whole answer."},
+    {"id":"bilingual-layout","status":"NOT_RUN","zh":"窄宽布局核对中英的下次发送选项、本条关闭入口、关闭未确认及完成段数；不要把配置 open 写成已经发声。","en":"At narrow and wide widths, verify both languages for the next-send option, per-reply close, unconfirmed close and completed-segment count. Open must not be described as actual audio start."}
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "fixture_version": "memory-education-boundaries-v1",
+  "synthetic_only": true,
+  "scenarios": {
+    "constraints": {
+      "cases": {
+        "zh": {"events": [
+          {"label":"physical_constraint","kind":"learner_statement","content":{"text":"在这次纸桥比较中，A桥跨度是10厘米、折了两道，B桥跨度是15厘米、折了四道。跨度和折法同时改变，而且没有记录承重，因此不能从这次记录判断哪种折法更牢。","synthetic_fixture":true}},
+          {"label":"reading_constraint","kind":"learner_statement","content":{"text":"这段故事只写了小林关上窗户，没有交代天气或原因。仅凭这句话不能确定他是因为下雨才关窗。","synthetic_fixture":true}},
+          {"label":"program_constraint","kind":"learner_statement","content":{"text":"这次两个循环的初始值不同：A从0开始，B从1开始，都是每次加2、执行三次。不能只用最后数值判断哪个循环多执行了一次。","synthetic_fixture":true,"support_level":"hinted"}},
+          {"label":"unaccepted_plan","kind":"plan","content":{"text":"有人建议下次把纸桥跨度都设为10厘米再测承重，我还没有接受，也没有做这个实验。","synthetic_fixture":true,"accepted":false,"execution_status":"not_started"}}
+        ]},
+        "en": {"events": [
+          {"label":"physical_constraint","kind":"learner_statement","content":{"text":"In this paper-bridge comparison, bridge A had a 10 cm span and two folds, while bridge B had a 15 cm span and four folds. Both span and folding changed, and load capacity was not recorded, so this record cannot establish which folding pattern is stronger.","synthetic_fixture":true}},
+          {"label":"reading_constraint","kind":"learner_statement","content":{"text":"The story only says that Lin closed the window; it gives neither the weather nor a reason. That sentence alone cannot establish that rain caused Lin to close it.","synthetic_fixture":true}},
+          {"label":"program_constraint","kind":"learner_statement","content":{"text":"The two loops started at different values: A started at 0 and B at 1. Both added 2 on each of three iterations. Their final values alone cannot show that one loop ran an extra iteration.","synthetic_fixture":true,"support_level":"hinted"}},
+          {"label":"unaccepted_plan","kind":"plan","content":{"text":"Someone suggested setting both bridge spans to 10 cm and measuring load capacity next time. I have not accepted this plan or performed the experiment.","synthetic_fixture":true,"accepted":false,"execution_status":"not_started"}}
+        ]}
+      },
+      "minimal_expectations": [
+        {"source_label":"physical_constraint","kind":"context_constraint","claim_type":"condition_limit","scope":"current_activity","support_level":"unknown","coverage":"expected"},
+        {"source_label":"reading_constraint","kind":"context_constraint","claim_type":"condition_limit","scope":"current_activity","support_level":"unknown","coverage":"expected"},
+        {"source_label":"program_constraint","kind":"context_constraint","claim_type":"condition_limit","scope":"current_activity","support_level":"unknown","coverage":"expected"}
+      ],
+      "excluded_source_labels": ["unaccepted_plan"],
+      "manual_review_criteria": [
+        "Each of the three task-specific constraints is retained as historical context, without inventing results or ability labels.",
+        "The bridge candidate preserves both spans, fold counts, simultaneous changes, missing load measurements and the limit on the conclusion.",
+        "The reading candidate preserves the missing weather/reason and does not assert that it rained or did not rain.",
+        "The loop candidate preserves initial values, increment, iteration count and the limit on inferring an extra iteration.",
+        "The hinted marker on the loop source does not turn the condition into evidence of an independently answered task.",
+        "The unaccepted plan is omitted and is never recorded as accepted, performed or a result."
+      ]
+    },
+    "preferences_and_support": {
+      "cases": {
+        "zh": {"events": [
+          {"label":"persistent_preference","kind":"learner_statement","content":{"text":"请记住以后讲解中英文科学词汇时，先给英文术语，再给中文解释。我明确希望后续活动也沿用这个顺序；如果我更改要求，请以新的要求为准。","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"persistent"}},
+          {"label":"temporary_preference","kind":"learner_statement","content":{"text":"只在今天这道分数题里，请先别给答案，给我一个提示；不要把它记成以后所有题目的偏好。","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"temporary"}},
+          {"label":"independent_response","kind":"learner_answer","content":{"text":"在没有提示的这次作答里，我把1/2加1/3写成了2/5。这只是这一次的答案。","synthetic_fixture":true,"support_level":"independent"}},
+          {"label":"hinted_response","kind":"learner_answer","content":{"text":"在看到“先把两项都换成六分之几”的提示后，我把1/2加1/3写成了5/6。这是提示后的这一次答案，还没有在无提示的新题中检验。","synthetic_fixture":true,"support_level":"hinted"}}
+        ]},
+        "en": {"events": [
+          {"label":"persistent_preference","kind":"learner_statement","content":{"text":"Please remember to give the English term first and then the Chinese explanation when explaining bilingual science vocabulary in future activities. I explicitly want this order to continue; if I change my request, use the new request.","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"persistent"}},
+          {"label":"temporary_preference","kind":"learner_statement","content":{"text":"Only for today's fraction problem, give me one hint before the answer. Do not remember this as my preference for all future problems.","synthetic_fixture":true,"explicit_preference":true,"preference_scope":"temporary"}},
+          {"label":"independent_response","kind":"learner_answer","content":{"text":"On this attempt without a hint, I wrote 1/2 plus 1/3 as 2/5. This is only my answer on this occasion.","synthetic_fixture":true,"support_level":"independent"}},
+          {"label":"hinted_response","kind":"learner_answer","content":{"text":"After the hint 'express both fractions in sixths first', I wrote 1/2 plus 1/3 as 5/6. This is my answer after a hint on this occasion; it has not been checked on a new problem without hints.","synthetic_fixture":true,"support_level":"hinted"}}
+        ]}
+      },
+      "minimal_expectations": [
+        {"source_label":"persistent_preference","kind":"help_preference","claim_type":"explicit_preference","scope":"cross_session_explicit","support_level":"unknown","coverage":"expected"},
+        {"source_label":"temporary_preference","kind":"help_preference","claim_type":"explicit_preference","scope":"current_session","support_level":"unknown","coverage":"optional_session_only"},
+        {"source_label":"independent_response","kind":"concept_evidence","claim_type":"task_specific_response","scope":"current_activity","support_level":"independent","coverage":"expected"},
+        {"source_label":"hinted_response","kind":"concept_evidence","claim_type":"task_specific_response","scope":"current_activity","support_level":"hinted","coverage":"expected"}
+      ],
+      "excluded_source_labels": [],
+      "manual_review_criteria": [
+        "The persistent preference preserves English-term-first then Chinese-explanation order, its science-vocabulary scope and revisability.",
+        "The temporary hint request is omitted or session-only, never added to the persistent preference.",
+        "Both answers and their different support levels are preserved without silently correcting the original 2/5 answer.",
+        "The hint wording and 5/6 answer stay linked to this occasion, including the absence of independent transfer testing.",
+        "Do not claim established mastery, lasting learning benefit, causal hint effectiveness or a general ability label from these two responses.",
+        "Category coverage is not a semantic accuracy score; extra misconception candidates must be assessed separately."
+      ]
+    }
+  }
+}

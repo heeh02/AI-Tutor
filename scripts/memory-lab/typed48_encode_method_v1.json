@@ -1,0 +1,66 @@
+{
+  "method": "typed48-bge-encoding-v1-20261104",
+  "frozen_before_encoding": true,
+  "synthetic_only": true,
+  "projection_method_sha256": "3e9a977488da598ab79b0daf3b5b98988a68249c26d9fe68b87aa4aaffa05b2c",
+  "projection_probe_sha256": "9a3b0186c75744660fa3ff3df45863258143f58d672b81b34b96e8835a6b9395",
+  "fixture_manifest_sha256": "858ee969827d54d1687d1a3966e726576a66024f9b462683323732dde94fbb81",
+  "projection_report_binding": "Required caller-supplied exact SHA256 of completed real Store projection report; report must bind the exact encoder_inputs.jsonl bytes. No report repair or fallback.",
+  "helper_files": {
+    "bge_m3_shadow.py": "7593c7db527fe1f872737899eeafee8697680c9765189183e4490b997bf8d922",
+    "bge_m3_shadow_method_v1.json": "2f7abcf3f30ae3c31f62730f59e3dc792aedcadeac570585d1e8f0be2085bf17",
+    "download_bge_m3.py": "b7a3a91beadbd79129c3c1c112e4fb0acd2f6455dd9b431f4b195662a33e5736",
+    "e5_python_reference.py": "26625f4def8f79a85a0d7bf8746d9fb2599c6429ead39831c7d0a43d6acfb2ee",
+    "check_diagnostic_postfreeze.py": "aaa373dc9527cc42c5dbcf9e929c28fa05f8684cec5b7820fe4b8a03a49207f2"
+  },
+  "reuse": "Frozen typed_projection_encode utility functions only (hash checks, JSON write, helper loader, RSS summary), and BGE shadow tokenize/encode. New typed48 provenance validation; no old validation/main patched or executed.",
+  "expected_inputs": {
+    "projected_memories": 48,
+    "current_query": 96,
+    "query_plus_goal": 96,
+    "total": 240
+  },
+  "text_contract": "Exact actual Store memory.content including typed prefix; original v2 query and exact text + space + goal + trailing space. Preserve order and text SHA256; reject omissions, additions, rewritten or duplicate queries.",
+  "profile": {
+    "artifact": "pytorch-bin-native-fp32",
+    "dimension": 1024,
+    "document_prefix": "",
+    "maximum_tokens": 512,
+    "model": "BAAI/bge-m3",
+    "model_key": "e8ea69aa701cae2e76b2e742053839773a19bbee66e53278864485d98b61bbf0",
+    "normalization": "L2",
+    "pooling": "cls-l2-v1",
+    "query_prefix": "",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "tokenizer_sha256": "21106b6d7dab2952c1d496fb21d5dc9db75c28ed361a05f5020bbba27810dd08",
+    "weight_sha256": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38"
+  },
+  "runtime": {
+    "device": "cpu",
+    "dtype": "float32",
+    "batch_size": 1,
+    "intra_threads": 2,
+    "inter_threads": 1,
+    "attention": "eager",
+    "eval": true,
+    "inference_mode": true,
+    "local_files_only": true,
+    "trust_remote_code": false,
+    "weights_only": true,
+    "use_safetensors": false,
+    "max_tokens": 512,
+    "truncation": false
+  },
+  "artifact_verification": "Existing fixed official BGE assets verified by byte count plus Git/LFS hashes via pinned verify function; no downloads or installs",
+  "output": "All token IDs/masks, exact normalized FP32 vectors and little-endian hashes, input/report/helper/model hashes, per-item tokenize/inference timing and process RSS samples. No hidden tensor dump.",
+  "memory_scope": "Whole-process /proc/self/status RSS/HWM samples, not exclusive model memory or guaranteed exact monotonic peak; preserve any decreasing HWM observations and report maximum observed RSS only",
+  "timing_scope": "Single ordered diagnostic; separate artifact verification, tokenizer, model load and per-item encoding. Not cold-start guarantee or balanced performance benchmark.",
+  "limits": [
+    "Encoding only; no Store vector import or retrieval",
+    "No model extraction or no-evidence rejection tested",
+    "No inherited raw60 or typed42 gate/results",
+    "No production defaults or frozen datasets/reports changed"
+  ],
+  "projection_common_sha256": "2dfcf8b95c399d8194aa944ff8ff8330e30365be0f0026c8ce3e42b4a52e98e8",
+  "utility_sha256": "707ef0cbb2512723b99c751e8df619856cf382b429559d500b92501e765625e5"
+}

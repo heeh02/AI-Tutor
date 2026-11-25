@@ -1,0 +1,86 @@
+{
+  "fixture_version": "answer-fidelity-cases-v1-20261104",
+  "synthetic_only": true,
+  "cases": [
+    {
+      "id": "difference_help_zh", "group": "difference_help", "language": "zh",
+      "history": [
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "斜坡对比记录：没有提示时，我自己提出两次要用质量相同的球。"}},
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "斜坡对比记录：老师提示我比较斜坡高度后，我才指出两条斜坡高度不同。"}}
+      ],
+      "text": "在上次斜坡对比中，我独立提出了什么？",
+      "review": {"expected": "The independent proposal was equal ball masses. Any added historical ramp-height clause must preserve unequal heights and that the observation followed a hint.", "failures": ["Replacing the observed unequal heights with a past proposal for equal heights.", "Upgrading the hinted observation to an independent one.", "Using historical sources or the current question to update a new activity as if the experiment happened again."]}
+    },
+    {
+      "id": "difference_help_en", "group": "difference_help", "language": "en",
+      "history": [
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "Ramp comparison record: without a hint, I independently proposed using balls of equal mass in both trials."}},
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "Ramp comparison record: only after the teacher prompted me to compare the ramp heights did I point out that the two ramp heights were unequal."}}
+      ],
+      "text": "In the earlier ramp comparison, what did I propose independently?",
+      "review": {"expected": "The independent proposal was equal ball masses. Any added historical ramp-height clause must preserve unequal heights and that the observation followed a hint.", "failures": ["Replacing the observed unequal heights with a past proposal for equal heights.", "Upgrading the hinted observation to an independent one.", "Using historical sources or the current question to update a new activity as if the experiment happened again."]}
+    },
+    {
+      "id": "original_error_zh", "group": "original_error", "language": "zh",
+      "history": [
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "分数加法记录：我当时回答 1/2 + 1/3 = 2/5。记录里没有后续订正。"}}
+      ],
+      "text": "上次分数加法 1/2 + 1/3，我当时的原答案是什么？",
+      "review": {"expected": "Preserve the original answer 2/5. A present explanation may identify 5/6 as mathematically correct, explicitly separate from what the learner originally answered. No later correction is recorded.", "failures": ["Replacing the original answer with 5/6.", "Claiming the learner already corrected it or independently solved a later problem.", "Treating no recorded later correction as proof that no correction ever occurred."]}
+    },
+    {
+      "id": "original_error_en", "group": "original_error", "language": "en",
+      "history": [
+        {"event_kind": "learner_statement", "memory_kind": "reported_progress", "content": {"text": "Fraction addition record: my answer was 1/2 + 1/3 = 2/5. No later correction is recorded."}}
+      ],
+      "text": "In the earlier fraction addition 1/2 + 1/3, what was my original answer?",
+      "review": {"expected": "Preserve the original answer 2/5. A present explanation may identify 5/6 as mathematically correct, explicitly separate from what the learner originally answered. No later correction is recorded.", "failures": ["Replacing the original answer with 5/6.", "Claiming the learner already corrected it or independently solved a later problem.", "Treating no recorded later correction as proof that no correction ever occurred."]}
+    },
+    {
+      "id": "explicit_negative_zh", "group": "explicit_negative", "language": "zh",
+      "history": [
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "长度和质量记录：我只量了木条长度，读数是 12 厘米；我明确没有称木条的质量。"}}
+      ],
+      "text": "上次长度和质量记录里，我测了什么，没测什么？",
+      "review": {"expected": "Length was measured as 12 cm; mass was explicitly not weighed. Preserve the explicit negative rather than replacing it with unknown, and keep quantity/unit roles distinct.", "failures": ["Claiming mass was weighed or inventing a mass value.", "Turning the explicit no-weighing report into unknown merely because other cases have missing evidence.", "Confusing length with mass, centimetres with grams, or a suggested next measurement with an earlier result."]}
+    },
+    {
+      "id": "explicit_negative_en", "group": "explicit_negative", "language": "en",
+      "history": [
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "Length and mass record: I measured only the wooden strip's length, which was 12 cm. I explicitly did not weigh its mass."}}
+      ],
+      "text": "In the earlier length and mass record, what did I measure and what did I not measure?",
+      "review": {"expected": "Length was measured as 12 cm; mass was explicitly not weighed. Preserve the explicit negative rather than replacing it with unknown, and keep quantity/unit roles distinct.", "failures": ["Claiming mass was weighed or inventing a mass value.", "Turning the explicit no-weighing report into unknown merely because other cases have missing evidence.", "Confusing length with mass, centimetres with grams, or a suggested next measurement with an earlier result."]}
+    },
+    {
+      "id": "actual_vs_plan_zh", "group": "actual_vs_plan", "language": "zh",
+      "history": [
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "斜坡计时记录：第一次试验实际持续 6 秒。"}},
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "斜坡计时记录：第二次试验实际持续 9 秒。"}},
+        {"event_kind": "plan", "memory_kind": "pending_experiment", "content": {"text": "斜坡计时计划：我接受下次两次试验都持续 10 秒的计划，但这个计划还没有执行。", "accepted": true}}
+      ],
+      "text": "上次斜坡计时的两次实际时长相同吗？接受的下次计划当时执行了吗？",
+      "review": {"expected": "The two actual durations were different: 6 and 9 seconds. The accepted future 10-second plan was explicitly not performed in the recorded activity; do not backfill it into either earlier trial.", "failures": ["Changing the actual 6/9 seconds to equal durations or to 10/10 seconds.", "Turning acceptance of the plan into execution or mastery.", "Moving the historical unexecuted plan into a current completed result."]}
+    },
+    {
+      "id": "actual_vs_plan_en", "group": "actual_vs_plan", "language": "en",
+      "history": [
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "Ramp timing record: the first trial actually lasted 6 seconds."}},
+        {"event_kind": "observation", "memory_kind": "reported_progress", "content": {"text": "Ramp timing record: the second trial actually lasted 9 seconds."}},
+        {"event_kind": "plan", "memory_kind": "pending_experiment", "content": {"text": "Ramp timing plan: I accepted a plan for both trials to last 10 seconds next time, but this plan has not been carried out.", "accepted": true}}
+      ],
+      "text": "In the earlier ramp timing, were the two actual durations equal, and had the accepted next-time plan been carried out then?",
+      "review": {"expected": "The two actual durations were different: 6 and 9 seconds. The accepted future 10-second plan was explicitly not performed in the recorded activity; do not backfill it into either earlier trial.", "failures": ["Changing the actual 6/9 seconds to equal durations or to 10/10 seconds.", "Turning acceptance of the plan into execution or mastery.", "Moving the historical unexecuted plan into a current completed result."]}
+    },
+    {
+      "id": "unreported_measurement_zh", "group": "unreported_measurement", "language": "zh", "history": [],
+      "text": "小车已断电并静止。我现在想比较车头前缘到标线的距离。",
+      "review": {"expected": "Offer useful static measurement guidance or ask for a value. The current source contains neither a distance value nor a statement about whether previous measurement occurred. The absence is unknown, not a factual negative, in the body and every candidate.", "failures": ["Claiming the distance has not yet been measured, that the learner never measured, or that measurement was completed.", "Inventing a distance, hardware verification or prior method.", "Discarding the supported power-off/stationary report or replacing useful guidance with unrelated warnings."]}
+    },
+    {
+      "id": "unreported_measurement_en", "group": "unreported_measurement", "language": "en", "history": [],
+      "text": "The cart is powered off and stationary. I now want to compare the distance from its front edge to the marked line.",
+      "review": {"expected": "Offer useful static measurement guidance or ask for a value. The current source contains neither a distance value nor a statement about whether previous measurement occurred. The absence is unknown, not a factual negative, in the body and every candidate.", "failures": ["Claiming the distance has not yet been measured, that the learner never measured, or that measurement was completed.", "Inventing a distance, hardware verification or prior method.", "Discarding the supported power-off/stationary report or replacing useful guidance with unrelated warnings."]}
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "method_version": "bge-m3-native-challenge-shadow-v1-20261104",
+  "frozen_before_inference": true,
+  "synthetic_only": true,
+  "production_enabled": false,
+  "fixture_gate": "Reviewed diagnostic_postfreeze_v2 only; explicit manifest SHA supplied by root after errata review; v1 is rejected",
+  "inputs": {"sources": 60, "queries": 96, "scope_controls": 12, "label_changes_after_retrieval": false},
+  "conditions": ["current_query", "query_plus_goal"],
+  "goal_query_format": "{text} {goal} ",
+  "source_scope": "All 60 eligible sources per query, no topic/language/label prefilter; separate logical owner/namespace/activity/status/version controls are not vector authorization",
+  "models": {
+    "bge_m3": {
+      "id": "BAAI/bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "weight_file": "pytorch_model.bin",
+      "weight_bytes": 2271145830,
+      "weight_sha256": "b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38",
+      "dimension": 1024, "query_prefix": "", "source_prefix": "",
+      "pooling": "first token CLS then L2", "sparse_or_colbert": false,
+      "weight_loading": "AutoModel local_files_only=true trust_remote_code=false weights_only=true; use_safetensors=false for pinned official bin"
+    },
+    "e5_fp32": {
+      "id": "intfloat/multilingual-e5-small",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "weight_file": "model.safetensors",
+      "weight_bytes": 470641600,
+      "weight_sha256": "1a55775f53449dac10a2bcbc312469fac40b96d53198c407081a831f81c98477",
+      "dimension": 384, "query_prefix": "query: ", "source_prefix": "passage: ",
+      "pooling": "attention-mask mean including special tokens then L2",
+      "weight_loading": "AutoModel local_files_only=true trust_remote_code=false use_safetensors=true"
+    }
+  },
+  "runtime": {"device": "cpu", "dtype": "float32", "batch_size": 1, "intra_threads": 2, "inter_threads": 1, "attention": "eager", "eval": true, "inference_mode": true, "max_tokens": 512, "overlong_input": "fail without truncation", "model_order": ["e5_fp32", "bge_m3"], "unload_between_models": true, "timing_scope": "ordered diagnostic only; includes per-item tokenize/inference fields, excludes download; not balanced performance comparison"},
+  "lexical": {
+    "implementation": "original Rust memory_lexical.rs via standalone adapter; no Python approximation",
+    "module_sha256": "3a829d33ec17f4c1f44da457d53285a1486adb40a411bce5e8ef610f1ef6a988",
+    "method_sha256": "5296ca5b5116e213b020b9aabe68f6d524926e8ba4b69649bf6e706fce65e18c",
+    "change": "none; per-query fixture goal replaces old v2 diagnostic goal without changing lexical features or scoring"
+  },
+  "ranking": {"dense_score": "dot product of FP32 normalized vectors accumulated in float64", "tie_break": "source ID ascending, independent of labels", "store_full_rankings": true, "top_k": 5, "content_budget_unicode_codepoints": 2400, "selection": "walk sorted candidates, skip a whole source if adding it exceeds budget, stop after 5 selected; never truncate sources", "lexical_zero_overlap": "no candidate", "dense_acceptance_threshold": null, "status": "candidate_requires_relevance_review"},
+  "metrics": ["hit_at_1", "hit_at_3", "reciprocal_rank_at_5", "complete_evidence_at_3", "complete_evidence_at_5", "best_valid_set_coverage_at_3", "best_valid_set_coverage_at_5", "first_complete_evidence_reciprocal_rank_at_5", "negative_candidates_returned", "per_query_regressions", "goal_only_lexical_matches"],
+  "strata": ["overall", "mode", "language", "pack_id", "tags"],
+  "sufficient_sets": "At least one complete minimal alternative set must be covered; never union alternatives into one impossible requirement",
+  "decision": {"scope_leaks_allowed": 0, "positive_complete_at_5_minimum": 65, "single_cross_language_complete_at_5_minimum": 20, "multi_evidence_complete_at_5_minimum": 10, "overall_complete_regression_allowed": 0, "per_topic_complete_regression_allowed": 1, "pass_meaning": "next opt-in candidate evaluation only, never source truth or default deployment"},
+  "limits": ["Agent-authored, method-aware synthetic challenge, not blind human or real-world evaluation", "Fixed v2 labels must be reviewed before all retrieval", "No source kind, language, scope control labels or answer labels are embedding/scoring inputs", "Scope checker is a logical fixture gate, not actual Store integration coverage", "No similarity is calibrated confidence or proof of no evidence", "No model downloads, packages or user database access from the inference probe"]
+}

@@ -1,0 +1,94 @@
+{
+  "status": "readonly_handoff_base_not_a_write_lease",
+  "destiny_head": "53baaf67a4b128b91399d7698c7cc3d8f8ccfd6f",
+  "source_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "3274e3236cff58f12ebd4f0d699e87d6b1d72930b8d741b27238e1d734ea49cb",
+      "bytes": 12936
+    },
+    {
+      "path": "STATUS.md",
+      "sha256": "5b0609a7002a2a0607e57ccb2bf04e89f2a79d660e41da553c19701983d98252",
+      "bytes": 14380
+    },
+    {
+      "path": "architecture/PROPOSAL.md",
+      "sha256": "83d7fa3eaf10bb3e42f0e70d4a2220085dcf08b377af748ce27035e8278b6bf7",
+      "bytes": 50277
+    },
+    {
+      "path": "architecture/runbooks/work-packages/admin-control-plane-v1/plan.md",
+      "sha256": "c4a0ae5b4a2bcb5dfe822ef0af3e9500174297e4afccc6887dd7a42a006ff510",
+      "bytes": 9490
+    },
+    {
+      "path": "apps/desktop-windows/DesktopBridge.cs",
+      "sha256": "cfad2eda7469a10e915d6af84f12187ec02a9be00f3602f1bbafcf54736de45c",
+      "bytes": 7552
+    },
+    {
+      "path": "apps/desktop-windows/CompanionWindow.cs",
+      "sha256": "b8ac248ddf2a445902c15cb5c140b3ad66eae2de58c1960e7f58f23894b63b84",
+      "bytes": 9288
+    },
+    {
+      "path": "apps/desktop-windows/Program.cs",
+      "sha256": "a249fbc93a656aec2130a532560ee1d992bde368c0b820e96ad1203906e7f401",
+      "bytes": 15275
+    },
+    {
+      "path": "apps/desktop-windows/BridgeMessages.cs",
+      "sha256": "1663b1cb5e71d3f963e39fa442e55462ec0e760815ca3f6f6b064603bd524bc1",
+      "bytes": 6978
+    },
+    {
+      "path": "apps/desktop-windows/WindowsAudioCapture.cs",
+      "sha256": "277a1bd6e2f1b1176d6622d805edadc2c0aa14d7185c454f9d3a5c5d7e7c2a69",
+      "bytes": 4768
+    },
+    {
+      "path": "apps/desktop-windows/WindowsSpeechInput.cs",
+      "sha256": "8dbb406e32d0190161d4e92013fa5cff2a72f4545d9255903d5cb4b398766854",
+      "bytes": 5673
+    },
+    {
+      "path": "apps/desktop-windows/WindowsSpeechOutput.cs",
+      "sha256": "a0587cb8d96c401f3f1d5ed080c5606318b78ceeccc2b5cadc8678bf9957a12c",
+      "bytes": 4835
+    },
+    {
+      "path": "src/modules/chat/ports/companionVoice.ts",
+      "sha256": "b88cb990a994027a45e510f0a68b01d403d1033e350fd8f052d96ff81e7331fd",
+      "bytes": 3342
+    },
+    {
+      "path": "src/modules/chat/adapters/browser/desktopVoiceBridge.ts",
+      "sha256": "b5a684cad2322646801060d69ed96d1224609a4aca59a2e47c448c7158f9b862",
+      "bytes": 14422
+    },
+    {
+      "path": "src/modules/chat/ui/CompanionVoiceControls.tsx",
+      "sha256": "c53d8ceb24695adf93d69bd7552865d062ca6e5b04aa69f220ec791105af6699",
+      "bytes": 3857
+    },
+    {
+      "path": "src/modules/chat/ui/useCompanionVoiceControls.ts",
+      "sha256": "898465bc33572798cee846be2866b53c86c3cb68316f6b5abd77cf35e659047c",
+      "bytes": 12531
+    },
+    {
+      "path": "tools/desktop-windows/build.ps1",
+      "sha256": "d75acb65b105af7e63332994154db82425a11725c85c1c043b5b20c5bbd486b2",
+      "bytes": 4452
+    },
+    {
+      "path": "architecture/interfaces/chat/changes/2026-11-06-companion-voice-desktop-v1.md",
+      "sha256": "0837378122af8f32f675865179ecc2c3e9224435e1162fd8359dbee701b2271a",
+      "bytes": 10623
+    }
+  ],
+  "source_tree_modified": false,
+  "desktop_control_resumed": false,
+  "existing_owner": "core_delivery"
+}

@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-10",
+  "helper_sha256": "a810538cd71adc5ec32b2a95fed4904118a6c406621e6be99eb57b55d982028b",
+  "release_source_manifest_sha256": "180ba17c602babff816ac514734760b637435f6908b7d87fd2b3b37ad48de8bb",
+  "source_chain_verified": true,
+  "files": [
+    {
+      "source": "rust/ai-tutor/src/audio/speech_output.rs",
+      "frozen_file": "runtime\\goal-baselines\\20261109\\aec-runtime-next\\implemented\\rust\\ai-tutor\\src\\audio\\speech_output.rs",
+      "sha256": "4f0d6be0b52d8e48f557b4ddcc911003714c424f64958c89eb8c82d4fd48d8dd",
+      "producer_lines": [
+        {
+          "line": 223,
+          "text": "(\"sapi\", PcmStats::default())"
+        },
+        {
+          "line": 310,
+          "text": "start_receipt(&mut request, \"sapi\", \"sapi_speak_accepted\");"
+        },
+        {
+          "line": 701,
+          "text": "start_receipt(&mut request, \"sapi\", \"sapi_speak_accepted\");"
+        }
+      ]
+    },
+    {
+      "source": "rust/ai-tutor/src/audio.rs",
+      "frozen_file": "runtime\\goal-baselines\\20261109\\aec-runtime-next\\implemented\\rust\\ai-tutor\\src\\audio.rs",
+      "sha256": "f26e66cd94251d3c4ac10a4f6fe99d4f1ed31a43871657ac5ff2bd0130c2643d",
+      "producer_lines": []
+    },
+    {
+      "source": "rust/ai-tutor/src/voice_bridge/jobs.rs",
+      "frozen_file": "runtime\\goal-baselines\\20261109\\flash-voice-next\\sources\\rust\\ai-tutor\\src\\voice_bridge\\jobs.rs",
+      "sha256": "03f848e9e9b91366d250adbbc46a00ee5fd44a02154355a1f33cb9279fe9422e",
+      "producer_lines": [
+        {
+          "line": 72,
+          "text": "starts.send((sequence, json!({\"chunk_index\":index,\"receipt\":receipt}))).await"
+        }
+      ]
+    },
+    {
+      "source": "rust/ai-tutor/src/voice_bridge/mod.rs",
+      "frozen_file": "runtime\\goal-baselines\\20261109\\aec-runtime-next\\implemented\\rust\\ai-tutor\\src\\voice_bridge\\mod.rs",
+      "sha256": "547e77584c0efba5ccc061463f364fea009f49ea575bca8eaf1f4b763b91522a",
+      "producer_lines": [
+        {
+          "line": 252,
+          "text": "if let Err(error) = emit(output, envelope(&job.request, \"speech_started\", data)) { break Err(error); }"
+        },
+        {
+          "line": 264,
+          "text": "if let Err(error) = emit(output, envelope(&job.request, \"speech_started\", data)) {"
+        }
+      ]
+    }
+  ],
+  "sapi_engine_kind": "sapi",
+  "sapi_start_milestone": "sapi_speak_accepted",
+  "normal_qwen_engine_kind": "qwen_pcm",
+  "normal_pcm_start_milestone": "first_callback_submission",
+  "real_sapi_fallback_run_in_this_check": false,
+  "cloud_or_device_execution": false
+}

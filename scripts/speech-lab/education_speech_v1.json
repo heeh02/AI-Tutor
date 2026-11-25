@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "source_type": "authored_synthetic_fixture",
+  "limitations": "Generated adult-voice audio is an engineering baseline, not evidence of child, accent, noise, naturalness or learning performance. Mixed-language SAPI pronunciation is itself a confounder.",
+  "samples": [
+    {"id":"zh_short","language":"zh","text":"先让小车停下来。","terms":["小车","停"]},
+    {"id":"en_short","language":"en","text":"First, stop the car.","terms":["stop","car"]},
+    {"id":"zh_concept","language":"zh","text":"测距模块告诉主控离墙有多远，电机让小车动起来。","terms":["测距","主控","电机"]},
+    {"id":"en_concept","language":"en","text":"The distance sensor tells the controller how far away the wall is. The motor moves the car.","terms":["distance","sensor","motor"]},
+    {"id":"zh_correction","language":"zh","text":"不对，我还没有完成实验，只是打算把停车距离改成二十厘米。","terms":["没有","实验","二十"]},
+    {"id":"en_correction","language":"en","text":"I have not finished the experiment. I only plan to change the stopping distance to twenty centimeters.","terms":["not","plan","twenty"]},
+    {"id":"zh_hint","language":"zh","text":"先不要告诉我答案，给我一个小提示，再让我自己试一次。","terms":["不要","提示","自己"]},
+    {"id":"en_hint","language":"en","text":"Please give me one small hint, then let me try again on my own.","terms":["hint","try","own"]},
+    {"id":"zh_number","language":"zh","text":"第一次用了三点五秒，第二次用了两秒，我们要比较的是同一段距离。","terms":["第一次","第二次","距离"]},
+    {"id":"en_number","language":"en","text":"The first run took three point five seconds. The second took two seconds over the same distance.","terms":["first","second","distance"]},
+    {"id":"mixed_zh","language":"zh","text":"我想比较 distance sensor 和电机的作用。","terms":["distance","sensor","电机"]},
+    {"id":"mixed_en","language":"en","text":"The motor is the 电机. Can you explain it in both languages?","terms":["motor","电机","languages"]}
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "scope": "Manual or isolated-fixture acceptance scripts; no actions are executed by this file.",
+  "execution_status": "NOT_RUN",
+  "languages": [
+    "zh",
+    "en"
+  ],
+  "cases": [
+    {
+      "id": "S01",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "在24条消息窗口底部，收到第25条回复。",
+        "expected": "对话容器跟随最后turn_id；页顶和其他面板不被滚动。"
+      },
+      "en": {
+        "task": "Stay at the bottom of a 24-message window and receive reply 25.",
+        "expected": "The conversation follows the latest turn ID without scrolling the page or other panels."
+      }
+    },
+    {
+      "id": "S02",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "上翻阅读旧消息，再收到两条回复。",
+        "expected": "不强拉到底部；显示新回复入口。"
+      },
+      "en": {
+        "task": "Scroll up to read earlier messages, then receive two replies.",
+        "expected": "Do not jump to the bottom; show the new-reply entry."
+      }
+    },
+    {
+      "id": "S03",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "存在未读新回复时点击“查看最新”。",
+        "expected": "滚动对话到底部，入口消失，后续回复继续跟随。"
+      },
+      "en": {
+        "task": "With a new reply pending, select Jump to latest.",
+        "expected": "Scroll the conversation to the bottom, clear the entry, and follow subsequent replies."
+      }
+    },
+    {
+      "id": "S04",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "出现新回复入口后，手动滚到距底部48像素内。",
+        "expected": "入口清除，后续新增回复正常跟随。"
+      },
+      "en": {
+        "task": "After the new-reply entry appears, manually scroll within 48 pixels of the bottom.",
+        "expected": "Clear the entry and follow subsequent replies."
+      }
+    },
+    {
+      "id": "S05",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "上翻后等待多次相同状态轮询。",
+        "expected": "不发生自动滚动或虚假新回复提示。"
+      },
+      "en": {
+        "task": "Scroll up and wait for repeated identical state polls.",
+        "expected": "Do not auto-scroll or show a false new-reply notification."
+      }
+    },
+    {
+      "id": "S06",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "从有24条消息的档案切换到另一个同样有24条消息的档案。",
+        "expected": "新会话从最新内容开始，旧未读提示清除，档案数据隔离。"
+      },
+      "en": {
+        "task": "Switch from a profile with 24 messages to another profile with 24 messages.",
+        "expected": "Start at the latest content in the new session, clear the old indicator, and keep profiles isolated."
+      }
+    },
+    {
+      "id": "S07",
+      "area": "scroll",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "切换到没有对话的新活动。",
+        "expected": "显示空态，不保留旧滚动提示。"
+      },
+      "en": {
+        "task": "Switch to a new activity with no conversation.",
+        "expected": "Show the empty state without retaining an old scroll indicator."
+      }
+    },
+    {
+      "id": "V01",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "开启预览并连续输入一段中英文问题。",
+        "expected": "预览独立刷新；输入内容、焦点、教师报告草稿保持。"
+      },
+      "en": {
+        "task": "Run the preview while typing a question containing Chinese and English.",
+        "expected": "Refresh the preview independently while preserving text, focus, and the teacher report draft."
+      }
+    },
+    {
+      "id": "V02",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "在原图和镜像间切换后点选同一人脸框。",
+        "expected": "图像与框使用同一快照；坐标镜像只影响显示，选中key不改变。"
+      },
+      "en": {
+        "task": "Toggle original and mirrored views, then select the same face box.",
+        "expected": "Image and boxes use one snapshot; mirroring affects display coordinates, not the selected key."
+      }
+    },
+    {
+      "id": "V03",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "明确点选一张脸，观察档案与跟随开关。",
+        "expected": "只选择临时目标；不换档案、不自动开启物理跟随。"
+      },
+      "en": {
+        "task": "Select a face explicitly and inspect the learner profile and follow control.",
+        "expected": "Select only the temporary target; do not switch profiles or enable physical following."
+      }
+    },
+    {
+      "id": "V04",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "清除选中目标，此时最近状态轮询仍含旧key。",
+        "expected": "帧中的null选择优先；旧状态不能重新显示为已选择。"
+      },
+      "en": {
+        "task": "Clear the selected target while the latest state poll still contains its old key.",
+        "expected": "The frame null selection wins; stale state must not restore the selection."
+      }
+    },
+    {
+      "id": "V05",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "有画面请求尚未返回时关闭摄像头。",
+        "expected": "立即清空画面；迟到旧响应不能恢复旧图或框；最多一个画面请求。"
+      },
+      "en": {
+        "task": "Close the camera while a frame request is still pending.",
+        "expected": "Clear the preview; a late response cannot restore old pixels or boxes; keep at most one frame request."
+      }
+    },
+    {
+      "id": "V06",
+      "area": "preview",
+      "requires_live_camera": true,
+      "zh": {
+        "task": "关闭后重新开启，令相机epoch变化。",
+        "expected": "旧epoch帧与目标不可复活，新的目标须重新选择。"
+      },
+      "en": {
+        "task": "Close and reopen the camera so its epoch changes.",
+        "expected": "Old-epoch frames and targets cannot revive; select a new target explicitly."
+      }
+    },
+    {
+      "id": "V07",
+      "area": "preview",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "用隔离fixture模拟画面接口认证错误或断开。",
+        "expected": "隐藏旧图和框，显示错误；不绕过认证、不自动用旧图伪装直播。"
+      },
+      "en": {
+        "task": "Use an isolated fixture to return an authentication error or disconnect the frame endpoint.",
+        "expected": "Hide old pixels and boxes and show the error; do not bypass authentication or present stale footage as live."
+      }
+    },
+    {
+      "id": "V08",
+      "area": "preview",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "用fixture依次返回关闭、连接中、有效直播状态。",
+        "expected": "请求间隔分别1000/250/33ms；以请求完成为起点，不并发积压。"
+      },
+      "en": {
+        "task": "Use a fixture to return closed, opening, and live states in sequence.",
+        "expected": "Use 1000/250/33 ms intervals after completion, without overlapping requests."
+      }
+    },
+    {
+      "id": "V09",
+      "area": "preview",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "用fixture展示PAUSED、ARMING和STOPPING状态。",
+        "expected": "停止入口保持可用；不实际发送设备命令。"
+      },
+      "en": {
+        "task": "Use a fixture to show PAUSED, ARMING, and STOPPING states.",
+        "expected": "Keep Stop available; this scripted fixture does not send physical commands."
+      }
+    },
+    {
+      "id": "D01",
+      "area": "dialogue",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "中文提问“测距模块为什么能帮助停车？”，再选择英文教学提出同义问题。",
+        "expected": "教学语言按设置；明确摄像头不验证模块连接，不把建议当已完成实验。"
+      },
+      "en": {
+        "task": "Ask why a distance module helps stopping in Chinese, then ask the equivalent question with English teaching selected.",
+        "expected": "Use the selected teaching language; do not treat camera observations as module verification or suggestions as completed experiments."
+      }
+    },
+    {
+      "id": "D02",
+      "area": "dialogue",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "发送后立即编辑下一条问题，并令旧发送请求失败。",
+        "expected": "保留新草稿；失败信息可见。"
+      },
+      "en": {
+        "task": "Edit a new question immediately after sending, then fail the earlier send request.",
+        "expected": "Preserve the newer draft and expose the failure."
+      }
+    },
+    {
+      "id": "D03",
+      "area": "dialogue",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "填入教师观察“第二次间隙更大”，直接结束并保存。",
+        "expected": "先保存观察再结束；来源保留，模块未勾选变更时不被清空。"
+      },
+      "en": {
+        "task": "Enter the teacher observation The second gap was larger, then finish and save.",
+        "expected": "Save the observation before finishing; retain provenance and leave unchanged module selections intact."
+      }
+    },
+    {
+      "id": "D04",
+      "area": "dialogue",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "生成过程中停止，再切换档案并继续输入。",
+        "expected": "旧回执、旧自动播报与旧滚动提示不进入新档案。"
+      },
+      "en": {
+        "task": "Stop during generation, switch profiles, and continue typing.",
+        "expected": "Keep old responses, old automatic speech, and old scroll indicators out of the new profile."
+      }
+    },
+    {
+      "id": "P01",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "将界面设为English，教学语言保持中文，再发送中文问题。",
+        "expected": "界面关键操作显示英文，教学回复继续按中文设置；已有报告和档案名称不被翻译。"
+      },
+      "en": {
+        "task": "Set the interface to English, keep the teaching language Chinese, and send a Chinese question.",
+        "expected": "Key interface actions use English while teaching remains Chinese; existing reports and profile names stay verbatim."
+      }
+    },
+    {
+      "id": "P02",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "分别选择短句、常规说明、术语表达，保持提示方式不变。",
+        "expected": "每次只提交reading_level；帮助方式不被覆盖，不新增年龄或能力推断字段。"
+      },
+      "en": {
+        "task": "Select plain, standard and technical reading styles while leaving guidance style unchanged.",
+        "expected": "Send only reading_level for each change; preserve guidance style and add no inferred age or ability fields."
+      }
+    },
+    {
+      "id": "P03",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "生成教学回复时只调整朗读语速；录音时只切换界面语言。",
+        "expected": "语速变更不取消文字生成；界面语言不失效当前录音/转写票据。"
+      },
+      "en": {
+        "task": "Change only speech speed during generation; change only interface language during recording.",
+        "expected": "Speech speed does not cancel text generation; interface language does not invalidate recording/transcription tickets."
+      }
+    },
+    {
+      "id": "P04",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "在隔离fixture返回缺少新偏好字段的旧状态，再返回已保存偏好。",
+        "expected": "旧状态默认界面中文、常规阅读、正常语速；有字段后按保存值显示。"
+      },
+      "en": {
+        "task": "Return older state without the new preference fields in an isolated fixture, then return saved preferences.",
+        "expected": "Default to Chinese interface, standard reading and normal speed for older state; show persisted values when present."
+      }
+    },
+    {
+      "id": "P05",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "保存界面英文与档案偏好，重载界面并在两个档案间切换。",
+        "expected": "界面语言保持工作台设置；教学语言、阅读表达、帮助方式和语速跟随各自档案。"
+      },
+      "en": {
+        "task": "Save English interface and learner preferences, reload the page, and switch between profiles.",
+        "expected": "Interface language stays workstation-wide; teaching language, reading style, guidance and speech speed follow each profile."
+      }
+    },
+    {
+      "id": "P06",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "在隔离状态中让档案提示方式为guided、本次偏好为one_step；查看教师设置并点击恢复档案提示方式。",
+        "expected": "同时明确显示档案适量提示与本次一次一步；恢复只提交help_style=guided，服务端清空本次偏好后提示块消失，其他偏好和输入草稿保留。"
+      },
+      "en": {
+        "task": "Use isolated state with guided profile guidance and a one_step activity preference; inspect teacher settings and restore profile guidance.",
+        "expected": "Clearly show Guided hints for the profile and One step at a time for this activity; restore sends only help_style=guided. Hide the notice after the server clears activity preferences; preserve other preferences and input drafts."
+      }
+    },
+    {
+      "id": "P07",
+      "area": "preferences",
+      "requires_live_camera": false,
+      "zh": {
+        "task": "本次偏好只有explicit_request，内容为“发送”或中英混合多行原话，切换界面语言。",
+        "expected": "仍显示本次活动偏好及恢复入口；原话不被当作界面文案翻译，换行保留，不凭空显示一次一步。空偏好对象不显示提示块。"
+      },
+      "en": {
+        "task": "Provide only explicit_request in activity preferences, using “发送” or a multiline bilingual request; switch interface language.",
+        "expected": "Keep the activity-preference notice and restore action. Preserve the request verbatim and its line breaks, without inventing a one-step style. An empty preference object shows no notice."
+      }
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+note: 模拟测试资料；必须隔离于真实学习者数据。期望行为不是运行时硬编码台词。
+mode: simulation
+activity: modular_rover
+learners:
+- demo_learner_A
+- demo_learner_B
+steps:
+- id: S1
+  learner: demo_learner_A
+  input: 我想让小车到墙前停下来，再亮绿灯。
+  expect:
+  - 确认目标
+  - 了解当前模块
+  - 不自动执行硬件
+- id: S2
+  event:
+    source: simulated
+    modules:
+    - control
+    - motor
+    - light
+    missing:
+    - distance
+  expect:
+  - 讨论距离感知能力
+  - 不声称通过人脸画面看到缺模块
+- id: S3
+  input: 我把测距模块接好了。
+  expect:
+  - 保存为学习者报告
+  - 不是硬件验证
+- id: S4
+  input: 它能停车也能亮绿灯，但是我想让它离墙更远一点。
+  expect:
+  - 保留首次据报告成功
+  - 只讨论一个调整变量
+  - 询问或解释更早停车
+- id: S5
+  input: 这次只告诉我一步就好。
+  expect:
+  - 偏好只适用于当前会话
+- id: S6
+  input: 改完以后能停得更远了。以后也请每次只给我一步提示。
+  expect:
+  - 保存报告结果
+  - 允许跨会话帮助偏好候选
+  - 等待证据验证后写入
+- id: S7
+  input: 今天先到这里，下次把墙挪动以后再试。
+  expect:
+  - 保留待做实验
+  - 整理记忆
+  - 不将未来试验标已完成
+- id: S8
+  action: restart_application_same_profile
+  expect:
+  - 召回相关进展
+  - 先确认当前搭建
+  - 提及尚未做的移动墙试验
+- id: S9
+  action: select_other_track_same_profile
+  expect:
+  - 视觉目标改变
+  - 学习者档案不自动改变
+- id: S10
+  action: explicitly_switch_to_demo_learner_B
+  expect:
+  - 取消A旧生成与播报
+  - 无A的长期记忆
+- id: S11
+  action: switch_back_and_delete_help_preference
+  expect:
+  - DB摘要缓存待写任务不再召回偏好
+  - 旧整理任务不能写回

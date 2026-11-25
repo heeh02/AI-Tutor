@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "experiment": "flash_workstation_text_acceptance_v1",
+  "maximum_calls": 4,
+  "automatic_retries": 0,
+  "replacement_calls": 0,
+  "provider": "deepseek_flash",
+  "thinking": "non_thinking",
+  "per_slot_deadline_seconds": 110,
+  "operation_deadline_seconds": 460,
+  "corpus": {
+    "path": "runtime/goal-baselines/20261106/teaching-eval-first/actual-first/inputs/cases.json",
+    "sha256": "8de47201d6fdb91592b2ca8ae40d48c3607b7c63fa0600306b3c3c41d1bf9492"
+  },
+  "artifacts": [
+    {
+      "source": "runtime/goal-baselines/20261106/teaching-eval-first/actual-first/inputs/revised.md",
+      "target": "prompts/tutor_core.md",
+      "sha256": "8a12e9a790c9e8d937ff2d59cd6e27c04ff2982d57b4604e02173bc787c1a101"
+    },
+    {
+      "source": "prompts/tutor-agent.md",
+      "target": "prompts/tutor-agent.md",
+      "sha256": "752d5df0341472638eeb5d4dea7a0fe4216ccc015c06fbc32fa52d9b6f1dcfd0"
+    },
+    {
+      "source": "implementation-package/AI_Tutor_Codex_Implementation_Package/schemas/tutor_reply.schema.json",
+      "target": "implementation-package/AI_Tutor_Codex_Implementation_Package/schemas/tutor_reply.schema.json",
+      "sha256": "5ee8922b12011944abd0f67c70efe0d42168908cfa6714fed9990b9cfdb252eb"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "powered_off_ruler_units_zh",
+      "language": "zh",
+      "text_sha256": "dde82b0597c4fc77f7e3bf3f2a1939cdd3c9235785136c409dd543de1a326f17"
+    },
+    {
+      "id": "motion_disabled_sensor_units_en",
+      "language": "en",
+      "text_sha256": "5288073f36a8092e076dfe7f25792b144fc9bb84733b6b6ae9cabb7c834eef94"
+    }
+  ],
+  "schedule": [
+    {
+      "slot": 0,
+      "route": "zh_stream",
+      "case_id": "powered_off_ruler_units_zh",
+      "language": "zh"
+    },
+    {
+      "slot": 1,
+      "route": "en_stream",
+      "case_id": "motion_disabled_sensor_units_en",
+      "language": "en"
+    },
+    {
+      "slot": 2,
+      "route": "cancel_active_stream",
+      "case_id": "motion_disabled_sensor_units_en",
+      "language": "en"
+    },
+    {
+      "slot": 3,
+      "route": "whole_reply",
+      "case_id": "powered_off_ruler_units_zh",
+      "language": "zh"
+    }
+  ],
+  "selection_evidence_sha256": "8837599a6139963a6b5f3c175e5114b8666c146a4a4a628edba34de2f0ceb69e",
+  "ack_policy": "Normal segments: capture raw final before simulated ordered display ACKs; first persistence is observed independently. Cancel slot: observe persisted prefix but do not ACK it before stop, so no candidate can commit if completion races.",
+  "cancel_acceptance": "Exact active foreground registration before actual session cancel; matching request/generation cancellation metrics and retirement required. Race is NOT_EXERCISED; no replacement or retry. Continue the final fixed whole slot only if ownership cleanup is confirmed.",
+  "stop_rule": "Infrastructure, source, protocol, application or cleanup failure stops later slots. Cancellation race is recorded separately and makes final runtime acceptance fail without replacing the request.",
+  "scope": "Actual remote HTTP text through ordinary Workstation submit/persist/delivery APIs. Simulated display ACK is not browser paint or sound. No local model/service startup, Kimi probe/inference, memory scheduler, camera/PTZ enable, microphone or TTS request. Normal Workstation idle local-owner construction remains real. No new broad quality claim.",
+  "early_persistence_acceptance": "Record first_persisted_before_final_observed separately. RUNTIME_PASS is route/contract/source/ownership acceptance and does not imply the polling observer saw a segment before final; no browser/latency claim is inferred.",
+  "per_slot_deadline_scope": "The entire slot including setup, existing throttle wait,Submit,observation,ACK and retirement is wrapped in110seconds; production HTTP retains its independent90second budget."
+}

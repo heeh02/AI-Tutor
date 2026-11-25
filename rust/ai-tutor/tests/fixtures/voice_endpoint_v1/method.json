@@ -1,0 +1,74 @@
+{
+  "protocol_version": 1,
+  "method_id": "voice_endpoint_v1",
+  "status_at_freeze": "preregistered_not_run",
+  "vad": {
+    "crate": "sonora-agc2",
+    "version": "0.2.0",
+    "implementation": "vad_wrapper::VoiceActivityDetectorWrapper, default RNN and default periodic reset",
+    "sample_rate_hz": 16000,
+    "frame_samples": 160,
+    "frame_ms": 10,
+    "input": "normalized mono f32; only a 160-sample copy is clamped to FloatS16 and scaled by 32768",
+    "original_pcm_modified": false,
+    "asr_results_used": false,
+    "rms_used_for_decisions": false
+  },
+  "endpoint": {
+    "onset_probability": 0.60,
+    "onset_window_frames": 20,
+    "onset_required_frames": 12,
+    "activity_probability": 0.35,
+    "ending_quiet_ms": 2500,
+    "no_speech_ms": 10000,
+    "duration_limit_ms": 20000,
+    "terminal_priority": ["device_error", "duration_limit", "speech_end", "no_speech"],
+    "clock": "successfully received 10ms audio frames; capture owner must separately enforce wall-clock and device-loss cancellation",
+    "binding": "exact recording_generation; old input/error ignored; one terminal candidate per instance",
+    "input_closed_claim": false
+  },
+  "sources": [
+    {"id":"zh_short","language":"zh","wav":"audio/zh_short.wav","sha256":"ad72efd95a1abc540737554f9ccb63b7a9933effb75e5e458824a90363bb9a33"},
+    {"id":"en_short","language":"en","wav":"audio/en_short.wav","sha256":"670191397605e3f21f2b0e331852b665f91e5ee21cb9573f2ffdd93aff825a9f"},
+    {"id":"mixed_zh","language":"zh_en","wav":"audio/mixed_zh.wav","sha256":"764b9f2b979df772d071e002234dada4025ae2df08e474959a39e807256de55c"},
+    {"id":"mixed_en","language":"en_zh","wav":"audio/mixed_en.wav","sha256":"d975317ad8dbf9de29fe223efb758325500f7a684be2766ad85a9002093a92ff"}
+  ],
+  "source_provenance": {
+    "type": "project_authored_text_rendered_by_SAPI_adult_synthetic_voices",
+    "original_manifest_sha256": "13b2ab48079c4062beca2734e1574e16efc22430bdd64b2544c48fd15f7160d9",
+    "archived_source_directory": "runtime/goal-baselines/20261104/aec-2x2-preregistered/audio/sapi16k",
+    "wav_copied_byte_for_byte": true,
+    "real_people_or_children": false
+  },
+  "fixture_construction": {
+    "source_support": "strip only exactly-zero leading/trailing i16 samples in derived in-memory cases; preserve every retained sample value and original WAV bytes",
+    "leading_silence_ms": 500,
+    "trailing_silence_ms": 4000,
+    "frame_alignment": "zero-pad final incomplete 10ms block only",
+    "clean": "each of the four source clips",
+    "pause_2000": "zh_short then en_short, and en_short then zh_short, with exactly 2000ms inserted silence between nonzero supports",
+    "pause_4000": "same two pairs with exactly 4000ms inserted silence; report known acoustic/semantic ambiguity, never count as successful completion of intended full turn",
+    "continuous": "repeat zh_short or en_short nonzero support with 100ms gaps until 21000ms after 500ms lead; no crossfade, normalization or denoise",
+    "silence": "11000ms zero input",
+    "low_noise": "11000ms xorshift32 seed 0x51a72026, shifts 13/17/5, upper16/65535*2-1, amplitude 0.002",
+    "low_hum": "11000ms 100Hz sine, amplitude 0.002",
+    "device_error": "2000ms zero input then explicit same-generation device error"
+  },
+  "predeclared_targets": {
+    "clean_and_pause_2000": "speech_end only after final source support; lag 2500..3500ms from final nonzero source sample boundary (not a human-annotated linguistic endpoint)",
+    "pause_4000": "measurement-only risk rows; preserve early termination and any future speech after terminal; no aggregate pass claim",
+    "continuous": "duration_limit at exactly 20000ms; no earlier speech_end/no_speech",
+    "silence_and_low_noise_and_low_hum": "no_speech at exactly 10000ms",
+    "device_error": "device_error at 2000ms and never a second terminal",
+    "processing": "report per-10ms p50/p95/p99/max and initialization separately; target p99 under 10ms on tested CPU only",
+    "all_rows_required": true,
+    "no_same_fixture_parameter_tuning": true,
+    "production_auto_mode_acceptance": false
+  },
+  "limitations": [
+    "Acoustic VAD cannot know whether a learner is thinking or has finished.",
+    "A 4s thinking pause exceeds the frozen 2.5s quiet rule; do not hide this failure by changing the label or threshold after running.",
+    "Adult synthetic voices and synthetic low-energy noise do not validate children, quiet speech, real rooms, device noise or speaker echo.",
+    "No microphone, ASR, playback, automatic Send, wall-clock capture shutdown or voice-loop integration is exercised."
+  ]
+}
