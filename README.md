@@ -12,7 +12,7 @@
 
 [![Windows](https://img.shields.io/badge/Windows-Desktop-0078D4?logo=windows&logoColor=white)](#-从这里出发)
 [![Rust](https://img.shields.io/badge/Rust-Native%20%2B%20WebAssembly-DEA584?logo=rust&logoColor=white)](#-可爱外表下的硬核内核)
-[![Kimi](https://img.shields.io/badge/Teaching%20Backend-Kimi-6C5CE7)](#-技术拼图)
+[![Teaching backends](https://img.shields.io/badge/Teaching-Kimi%20%2B%20DeepSeek%20Flash-6C5CE7)](#-技术拼图)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2EA44F)](LICENSE)
 
 [认识小伙伴](#-让学习成为一场小小的探险) · [产品亮点](#-你会喜欢它的六个理由) · [快速开始](#-从这里出发) · [隐私安全](#%EF%B8%8F-你的学习小世界由你守护) · [参与贡献](#-一起把它变得更可爱)
@@ -40,6 +40,38 @@ AI Tutor 围绕**主控、电机、测距和灯**等实体功能模块，陪伴�
 
 > [!IMPORTANT]
 > AI Tutor 当前是 **Windows 本机教学原型**：它帮助学习者描述、搭建、试验和复盘，**不控制实体小车、不识别积木拓扑，也不进行人脸身份或情绪判断**。可爱可以天马行空，能力边界必须清清楚楚。💛
+
+## 📸 看看小宇认真工作的样子
+
+下面不是概念图，而是优化后工作台在真实浏览器中的运行画面：匿名模拟档案、四个模拟模块、两轮真实 DeepSeek Flash 教学，以及有来源的学习记忆。
+
+![AI Tutor 真实工作台：三步引导、机器人、教学回复和输入区](docs/assets/gui-overview.png)
+
+> 🎤 **明天要汇报？** 直接打开 [10 分钟完整汇报指南](docs/PRESENTATION_GUIDE_20261126.md)：包含逐分钟流程、讲稿要点、现场输入、真实回复、5 分钟压缩版，以及断网、无摄像头和无麦克风备用方案。
+
+### 🧠 不只聊一次，还把学习过程留下来
+
+| 真实活动与模拟观察 | 两条有来源的记忆与运行状态 |
+|---|---|
+| ![当前目标、模拟模块和最新观察](docs/assets/gui-activity.png) | ![学习进展、明确偏好、真实指标与情绪关闭状态](docs/assets/gui-memory-diagnostics.png) |
+
+学习者可以看到当前目标、模块来源和最新观察；学习进展与明确偏好都能检查来源、更正或遗忘。界面也会诚实显示：**情绪模型关闭，不根据人脸推断情绪。**
+
+### 📱 手机也能舒服地继续探索
+
+<div align="center">
+<img src="docs/assets/gui-mobile.png" width="360" alt="390px 手机上的真实 AI Tutor 对话页面">
+</div>
+
+小高度桌面窗口优先保留输入、语音、停止和发送按钮；手机端先显示对话，再展示机器人与辅助面板。三步准备引导、快捷键提示和字数计数，让第一次使用也知道下一步。
+
+### 👀 检测人脸，但不识别「你是谁」
+
+<div align="center">
+<img src="docs/assets/face-detection-unsplash.jpg" width="360" alt="互联网照片经过真实 ONNX 推理后的人脸检测框">
+</div>
+
+这张图片来自 [Michael Dam / Unsplash](https://unsplash.com/photos/mEZ3PoFGs_k)（Unsplash License）。项目固定的 ONNX 模型在本机完成真实推理，检测到 **1 张人脸，置信度约 0.906**；标注框来自模型输出。它只证明**离线人脸检测**，不证明身份识别，也不因为人物微笑就生成情绪标签。原图不发送给远程教学服务。
 
 ## 🎀 你会喜欢它的六个理由
 
@@ -96,7 +128,8 @@ AI Tutor 围绕**主控、电机、测距和灯**等实体功能模块，陪伴�
 |---|---|
 | 💻 **Windows x64** | 当前应用面向 Windows 本机运行 |
 | 🦀 **Rust 与构建工具** | 已验证环境为 Rust 1.98.1、MSVC 与 Windows SDK；新机器需检查 [`.cargo/config.toml`](.cargo/config.toml) 中的本机工具路径 |
-| 🌙 **Kimi Code CLI 2.3.1** | 使用官方 CLI 的正常登录作为教学模型后端；教学文字会产生远程模型请求及相应用量 |
+| 🌙 **Kimi Code CLI 2.3.1** | 默认使用官方 CLI 的正常登录作为教学模型后端；教学文字会产生远程模型请求及相应用量 |
+| ⚡ **DeepSeek Flash（可选）** | 复现本页两轮演示时使用；密钥通过项目脚本加密保存在仓库之外 |
 | 🎙️ **麦克风与摄像头（可选）** | 文字教学可独立使用；语音需要麦克风，视觉互动需要摄像头 |
 | 📷 **OBSBOT Tiny3（可选）** | 已有真实设备发现与视频链路证据；普通文字和语音流程不依赖它 |
 
@@ -127,6 +160,25 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-rust.ps1
 
 > [!NOTE]
 > 源码仓库不附带模型权重、编译产物和 `bin/*.exe`，首次克隆后需要先运行安装脚本。模型来源、版本、许可证信息与 SHA-256 摘要保存在 [`models/`](models/) 的清单中。
+
+### 可选：使用 DeepSeek Flash 教学
+
+默认教学后端是 Kimi。需要复现本页演示时，也可以显式选择 DeepSeek Flash：
+
+1. 在 PowerShell 运行 `scripts/validation/store-deepseek-secret.ps1`，按隐藏提示输入密钥。密钥使用 Windows 当前用户 DPAPI 加密，保存在仓库之外；脚本不会覆盖已有凭证。
+2. 创建 `runtime/teaching-provider-policy.json`：
+
+   ```json
+   {
+     "protocol_version": 1,
+     "provider": "deepseek_flash",
+     "thinking": "non_thinking"
+   }
+   ```
+
+3. 重新启动工作台，确认页面显示「DeepSeek Flash · 远程教学」。配置只在启动时读取，本地预检通过不代表远端一定可用，仍以实际请求结果为准。
+
+**密钥不要写入该 JSON、源码、截图或 Git 提交。** 教学文字会发送到 DeepSeek；画面和录音仍留在本机。
 
 ### 3️⃣ 打开学习工作台
 
@@ -161,7 +213,7 @@ http://127.0.0.1:8765/
 
 | 数据 | 去哪里 | 默认保存方式 |
 |---|---|---|
-| 💬 **教学文字与必要匿名上下文** | 发送到远程 Kimi，用于生成教学回复 | 应用本地记录学习活动；远程服务规则由对应服务决定 |
+| 💬 **教学文字与必要匿名上下文** | 发送到当前选择的远程教学服务（Kimi 或 DeepSeek），用于生成教学回复 | 应用本地记录学习活动；远程服务规则由对应服务决定 |
 | 📷 **摄像头画面与人脸框** | 仅在本机处理 | 默认不保存视频或人脸裁剪 |
 | 🎙️ **麦克风录音** | 仅在本机交给 Whisper 识别 | 默认不保存原始录音 |
 | 🗣️ **语音播报** | 本机 Windows SAPI | 不依赖远程语音合成 |
@@ -178,7 +230,7 @@ http://127.0.0.1:8765/
 flowchart LR
     U["🧑‍🏫 学习者 / 教师"] --> UI["🦀 Yew + WebAssembly<br/>本机工作台"]
     UI --> APP["🦀 Rust · Tokio · Axum<br/>认证 · 会话 · 业务编排"]
-    APP --> K["🌙 Kimi Code CLI<br/>教学文字 · 无工具模式"]
+    APP --> K["🌙 Kimi / DeepSeek Flash<br/>教学文字 · 无工具模式"]
     APP --> V["👀 ONNX Runtime + ByteTrack<br/>本地人脸检测与追踪"]
     APP --> A["🎙️ Whisper + Windows SAPI<br/>本地识别与播报"]
     APP --> M["🧠 SQLite<br/>活动 · 快慢记忆 · 来源"]
@@ -198,7 +250,7 @@ flowchart LR
 | 麦克风与音频 | CPAL / WASAPI，20 秒有界录音缓冲 |
 | 本地语音识别 | whisper-rs / whisper.cpp / 多语种 base |
 | 本地语音播报 | Windows SAPI COM |
-| 教学后端 | 官方 Kimi Code CLI 2.3.1，独立无工具子进程 |
+| 教学后端 | 官方 Kimi Code CLI 2.3.1，或可选 DeepSeek Flash；独立无工具路径 |
 | 学习记忆 | rusqlite / SQLite，真实与模拟独立数据库 |
 
 ### 📁 仓库导览
@@ -240,6 +292,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-install-rust.ps
 
 可爱不等于含糊，宣传也不替实验签字。当前主要状态如下：
 
+- ✅ **2026-11-26 GUI 与真实浏览器演示**：UI **179 项通过、0 失败**，WASM 构建成功；模拟档案完成两轮 DeepSeek Flash 对话和两条真实记忆，另通过本地播报触发与停止。详见 [汇报与验证记录](docs/PRESENTATION_GUIDE_20261126.md#八本次验证记录)。
 - ✅ **Rust 本机服务与 WASM 工作台**已实现；2026-11-03 的验收记录为 workspace **261 项通过、0 失败、1 项真实 Kimi 付费探针忽略**，具体范围以当次报告为准。
 - ✅ **真实 Kimi 多轮教学、来源校验、记忆纠正与隔离**已有实际测试证据。
 - ✅ **OBSBOT Tiny3 视频、人脸检测、ByteTrack 与目标选择**已有真实设备证据；多人交叉、遮挡和真实拔插仍需单独现场验证。
@@ -264,6 +317,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-install-rust.ps
 
 ## 📚 继续探索
 
+- [10 分钟汇报与真实演示指南](docs/PRESENTATION_GUIDE_20261126.md)
 - [产品运行架构](docs/RUST_ARCHITECTURE.md)
 - [CLI 使用说明](docs/CLI.md)
 - [最新验收报告](ACCEPTANCE_REPORT.md)

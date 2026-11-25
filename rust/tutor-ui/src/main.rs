@@ -13,6 +13,7 @@ mod confirm_forget;
 mod conversation_history;
 mod evidence_labels;
 mod experiment_comparison;
+mod exploration_progress;
 mod help_preference;
 mod historical_comparisons;
 mod i18n;

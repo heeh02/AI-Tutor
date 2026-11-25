@@ -861,3 +861,86 @@ footer > span:first-child { display: flex; align-items: center; gap: 9px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+.topbar { position: sticky; top: 0; z-index: 25; backdrop-filter: blur(18px); }
+.exploration-progress { margin: 0 0 20px; padding: 14px 18px; border: 1px solid #e5dfea; border-radius: 18px; background: #fffdf9; }
+.exploration-progress ol { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
+.exploration-progress li { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 0 18px; border-right: 1px solid #ebe5ef; color: #8b7d96; }
+.exploration-progress li:first-child { padding-left: 0; }
+.exploration-progress li:last-child { padding-right: 0; border-right: 0; }
+.progress-marker { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 11px; background: #f1edf5; color: #8f7ca1; font-size: 12px; font-weight: 650; }
+.progress-marker svg { width: 16px; height: 16px; }
+.exploration-progress li > div { min-width: 0; }
+.exploration-progress strong, .exploration-progress small { display: block; }
+.exploration-progress strong { color: #6f617b; font-size: 12px; font-weight: 600; }
+.exploration-progress small { margin-top: 2px; color: #8d8297; font-size: 10px; }
+.exploration-progress li.complete .progress-marker { background: #e8f1e9; color: #65816b; }
+.exploration-progress li.complete strong { color: #687a69; }
+.exploration-progress li.current .progress-marker { background: #79658f; color: #fff; box-shadow: 0 0 0 5px #eee8f4; }
+.exploration-progress li.current strong { color: #564266; }
+.composer-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; color: #83758d; font-size: 10px; }
+.input-count { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.model-label { color: #756681; font-size: 10px; }
+.composer-heading, .composer-heading > label { color: #796b83; font-size: 11px; }
+.composer-note { color: #756c7c; font-size: 11px; }
+.chat-empty > p { color: #817789; font-size: 12px; }
+.prompt-suggestions > small { color: #877592; font-size: 11px; }
+.companion-heading p { color: #7e7388; font-size: 12px; }
+.current-mission small { font-size: 10px; }
+.panel > summary small { color: #897a94; font-size: 11px; }
+@media (min-width: 1000px) {
+  .has-learner .workspace-grid { grid-template-columns: minmax(0,1.04fr) minmax(420px,1fr); }
+}
+@media (min-width: 761px) {
+  .has-learner main { padding-top: 23px; }
+  .has-learner .intro { margin-bottom: 19px; }
+  .has-learner .intro p { display: none; }
+  .has-learner .intro h1 { margin-top: 5px; margin-bottom: 5px; }
+  .has-learner .dialogue-panel { height: 620px; min-height: 620px; }
+}
+@media (min-width: 1000px) and (max-height: 800px) {
+  .topbar { height: 70px; }
+  .has-learner main { padding-top: 15px; }
+  .has-learner .intro { margin-bottom: 12px; }
+  .has-learner .intro h1 { margin: 0; font-size: 22px; }
+  .has-learner .intro .eyebrow { display: none; }
+  .has-learner .profile-summary { padding-top: 8px; padding-bottom: 8px; }
+  .has-learner .sim-banner { margin-bottom: 12px; padding-top: 8px; padding-bottom: 8px; }
+  .has-learner .exploration-progress { margin-bottom: 12px; padding: 9px 14px; }
+  .has-learner .exploration-progress small { display: none; }
+  .has-learner .progress-marker { width: 28px; height: 28px; }
+  .has-learner .dialogue-panel { height: calc(100svh - 270px); min-height: 460px; }
+  .has-learner .dialogue-panel > .panel-title { height: 56px; min-height: 56px; }
+  .has-learner .history-switch { min-height: 34px; padding-top: 4px; padding-bottom: 4px; }
+  .has-learner .conversation { padding: 16px 20px; }
+  .has-learner .chat-empty { padding: 4px; }
+  .has-learner .tutor-emblem { margin-bottom: 8px; }
+  .has-learner .prompt-suggestions { margin-top: 12px; gap: 5px; }
+  .has-learner .prompt-chip { min-height: 31px; padding-top: 6px; padding-bottom: 6px; }
+  .has-learner .composer { padding: 11px 17px 9px; }
+  .has-learner .composer textarea { height: 59px; padding: 9px 12px; }
+  .has-learner .composer-heading { margin-bottom: 7px; }
+  .has-learner .composer-actions { margin-top: 7px; }
+  .has-learner .composer-note { margin-top: 6px; font-size: 10px; }
+  .has-learner .composer-meta { margin-top: 5px; }
+}
+@media (max-width: 760px) {
+  .exploration-progress { margin-bottom: 17px; padding: 13px 12px; border-radius: 16px; }
+  .exploration-progress li { flex-direction: column; align-items: flex-start; gap: 8px; padding: 0 12px; }
+  .exploration-progress strong { font-size: 11px; line-height: 1.55; }
+  .exploration-progress small { font-size: 9px; line-height: 1.55; }
+  .progress-marker { width: 29px; height: 29px; border-radius: 10px; }
+  .dialogue-column, .has-continuation .dialogue-column { grid-row: 1; }
+  .companion-stage, .has-continuation .companion-stage { grid-row: 2; }
+  .stage-utilities { grid-row: 3; }
+  .has-continuation .current-mission { grid-row: 3; }
+  .has-continuation .camera-dock { grid-row: 4; }
+  .composer-meta { font-size: 10px; }
+  .composer-note { font-size: 10px; }
+}
+@media (max-width: 430px) {
+  .exploration-progress small { display: none; }
+  .exploration-progress li { gap: 7px; padding: 0 9px; }
+  .exploration-progress strong { font-size: 10px; }
+  .composer-meta > span:first-child { max-width: 210px; }
+}

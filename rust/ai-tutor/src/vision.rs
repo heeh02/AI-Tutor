@@ -2072,6 +2072,10 @@ pub fn camera_worker(root: PathBuf, id: String) -> Result<(), String> {
 mod vision_replay_tests;
 
 #[cfg(test)]
+#[path = "vision_photo_probe.rs"]
+mod vision_photo_probe;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     #[test]

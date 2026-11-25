@@ -252,8 +252,8 @@ pub fn t<'a>(language: &str, source: &'a str) -> &'a str {
         "点击脸框只选择画面内目标，不会开启物理云台跟随。" => {
             "Selecting a face box does not enable physical camera following."
         }
-        "画面只在本机处理，不发送给 Kimi。临时标签不代表身份、说话者或情绪。" => {
-            "Video stays local. Temporary labels do not identify a person, speaker, or emotion."
+        "画面只在本机处理，不发送给任何远程教学服务。临时标签不代表身份、说话者或情绪。" => {
+            "Video stays local and is never sent to a remote teaching service. Temporary labels do not identify a person, speaker, or emotion."
         }
         "物理云台跟随" => "Physical camera following",
         "云台高级控制与标定" => "Advanced camera control and calibration",
