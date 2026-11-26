@@ -47,11 +47,24 @@ try {
         Write-TestFile (Join-Path $taskTestRoot $taskFile.Relative) ('old-'+[IO.Path]::GetFileName($taskFile.Relative))
     }
     $taskFiles += $taskFinalAsrFiles
+    $taskMemoryFiles = @(Get-LocalMemoryProgramFiles)
+    Assert-Install ($taskMemoryFiles.Count -eq 2) 'The semantic retrieval bundle needs two program files.'
+    $taskMemoryNames = @('managed_embedding.py','embedding_worker.py')
+    for ($taskIndex=0; $taskIndex -lt $taskMemoryNames.Count; $taskIndex++) {
+        $taskFile = $taskMemoryFiles[$taskIndex]
+        $taskName = $taskMemoryNames[$taskIndex]
+        Assert-Install ($taskFile.Source -eq ('scripts\local-memory\'+$taskName) -and $taskFile.Relative -eq ('bin\local-memory\'+$taskName)) 'Semantic retrieval program paths differ from the runtime bundle contract.'
+        Assert-Install (Test-Path -LiteralPath (Join-Path (Split-Path -Parent $PSScriptRoot) $taskFile.Source) -PathType Leaf) 'A real semantic retrieval program source is missing.'
+        Write-TestFile (Join-Path $taskTestRoot $taskFile.Source) ('new-'+$taskName)
+        Write-TestFile (Join-Path $taskTestRoot $taskFile.Relative) ('old-'+$taskName)
+    }
+    $taskFiles += $taskMemoryFiles
     Write-TestFile (Join-Path $taskTestRoot 'target\test-ui\index.html') 'new-ui'
     Write-TestFile (Join-Path $taskTestRoot 'frontend\dist\index.html') 'old-ui'
     Write-TestFile (Join-Path $taskTestRoot 'runtime\data\learner.sqlite') 'keep-learning-data'
     $taskRetained = @('runtime\speech-cosy\api-key','runtime\speech-gpu\omni-api-key','runtime\speech-gpu\omni-env-path.txt','runtime\local-speech-policy.json','runtime\tts-references.json','models\speech\model.safetensors','runtime\local-asr-policy.json','runtime\speech-service.json','runtime\speech-asr-venv\Scripts\python.exe','models\speech\sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20\encoder.onnx')
     $taskRetained += @('runtime\gpu-resource-policy.json','runtime\local-final-asr-policy.json')
+    $taskRetained += @('runtime\local-memory-policy.json','models\memory\bge-m3\pytorch_model.bin')
     foreach ($taskRelative in $taskRetained) { Write-TestFile (Join-Path $taskTestRoot $taskRelative) 'keep-local-dependency' }
     $taskFiles += [PSCustomObject]@{Source='target\test-ui\index.html';Relative='frontend\dist\index.html'}
     $taskBackup = Publish-ProjectFiles $taskTestRoot $taskFiles
@@ -61,7 +74,7 @@ try {
     Assert-Install (([IO.File]::ReadAllText((Join-Path $taskBackup 'bin\ptz-calibrate-probe.exe'))) -eq 'old-ptz-calibrate-probe.exe') 'Previous calibration tool backup is missing.'
     Assert-Install (([IO.File]::ReadAllText((Join-Path $taskBackup 'frontend\dist\index.html'))) -eq 'old-ui') 'Previous UI backup is missing.'
     Assert-Install (([IO.File]::ReadAllText((Join-Path $taskTestRoot 'runtime\data\learner.sqlite'))) -eq 'keep-learning-data') 'Learning data changed during deployment.'
-    foreach ($taskFile in ($taskSpeechFiles + $taskAsrFiles + $taskFinalAsrFiles)) {
+    foreach ($taskFile in ($taskSpeechFiles + $taskAsrFiles + $taskFinalAsrFiles + $taskMemoryFiles)) {
         $taskName = [IO.Path]::GetFileName($taskFile.Relative)
         Assert-Install (([IO.File]::ReadAllText((Join-Path $taskTestRoot $taskFile.Relative))) -eq ('new-'+$taskName)) 'A managed speech program asset was not installed.'
         Assert-Install (([IO.File]::ReadAllText((Join-Path $taskBackup $taskFile.Relative))) -eq ('old-'+$taskName)) 'A managed speech program asset backup is missing.'
@@ -129,7 +142,7 @@ try {
     Assert-Install $taskRejected 'A missing build output was accepted.'
     Assert-Install (([IO.File]::ReadAllText($taskOwned)) -eq 'new-ai-tutor.exe') 'Preflight failure changed the installed program.'
 
-    foreach ($taskFile in $taskAsrFiles) {
+    foreach ($taskFile in ($taskAsrFiles + $taskMemoryFiles)) {
         $taskSource = Join-Path $taskTestRoot $taskFile.Source
         $taskOriginal = [IO.File]::ReadAllText($taskSource)
         Remove-Item -LiteralPath $taskSource
@@ -137,7 +150,7 @@ try {
         $taskRejected=$false
         try {
             try { Publish-ProjectFiles $taskTestRoot $taskFiles -BeforeReplace { $taskGate.Called=$true } | Out-Null } catch { $taskRejected=$true }
-            Assert-Install ($taskRejected -and -not $taskGate.Called) 'Each missing recognition asset must fail before asking the current service to stop.'
+            Assert-Install ($taskRejected -and -not $taskGate.Called) 'Each missing managed program asset must fail before asking the current service to stop.'
             Assert-Install (([IO.File]::ReadAllText($taskOwned)) -eq 'new-ai-tutor.exe') 'Recognition preflight failure changed the installed program.'
         } finally { Write-TestFile $taskSource $taskOriginal }
     }
@@ -183,7 +196,7 @@ try {
     foreach ($taskRelative in $taskRetained) {
         Assert-Install (([IO.File]::ReadAllText((Join-Path $taskTestRoot $taskRelative))) -eq 'keep-local-dependency') 'A failed update changed a local model, environment, policy or credential.'
     }
-    Write-Host 'PASS: project ownership, staged binaries/UI/eight voice/three streaming ASR/six precise ASR assets, exact bundle paths, dependency retention, rollback, missing files before stop, shared bounded stop deadline, path guards. Only temporary files and fake processes were used.'
+    Write-Host 'PASS: project ownership, staged binaries/UI/eight voice/three streaming ASR/six precise ASR/two semantic retrieval assets, exact bundle paths, dependency retention, rollback, missing files before stop, shared bounded stop deadline, path guards. Only temporary files and fake processes were used.'
 } finally {
     $taskResolved = [IO.Path]::GetFullPath($taskTestRoot)
     $taskTempBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + '\'

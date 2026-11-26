@@ -549,6 +549,29 @@ mod tests {
         assert!(validate_profile_journal(&incomplete, "isolated teaching policy").is_err());
     }
 
+    #[test]
+    fn isolated_acp_pins_the_owned_agent_directory_inside_an_outer_worktree() -> Result<()> {
+        let directory = tempfile::tempdir()?;
+        fs::create_dir(directory.path().join("prompts"))?;
+        fs::write(
+            directory.path().join("prompts/tutor-agent.md"),
+            include_str!("../../../prompts/tutor-agent.md"),
+        )?;
+        let provider = KimiProvider::new(directory.path())?;
+        let home = prepare_home(&provider, false, "synthetic", None, false)?;
+        let config: toml::Value = toml::from_str(&fs::read_to_string(
+            home.home.join("config.toml"),
+        )?)?;
+        let expected = fs::canonicalize(home.work.join(".kimi-code/agents"))?;
+        let directories = config["extra_agent_dirs"]
+            .as_array()
+            .ok_or_else(|| anyhow!("isolated agent directory missing"))?;
+        ensure!(directories.len() == 1);
+        ensure!(directories[0].as_str() == Some(expected.to_string_lossy().as_ref()));
+        ensure!(home.work.join(".kimi-code/agents/agent.md").is_file());
+        Ok(())
+    }
+
     #[tokio::test]
     async fn acp_reader_preserves_utf8_across_single_byte_chunks() -> Result<()> {
         let (mut writer, reader) = tokio::io::duplex(1);

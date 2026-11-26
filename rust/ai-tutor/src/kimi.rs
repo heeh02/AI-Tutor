@@ -387,6 +387,31 @@ mod io_contract_tests {
         Ok(())
     }
 }
+fn inherited_extension_paths(root: &Path, user_home: &Path) -> Vec<PathBuf> {
+    let canonical_home = fs::canonicalize(user_home).unwrap_or_else(|_| user_home.to_path_buf());
+    let mut paths = vec![
+        user_home.join(".agents/AGENTS.md"),
+        user_home.join(".agents/agents"),
+        user_home.join(".agents/plugins"),
+        user_home.join(".mcp.json"),
+    ];
+    for ancestor in root.ancestors() {
+        for name in [
+            ".kimi-code/mcp.json",
+            ".mcp.json",
+            ".kimi-code/plugins",
+            ".kimi-code/agents",
+            ".agents/agents",
+        ] {
+            if ancestor == canonical_home && name == ".kimi-code/plugins" {
+                continue;
+            }
+            paths.push(ancestor.join(name));
+        }
+    }
+    paths
+}
+
 fn home() -> PathBuf {
     std::env::var_os("USERPROFILE")
         .or_else(|| std::env::var_os("HOME"))
@@ -824,23 +849,7 @@ impl KimiProvider {
         state.metrics[key] = json!(n + 1);
     }
     fn audit_environment(&self) -> Result<()> {
-        let mut paths = vec![
-            home().join(".agents/AGENTS.md"),
-            home().join(".agents/agents"),
-            home().join(".agents/plugins"),
-            home().join(".mcp.json"),
-        ];
-        for ancestor in self.root.ancestors() {
-            for name in [
-                ".kimi-code/mcp.json",
-                ".mcp.json",
-                ".kimi-code/plugins",
-                ".kimi-code/agents",
-                ".agents/agents",
-            ] {
-                paths.push(ancestor.join(name));
-            }
-        }
+        let paths = inherited_extension_paths(&self.root, &home());
         ensure!(
             !paths.iter().any(|p| p.exists()),
             "检测到未经核验的继承扩展，Tutor 后端保持关闭"
@@ -1415,6 +1424,37 @@ mod tests {
         ensure!(metric["generation"].is_null() && metric["session_generation"].is_null());
         Ok(())
     }
+    #[test]
+    fn user_plugin_availability_does_not_disable_isolated_profiles_but_project_extensions_stay_blocked() {
+        let user = Path::new("/home/user");
+        let root = user.join("work/project");
+        let paths = inherited_extension_paths(&root, user);
+        assert!(!paths.contains(&user.join(".kimi-code/plugins")));
+        for expected in [
+            user.join(".kimi-code/agents"),
+            user.join(".agents/agents"),
+            user.join(".agents/plugins"),
+            user.join(".mcp.json"),
+            root.join(".kimi-code/plugins"),
+        ] {
+            assert!(paths.contains(&expected), "missing blocked path: {expected:?}");
+        }
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn canonical_user_plugin_directory_is_excluded_from_inherited_project_paths() -> Result<()> {
+        let directory = tempfile::tempdir()?;
+        let user = directory.path().join("home");
+        fs::create_dir(&user)?;
+        let root = user.join("work/project");
+        let paths = inherited_extension_paths(&root, &user);
+        let canonical_user = fs::canonicalize(&user)?;
+        assert!(!paths.contains(&canonical_user.join(".kimi-code/plugins")));
+        assert!(paths.contains(&root.join(".kimi-code/plugins")));
+        Ok(())
+    }
+
     #[tokio::test]
     async fn generate_early_failure_replaces_previous_citation_record_after_invoke_returns()
     -> Result<()> {

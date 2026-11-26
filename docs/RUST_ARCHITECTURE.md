@@ -13,6 +13,7 @@
 | 本地识别 | Rust / whisper-rs，调用本地whisper.cpp与多语种ggml base权重 |
 | 本地播报 | Rust直接调用Windows SAPI COM，使用已安装中英文声音 |
 | 教学后端 | Rust直接管理官方Kimi Code2.3.1子进程，无shell或脚本中转 |
+| 可选中英语义检索 | 显式启用的本地 BGE-M3 CPU 服务、SQLite 向量缓存与有界查询；失败回退词面召回 |
 | 快慢记忆、来源、中文召回、删除 | Rust / rusqlite / SQLite，真实与模拟独立数据库 |
 | 物理云台 | Rust状态与冻结保护；校准失败后禁止一切应用运动命令 |
 
@@ -20,7 +21,7 @@
 
 视觉、教学、记忆和音频执行链保持分离。采集只保留最新帧，帧与框共享frame_id；镜像仅影响显示。Kimi请求不阻塞视频。原生辅助进程用Windows Job Object管理，父进程退出时回收；启动管道握手保证设备只在Job绑定后才初始化。
 
-教学每轮独立调用。Rust原生建立隔离CLI目录和只引用正常OAuth凭证目录的NTFS junction，不提取token。专用agent显式tools/subagents为空；原生Job控制子进程树、输出有界、超时有界、JSONL严格解析。所有更新仅是候选，严格字段与来源校验后，还需实际显示确认才应用。
+教学每轮独立调用。Rust原生建立隔离CLI目录和只引用正常OAuth凭证目录的NTFS junction，不提取token。ACP 的 `extra_agent_dirs` 只指向当次隔离目录，避免外层 Git 项目根覆盖教学 profile；专用agent显式tools/subagents为空，并在提示前读取实际绑定证据。原生Job控制子进程树、输出有界、超时有界、JSONL严格解析。所有更新仅是候选，严格字段与来源校验后，还需实际显示确认才应用。
 
 SQLite结构与原数据协议兼容。学习者档案、会话、活动、摄像头周期、临时track和request_id/generation分别管理。删除增加epoch，取消旧生成和音频，处理派生记忆、来源、快状态、近期对话和本应用拥有的CLI记录；不删除已有编程历史。新活动与恢复时，当前模块必须重新确认。
 

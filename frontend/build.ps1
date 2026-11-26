@@ -14,5 +14,11 @@ New-Item -ItemType Directory -Force -Path $taskAssets | Out-Null
 & $taskBindgen --target web --no-typescript --out-dir $taskAssets --out-name tutor_ui (Join-Path $taskRoot 'target\ui\wasm32-unknown-unknown\release\tutor-ui.wasm')
 if ($LASTEXITCODE -ne 0) { throw 'WebAssembly binding generation failed.' }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'index.html') -Destination (Join-Path $taskDist 'index.html') -Force
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'style.css') -Destination (Join-Path $taskAssets 'style.css') -Force
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'bootstrap.js') -Destination (Join-Path $taskAssets 'bootstrap.js') -Force
+foreach ($taskAsset in @('style.css','bootstrap.js','robot-companion.js','app-icon.svg','manifest.webmanifest')) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot $taskAsset) -Destination (Join-Path $taskAssets $taskAsset) -Force
+}
+$taskThreeAssets = Join-Path $taskAssets 'vendor\three'
+New-Item -ItemType Directory -Force -Path $taskThreeAssets | Out-Null
+foreach ($taskAsset in Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'vendor\three') -File) {
+    Copy-Item -LiteralPath $taskAsset.FullName -Destination (Join-Path $taskThreeAssets $taskAsset.Name) -Force
+}

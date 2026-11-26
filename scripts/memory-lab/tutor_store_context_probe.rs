@@ -351,9 +351,25 @@ fn build_case(frozen: &Frozen, method: &Value, id: &str) -> Result<(Value, Value
             let removed = decision(&p, &format!("{pack}_s01"))?;
             p.store
                 .forget(&p.learner_id, Some(s(removed, "memory_id")))?;
+            let selection = s(
+                &p.store.session(&sid)?["continuation"],
+                "selection_event_id",
+            )
+            .to_owned();
+            ensure!(
+                !selection.is_empty(),
+                "Independent memory deletion withdrew the explicit selection"
+            );
+            p.store.revise_education_event(
+                &p.learner_id,
+                &sid,
+                &selection,
+                "simulated",
+                &json!({"text":"撤销这次续做选择；不再继承旧活动。"}),
+            )?;
             ensure!(
                 p.store.session(&sid)?["continuation"].is_null(),
-                "Forgotten selection remains live"
+                "Revoked selection remains live"
             );
             allowed = HashSet::from([sid.clone()]);
             if id == "new_choice_after_forget" {

@@ -18,5 +18,5 @@ models/memory/
 models/ggml-base.bin
 runtime-tools/
 archive/pre-rust-reference/frontend/node_modules/
-bin/
+/bin/
 

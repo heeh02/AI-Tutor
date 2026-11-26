@@ -65,7 +65,7 @@
 .\bin\tutorctl.exe --root . turn send --session session_ID --text '它已经能停车了，我想让间隙更大' --wait --wait-seconds 120
 ```
 
-`turn send` 通过现有服务调用真实 Kimi，可能产生远程用量；没有自动重试。`--wait` 在 1–180 秒内（默认 120 秒）轮询当前请求，仅返回本轮请求编号、回复和状态，不输出其他轮次。新代次或档案切换会报告 `superseded`。
+`turn send` 通过现有服务调用真实 Kimi，可能产生远程用量；没有自动重试。`--wait` 在 1–180 秒内（默认 120 秒）轮询当前请求，仅返回本轮请求编号、回复和状态，不输出其他轮次。新代次或档案切换会报告 `superseded`。分句模式同时检查 `tutor_stream.phase`，离开 `generating` 后从只读 stream 接口拼接已校验正文；`final_pending` 仍待真实显示，`completed` 才表示显示流程完成。失败、取消或中断不会包装成成功。
 
 CLI **不调用 `delivery/shown`、不自动朗读**。输出中看到 `generated` 只表示模型已生成；真正显示后的投递确认由用户工作台完成，之后才应用相关教学与记忆候选。已有 UI 确认时，CLI 如实报告该状态。请通过用户界面完成成人教学交互验收。
 

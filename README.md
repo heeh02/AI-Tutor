@@ -154,7 +154,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-rust.ps1
 
 - 按清单下载并校验人脸检测模型、Whisper base 模型与原生依赖；
 - 构建 Rust 本机程序和 Rust/Yew WebAssembly 界面；
-- 将程序安装到 `bin/`，界面资源安装到 `frontend/dist/`；
+- 将程序与本地模型辅助组件安装到 `bin/`，界面资源安装到 `frontend/dist/`；
 - 更新已有安装时先暂存与校验，再正常停止旧服务，失败时恢复已替换文件；
 - 最后核验真实 Kimi 无工具连接，不提取 OAuth 令牌，也不改写全局 Kimi 配置。
 
@@ -207,7 +207,35 @@ http://127.0.0.1:8765/
 | 💾 **结束并保存** | 先保存观察，再保留有来源的进展；下次可召回历史，但当前模块仍需重新确认 |
 | 👁️ **选择临时视觉目标** | 只改变当前视觉互动对象，不切换档案，也不自动启用物理云台 |
 
-面向辅助工具与自动化检查，项目还提供 `bin/tutorctl.exe`。它通过本机认证 API 读取状态和控制工作台，不直接读取数据库，也不绕过界面确认。完整入口见 [CLI 使用说明](docs/CLI.md)。
+面向辅助工具与自动化检查，项目还提供 `bin/tutorctl.exe`。它通过本机认证 API 读取状态和控制工作台，不直接读取数据库，也不绕过界面确认。完整入口见 [CLI 使用说明](docs/CLI.md)；并行界面开发使用 [后端 API 交接](docs/BACKEND_API_HANDOFF.md)。
+
+### 可选：中英语义记忆检索
+
+基础安装默认使用词语匹配，不依赖 WSL，也不需要下载语义模型。需要跨中英文含义查找学习记忆时，可显式启用本地 BGE-M3；模型和向量计算留在本机，检索仍受档案、活动、来源版本和遗忘规则约束。
+
+1. 准备已安装 `torch`、`transformers`、`tokenizers` 和 `numpy` 的 WSL/Linux Python。应用不会自行安装 Python 包或修改该环境。
+2. 下载并校验固定版本的官方模型（约 2.27 GB，报告路径必须尚不存在）：
+
+   ```powershell
+   python scripts/memory-lab/download_bge_m3.py --root . --report runtime/bge-m3-assets.json
+   ```
+
+3. 创建 `runtime/local-memory-policy.json`。`namespace` 只能选择一个数据空间，`python_executable` 是 Linux 绝对路径，`model_directory` 使用本机 Windows 绝对路径：
+
+   ```json
+   {
+     "protocol_version": 1,
+     "mode": "bge_cpu",
+     "namespace": "simulator",
+     "distribution": "Ubuntu",
+     "python_executable": "/path/to/python",
+     "model_directory": "C:\\path\\to\\AI-Tutor\\models\\memory\\bge-m3"
+   }
+   ```
+
+4. 重新启动工作台，在服务设置中查看准备状态。首次冷启动需要校验并加载约 2.27 GB 权重，可能需要数分钟；后台只为当前档案建立索引，查询有独立时限。准备失败或索引未完成时继续对话仍使用词语匹配，也可以停止或手动重试语义检索。
+
+安装更新会保留模型目录和此策略文件。若要恢复默认行为，将 `mode` 改为 `disabled`，或停止语义检索后移除该策略文件。
 
 ## 🛡️ 你的学习小世界，由你守护
 
@@ -293,7 +321,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-install-rust.ps
 可爱不等于含糊，宣传也不替实验签字。当前主要状态如下：
 
 - ✅ **2026-11-26 GUI 与真实浏览器演示**：UI **179 项通过、0 失败**，WASM 构建成功；模拟档案完成两轮 DeepSeek Flash 对话和两条真实记忆，另通过本地播报触发与停止。详见 [汇报与验证记录](docs/PRESENTATION_GUIDE_20261126.md#八本次验证记录)。
-- ✅ **Rust 本机服务与 WASM 工作台**已实现；2026-11-03 的验收记录为 workspace **261 项通过、0 失败、1 项真实 Kimi 付费探针忽略**，具体范围以当次报告为准。
+- ✅ **后端与可选语义记忆检索**：本轮后端全量回归及 Python **211 项检查通过**；真实 Kimi 无工具回复、BGE 中英检索、全新目录安装与重启记忆读回均已验证。历史验收范围仍以对应报告为准。
 - ✅ **真实 Kimi 多轮教学、来源校验、记忆纠正与隔离**已有实际测试证据。
 - ✅ **OBSBOT Tiny3 视频、人脸检测、ByteTrack 与目标选择**已有真实设备证据；多人交叉、遮挡和真实拔插仍需单独现场验证。
 - 🟡 **基本成人按键说话、转写编辑与可听播报**已获用户确认；英语自然语音、现场回声、打断与播报中切换档案尚未完成全项验收。

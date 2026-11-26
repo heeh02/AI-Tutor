@@ -20,7 +20,7 @@ import embedding_worker as wire
 
 MAX_LINE = wire.MAX_LINE
 START_GATE_SECONDS = 10
-STARTUP_SECONDS = 90
+STARTUP_SECONDS = 300
 ENCODE_SECONDS = 60
 SIGKILL = getattr(signal, 'SIGKILL', 9)
 SIGHUP = getattr(signal, 'SIGHUP', 1)

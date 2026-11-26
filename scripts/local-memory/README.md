@@ -91,7 +91,7 @@ current request identity, token bound, vector dimension and norm. It consumes
 The manager watches owner stdin, worker stdout and bounded nonblocking writes in
 one selector loop. Owner stop/EOF remains observable during model loading and
 encoding. The startup gate is 10 seconds; manager preparation and encode
-backstops are 90 and 60 seconds. The native actor may impose a shorter deadline
+backstops are 300 and 60 seconds. The native actor may impose a shorter deadline
 (currently five seconds for encoding), poison the owner, and request cleanup.
 
 A worker is created with a new Linux session/process group. It also arms a

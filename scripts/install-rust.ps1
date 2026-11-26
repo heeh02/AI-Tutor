@@ -47,6 +47,14 @@ function Get-FinalAsrProgramFiles {
     [PSCustomObject]@{Source='scripts\speech-lab\gpu_admission.py';Relative='bin\final-asr\gpu_admission.py'}
 }
 
+function Get-LocalMemoryProgramFiles {
+    # The opt-in semantic retrieval owner needs both sibling files. Models,
+    # environments and policies remain local dependencies, not update assets.
+    foreach ($taskName in @('managed_embedding.py','embedding_worker.py')) {
+        [PSCustomObject]@{Source=('scripts\local-memory\'+$taskName);Relative=('bin\local-memory\'+$taskName)}
+    }
+}
+
 function Stop-ProjectInstances([string]$Root) {
     $taskRunning = @(Get-ProjectInstances $Root)
     if ($taskRunning.Count -eq 0) { return }
@@ -179,6 +187,7 @@ $taskFiles = @('ai-tutor.exe','ptz-read-probe.exe','tutorctl.exe','ptz-calibrate
 $taskFiles += @(Get-LocalSpeechProgramFiles)
 $taskFiles += @(Get-LocalAsrProgramFiles)
 $taskFiles += @(Get-FinalAsrProgramFiles)
+$taskFiles += @(Get-LocalMemoryProgramFiles)
 $taskUiRoot = Get-ProjectPath $taskRoot $taskUiStage
 foreach ($taskFile in Get-ChildItem -LiteralPath $taskUiRoot -File -Recurse) {
     $taskRelative = $taskFile.FullName.Substring($taskUiRoot.Length).TrimStart('\')

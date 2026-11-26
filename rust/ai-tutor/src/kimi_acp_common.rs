@@ -282,7 +282,8 @@ pub(super) fn prepare_home(
         front.replace("name: ai-tutor", "name: agent")
     );
     fs::write(work.join(".kimi-code/agents/agent.md"), overridden)?;
-    let config = if real {
+    let agent_directory = fs::canonicalize(work.join(".kimi-code/agents"))?;
+    let mut config = if real {
         provider.safe_config()?
     } else {
         toml::Value::try_from(json!({
@@ -298,6 +299,16 @@ pub(super) fn prepare_home(
                 "max_context_size":32768,"capabilities":["tool_use"]}}
         }))?
     };
+    // ACP searches project agents from the nearest .git ancestor, not cwd.
+    config
+        .as_table_mut()
+        .ok_or_else(|| anyhow!("ACP 隔离配置不是 TOML 表"))?
+        .insert(
+            "extra_agent_dirs".into(),
+            toml::Value::Array(vec![toml::Value::String(
+                agent_directory.to_string_lossy().into_owned(),
+            )]),
+        );
     fs::write(home.join("config.toml"), toml::to_string(&config)?)?;
     fs::write(home.join("tui.toml"), "[upgrade]\nauto_install = false\n")?;
     if real {

@@ -10,7 +10,7 @@ use tokio::{
     time::Instant,
 };
 
-const PREPARE: Duration = Duration::from_secs(90);
+const PREPARE: Duration = Duration::from_secs(300);
 const ENCODE: Duration = Duration::from_secs(5);
 const STOP: Duration = Duration::from_secs(30);
 
