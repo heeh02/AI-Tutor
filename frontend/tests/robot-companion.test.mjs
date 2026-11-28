@@ -104,13 +104,13 @@ class LifecycleRobot extends Robot {
     this._renderer = new RendererSink();
     this._stage.prepend(this._renderer.domElement);
     this._environment = new THREE.WebGLRenderTarget(1, 1);
-    const body = new THREE.Group();
-    this._scene.add(body);
+    this._bodyMotion = new THREE.Group();
+    this._scene.add(this._bodyMotion);
     this._torso = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
-    body.add(this._torso);
+    this._bodyMotion.add(this._torso);
     this._yawPivot = new THREE.Group();
     this._pitchPivot = new THREE.Group();
-    body.add(this._yawPivot);
+    this._bodyMotion.add(this._yawPivot);
     this._yawPivot.add(this._pitchPivot);
     this._smile = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
     this._pitchPivot.add(this._smile);
@@ -122,6 +122,35 @@ class LifecycleRobot extends Robot {
     this._brows = [new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial()), new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial())];
     this._mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
     this._pitchPivot.add(this._mouthOpen);
+    this._arms = [];
+    this._elbows = [];
+    this._wrists = [];
+    this._fingers = [];
+    this._thumbs = [];
+    for (const side of [-1, 1]) {
+      const arm = new THREE.Group();
+      arm.userData.side = side;
+      this._bodyMotion.add(arm);
+      const elbow = new THREE.Group();
+      arm.add(elbow);
+      const wrist = new THREE.Group();
+      elbow.add(wrist);
+      const hand = new THREE.Group();
+      hand.userData.side = side;
+      wrist.add(hand);
+      for (let index = 0; index < 4; index++) {
+        const finger = new THREE.Group();
+        finger.userData = { side, index };
+        hand.add(finger);
+        this._fingers.push(finger);
+      }
+      const thumb = new THREE.Group();
+      hand.add(thumb);
+      this._thumbs.push(thumb);
+      this._arms.push(arm);
+      this._elbows.push(elbow);
+      this._wrists.push(wrist);
+    }
     this._applyHeadPose();
     this._updateCamera();
   }
@@ -247,7 +276,7 @@ test('unmount releases scene references, listeners and RAF; remount uses latest 
   assert.equal(resizeObserver.disconnected, true);
   assert.equal(intersectionObserver.disconnected, true);
   assert.equal(frames.size, 0);
-  for (const key of ['_scene', '_torso', '_smile', '_camera', '_eyeMaterial', '_chestMaterial', '_antennaMaterial', '_bodyMotion', '_expressionPivot', '_arms', '_wrists', '_pupils', '_brows', '_antenna', '_mouthOpen']) {
+  for (const key of ['_scene', '_torso', '_smile', '_camera', '_eyeMaterial', '_chestMaterial', '_antennaMaterial', '_bodyMotion', '_expressionPivot', '_arms', '_elbows', '_wrists', '_fingers', '_thumbs', '_pupils', '_brows', '_antenna', '_mouthOpen']) {
     assert.ok(robot[key] === null, `${key} must not retain the disposed scene`);
   }
   pose(robot, live('A', -10, 20));
@@ -280,6 +309,33 @@ test('moods and greetings animate expression without altering the accepted head 
   assert.deepEqual(angles(robot), before);
   robot._animateDetails(4.3);
   assert.equal(robot.getPoseSnapshot().gesture, 'rest');
+  assert.deepEqual(angles(robot), before);
+});
+
+test('shoulder, elbow, wrist and finger motion stays separate from hardware head pose', () => {
+  const robot = createRobot(true);
+  pose(robot, live('A', 24, 12));
+  const before = angles(robot);
+  assert.equal(robot._fingers.length, 8);
+  assert.equal(robot._thumbs.length, 2);
+  robot.greet();
+  robot._animateDetails(0.55);
+  assert.ok(robot._arms[1].rotation.z > 0.3);
+  assert.ok(robot._elbows[1].rotation.z < -0.2);
+  assert.ok(Math.abs(robot._wrists[1].rotation.z) > 0.01);
+  assert.deepEqual(angles(robot), before);
+  robot.setAttribute('mood', 'listening');
+  robot._animateDetails(1.1);
+  assert.ok(robot._elbows[1].rotation.x < 0);
+  assert.deepEqual(angles(robot), before);
+  robot.setAttribute('mood', 'thinking');
+  robot._animateDetails(1.7);
+  assert.ok(robot._elbows[0].rotation.x < -0.5);
+  assert.deepEqual(angles(robot), before);
+  media.matches = true;
+  media.dispatchEvent(new Event('change'));
+  assert.equal(robot._arms[1].rotation.z, 0.11);
+  assert.equal(robot._wrists[1].rotation.z, 0);
   assert.deepEqual(angles(robot), before);
 });
 

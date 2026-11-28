@@ -154,6 +154,7 @@ class AiTutorRobot extends HTMLElement {
     this._listeners = [];
     this._lastFrame = 0;
     this._elapsed = 0;
+    this._lastAnimationElapsed = 0;
     this._blinkAt = 2.7;
     this._gesture = null;
     this._gaze = { x: 0, y: 0 };
@@ -431,6 +432,8 @@ class AiTutorRobot extends HTMLElement {
     this._arms = [];
     this._elbows = [];
     this._wrists = [];
+    this._fingers = [];
+    this._thumbs = [];
     for (const side of [-1, 1]) {
       addMesh(body, new THREE.SphereGeometry(0.17, 28, 20), lavender, side * 0.6, 1.35, 0);
       const shoulderRing = addMesh(body, new THREE.TorusGeometry(0.145, 0.025, 10, 32), joint,
@@ -452,10 +455,30 @@ class AiTutorRobot extends HTMLElement {
       wrist.position.set(0, -0.29, 0.02);
       elbow.add(wrist);
       addMesh(wrist, new THREE.CylinderGeometry(0.105, 0.115, 0.075, 24), joint, 0, 0.035, 0);
-      const hand = addMesh(wrist, new THREE.SphereGeometry(0.15, 28, 20), lavender, 0, -0.035, 0.005);
-      hand.scale.set(0.96, 1.05, 0.88);
-      const thumb = addMesh(wrist, new THREE.SphereGeometry(0.078, 20, 14), shell, -side * 0.105, -0.015, 0.075);
-      thumb.scale.set(0.85, 1, 0.9);
+      addMesh(wrist, new THREE.TorusGeometry(0.11, 0.016, 8, 28), lavender, 0, 0.004, 0).rotation.x = Math.PI / 2;
+      const hand = new THREE.Group();
+      hand.position.set(0, -0.025, 0.012);
+      hand.userData.side = side;
+      wrist.add(hand);
+      addMesh(hand, roundedBox(0.235, 0.22, 0.15, 0.075, 0.022), lavender, 0, -0.065, 0);
+      addMesh(hand, roundedBox(0.16, 0.125, 0.025, 0.045, 0.008), shell, 0, -0.045, 0.083);
+      for (let fingerIndex = 0; fingerIndex < 4; fingerIndex++) {
+        const finger = new THREE.Group();
+        const length = [0.058, 0.074, 0.07, 0.052][fingerIndex];
+        finger.position.set((fingerIndex - 1.5) * 0.052, -0.17, 0.008);
+        finger.userData.index = fingerIndex;
+        finger.userData.side = side;
+        hand.add(finger);
+        addMesh(finger, new THREE.CapsuleGeometry(0.026, length, 5, 12), lavender, 0, -length * 0.45, 0);
+        addMesh(finger, new THREE.SphereGeometry(0.027, 14, 10), shell, 0, -length - 0.02, 0.004).scale.set(1, 0.82, 0.92);
+        this._fingers.push(finger);
+      }
+      const thumb = new THREE.Group();
+      thumb.position.set(-side * 0.125, -0.07, 0.055);
+      thumb.rotation.z = side * 0.45;
+      hand.add(thumb);
+      addMesh(thumb, new THREE.CapsuleGeometry(0.038, 0.06, 6, 14), shell, 0, -0.035, 0);
+      this._thumbs.push(thumb);
       this._arms.push(arm);
       this._elbows.push(elbow);
       this._wrists.push(wrist);
@@ -694,6 +717,9 @@ class AiTutorRobot extends HTMLElement {
     if (!this._eyes) return;
     const active = !this._reducedMotion;
     const ease = active ? 0.16 : 1;
+    const animationDelta = THREE.MathUtils.clamp(elapsed - this._lastAnimationElapsed, 0, 0.1);
+    const jointEase = active ? 1 - Math.exp(-animationDelta * 10) : 1;
+    this._lastAnimationElapsed = elapsed;
     const listening = this._mood === 'listening';
     const thinking = this._mood === 'thinking';
     const speaking = this._mood === 'speaking';
@@ -765,64 +791,94 @@ class AiTutorRobot extends HTMLElement {
       const breath = active ? Math.sin(elapsed * 1.45) * 0.003 : 0;
       const bodyLean = (thinking ? 0.018 : 0) - wave * 0.025
         + (active && speaking ? Math.sin(elapsed * 1.8) * 0.004 : 0);
-      this._bodyMotion.rotation.z = THREE.MathUtils.lerp(this._bodyMotion.rotation.z, bodyLean, ease * 0.8);
+      this._bodyMotion.rotation.z = THREE.MathUtils.lerp(this._bodyMotion.rotation.z, bodyLean, jointEase * 0.8);
       this._bodyMotion.rotation.x = THREE.MathUtils.lerp(this._bodyMotion.rotation.x,
-        (listening ? 0.024 : 0) + (active && speaking ? Math.sin(elapsed * 2.1) * 0.004 : 0), ease * 0.8);
+        (listening ? 0.024 : 0) + (active && speaking ? Math.sin(elapsed * 2.1) * 0.004 : 0), jointEase * 0.8);
       this._bodyMotion.position.y = breath;
     }
     if (this._expressionPivot) {
       const idleTilt = active && this._mood === 'idle' ? Math.sin(elapsed * 0.62) * 0.005 : 0;
       const tilt = idleTilt + (thinking ? 0.055 : 0) - (listening ? 0.008 : 0)
         + (active ? Math.sin(gestureAge * 5) * wave * 0.018 : 0);
-      this._expressionPivot.rotation.z = THREE.MathUtils.lerp(this._expressionPivot.rotation.z, tilt, ease);
+      this._expressionPivot.rotation.z = THREE.MathUtils.lerp(this._expressionPivot.rotation.z, tilt, jointEase);
       this._expressionPivot.rotation.x = THREE.MathUtils.lerp(this._expressionPivot.rotation.x,
         (listening ? -0.024 : thinking ? 0.018 : 0)
-          + (active && speaking ? Math.sin(elapsed * 2.2) * 0.008 : 0) - wave * 0.01, ease);
+          + (active && speaking ? Math.sin(elapsed * 2.2) * 0.008 : 0) - wave * 0.01, jointEase);
     }
     this._arms?.forEach((arm, index) => {
       const side = arm.userData.side;
-      let x = active ? Math.sin(elapsed * 1.45 + side * 0.7) * 0.008 : 0;
-      let z = side * 0.13 + (active ? Math.sin(elapsed * 1.45 + side * 0.5) * 0.006 : 0);
-      let elbowX = -0.055;
+      let x = active ? Math.sin(elapsed * 1.45 + side * 0.7) * 0.006 : 0;
+      let z = side * 0.09 + (active ? Math.sin(elapsed * 1.45 + side * 0.5) * 0.005 : 0);
+      let elbowX = -0.035;
       let elbowZ = 0;
       let wristX = 0;
       let wristZ = 0;
       if (listening) {
-        x = -0.1;
-        z = side * 0.14;
-        elbowX = -0.16;
+        x = -0.07;
+        z = side * 0.12;
+        elbowX = -0.08;
+        if (side > 0) {
+          x = -0.18;
+          z = 0.28;
+          elbowX = -0.34;
+          wristX = -0.12;
+        }
       }
       if (thinking) {
-        x = side < 0 ? -0.18 : -0.04;
-        z = side < 0 ? -0.22 : 0.13;
-        elbowX = side < 0 ? -1.5 : -0.08;
-        elbowZ = side < 0 ? 0.12 : 0;
+        if (side < 0) {
+          x = -0.16;
+          z = -0.18;
+          elbowX = -1.32;
+          elbowZ = 0.1;
+          wristX = -0.28;
+          wristZ = 0.08;
+        } else {
+          x = -0.03;
+          z = 0.11;
+          elbowX = -0.06;
+        }
       }
       if (speaking) {
         const phase = elapsed * 2.2 + (side > 0 ? 0 : Math.PI);
-        x = -0.1 + (active ? Math.sin(phase) * 0.035 : 0);
-        z = side * (0.19 + (active ? (Math.sin(phase) + 1) * 0.025 : 0.025));
-        elbowX = -0.18 + (active ? Math.sin(phase + 0.6) * 0.06 : 0);
-        wristX = active ? Math.sin(phase) * 0.035 : 0;
+        x = -0.06 + (active ? Math.sin(phase) * 0.022 : 0);
+        z = side * (0.14 + (active ? (Math.sin(phase) + 1) * 0.018 : 0.018));
+        elbowX = -0.1 + (active ? Math.sin(phase + 0.6) * 0.045 : 0);
+        wristX = active ? Math.sin(phase) * 0.03 : 0;
+        wristZ = active ? side * Math.sin(phase * 0.7) * 0.025 : 0;
       }
       if (wave > 0 && side > 0) {
-        x = THREE.MathUtils.lerp(x, -0.04, wave);
-        z = THREE.MathUtils.lerp(z, 2.42, wave);
-        elbowX = THREE.MathUtils.lerp(elbowX, -0.08, wave);
-        elbowZ = THREE.MathUtils.lerp(elbowZ, -0.18, wave);
-        wristZ = Math.sin(gestureAge * 11) * wave * 0.26;
+        x = THREE.MathUtils.lerp(x, -0.26, wave);
+        z = THREE.MathUtils.lerp(z, 2.08, wave);
+        elbowX = THREE.MathUtils.lerp(elbowX, -0.16, wave);
+        elbowZ = THREE.MathUtils.lerp(elbowZ, -0.42, wave);
+        wristX = THREE.MathUtils.lerp(wristX, -0.12, wave);
+        wristZ = Math.sin(gestureAge * 8.5) * wave * 0.42;
       } else if (wave > 0) {
-        z += side * wave * 0.035;
-        elbowX -= wave * 0.06;
+        z += side * wave * 0.025;
+        elbowX -= wave * 0.04;
       }
-      arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, x, ease);
-      arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, z, ease);
+      arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, x, jointEase);
+      arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, z, jointEase);
       const elbow = this._elbows[index];
-      elbow.rotation.x = THREE.MathUtils.lerp(elbow.rotation.x, elbowX, ease);
-      elbow.rotation.z = THREE.MathUtils.lerp(elbow.rotation.z, elbowZ, ease);
+      elbow.rotation.x = THREE.MathUtils.lerp(elbow.rotation.x, elbowX, jointEase);
+      elbow.rotation.z = THREE.MathUtils.lerp(elbow.rotation.z, elbowZ, jointEase);
       const wrist = this._wrists[index];
-      wrist.rotation.x = THREE.MathUtils.lerp(wrist.rotation.x, wristX, ease);
-      wrist.rotation.z = THREE.MathUtils.lerp(wrist.rotation.z, wristZ, ease);
+      wrist.rotation.x = THREE.MathUtils.lerp(wrist.rotation.x, wristX, jointEase);
+      wrist.rotation.z = THREE.MathUtils.lerp(wrist.rotation.z, wristZ, jointEase);
+    });
+    this._fingers?.forEach(finger => {
+      const side = finger.userData.side;
+      const index = finger.userData.index;
+      let curl = listening && side > 0 ? 0.12 : thinking && side < 0 ? 0.22 : speaking ? -0.025 : 0;
+      if (wave > 0 && side > 0) {
+        curl = THREE.MathUtils.lerp(curl, -0.12 + Math.sin(gestureAge * 8.5 + index * 0.3) * 0.05, wave);
+      }
+      finger.rotation.x = THREE.MathUtils.lerp(finger.rotation.x, curl, jointEase);
+    });
+    this._thumbs?.forEach(thumb => {
+      const side = thumb.parent?.userData.side ?? 1;
+      const target = side * 0.45 - (wave > 0 && side > 0 ? 0.2 * wave : listening ? side * 0.05 : 0);
+      thumb.rotation.z = THREE.MathUtils.lerp(thumb.rotation.z, target, jointEase);
     });
     if (this._antenna) {
       this._antenna.rotation.z = active
@@ -887,6 +943,8 @@ class AiTutorRobot extends HTMLElement {
     this._arms = null;
     this._elbows = null;
     this._wrists = null;
+    this._fingers = null;
+    this._thumbs = null;
     this._eyes = null;
     this._pupils = null;
     this._brows = null;
@@ -907,6 +965,7 @@ class AiTutorRobot extends HTMLElement {
     this._cheekMaterial = null;
     this._pointer = null;
     this._lastFrame = 0;
+    this._lastAnimationElapsed = 0;
   }
 }
 

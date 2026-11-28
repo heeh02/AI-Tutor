@@ -262,21 +262,21 @@ impl Component for RobotCompanion {
             }
         } else if live {
             if en {
-                "Camera synced"
+                "Xiao Yu is with you"
             } else {
-                "摄像头同步中"
+                "小宇在陪着你"
             }
         } else if camera_running {
             if en {
-                "Waiting for pose"
+                "Xiao Yu is ready"
             } else {
-                "等待姿态反馈"
+                "小宇准备好了"
             }
         } else {
             if en {
-                "Ready to chat"
+                "Xiao Yu is ready"
             } else {
-                "可以开始对话"
+                "小宇准备好了"
             }
         };
         let source = if self.demo {
