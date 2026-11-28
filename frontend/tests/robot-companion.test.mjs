@@ -29,7 +29,10 @@ class TestNode extends EventTarget {
   }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
   prepend(child) { child.parentNode = this; }
+  getBoundingClientRect() { return { left: 0, top: 0, width: 600, height: 420 }; }
+  setPointerCapture(id) { this.pointerId = id; }
   remove() { this.parentNode = null; this.removed = true; }
+  closest() { return null; }
 }
 
 const registered = new Map();
@@ -115,6 +118,10 @@ class LifecycleRobot extends Robot {
     this._chestMaterial = new THREE.MeshStandardMaterial();
     this._antennaMaterial = new THREE.MeshStandardMaterial();
     this._eyes = [new THREE.Group(), new THREE.Group()];
+    this._pupils = [new THREE.Group(), new THREE.Group()];
+    this._brows = [new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial()), new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial())];
+    this._mouthOpen = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
+    this._pitchPivot.add(this._mouthOpen);
     this._applyHeadPose();
     this._updateCamera();
   }
@@ -240,7 +247,7 @@ test('unmount releases scene references, listeners and RAF; remount uses latest 
   assert.equal(resizeObserver.disconnected, true);
   assert.equal(intersectionObserver.disconnected, true);
   assert.equal(frames.size, 0);
-  for (const key of ['_scene', '_torso', '_smile', '_camera', '_eyeMaterial', '_chestMaterial', '_antennaMaterial']) {
+  for (const key of ['_scene', '_torso', '_smile', '_camera', '_eyeMaterial', '_chestMaterial', '_antennaMaterial', '_bodyMotion', '_expressionPivot', '_arms', '_wrists', '_pupils', '_brows', '_antenna', '_mouthOpen']) {
     assert.ok(robot[key] === null, `${key} must not retain the disposed scene`);
   }
   pose(robot, live('A', -10, 20));
@@ -248,4 +255,74 @@ test('unmount releases scene references, listeners and RAF; remount uses latest 
   assert.notEqual(robot._renderer, renderer);
   assert.notEqual(robot._scene, oldScene);
   assert.deepEqual(angles(robot), { yaw_deg: 10, pitch_deg: 20 });
+});
+
+test('moods and greetings animate expression without altering the accepted head pose', () => {
+  const robot = createRobot(true);
+  pose(robot, live('A', 24, 12));
+  const before = angles(robot);
+  robot.setAttribute('mood', 'listening');
+  robot._animateDetails(1);
+  assert.equal(robot._eyes[0].scale.y, 1.12);
+  assert.equal(robot._brows[0].visible, true);
+  robot.setAttribute('mood', 'thinking');
+  robot._animateDetails(2);
+  assert.equal(robot._eyes[0].scale.y, 0.82);
+  assert.ok(robot._gaze.x > 0);
+  robot.setAttribute('mood', 'speaking');
+  robot._animateDetails(3);
+  assert.equal(robot._smile.visible, false);
+  assert.equal(robot._mouthOpen.visible, true);
+  robot.setAttribute('mood', 'idle');
+  robot.greet();
+  robot._animateDetails(1.4);
+  assert.equal(robot.getPoseSnapshot().gesture, 'hello');
+  assert.deepEqual(angles(robot), before);
+  robot._animateDetails(4.3);
+  assert.equal(robot.getPoseSnapshot().gesture, 'rest');
+  assert.deepEqual(angles(robot), before);
+});
+
+test('reduced motion stops greeting and gaze movement without losing mood feedback', () => {
+  const robot = createRobot(true);
+  robot.greet();
+  assert.equal(robot.getPoseSnapshot().gesture, 'hello');
+  media.matches = true;
+  media.dispatchEvent(new Event('change'));
+  robot.setAttribute('mood', 'listening');
+  assert.equal(robot.getPoseSnapshot().gesture, 'rest');
+  assert.equal(robot._eyes[0].scale.y, 1.12);
+  robot.greet();
+  assert.equal(robot.getPoseSnapshot().gesture, 'rest');
+  assert.deepEqual(robot._gazeTarget, { x: 0, y: 0 });
+});
+
+
+test('canvas taps and Enter greet while dragging changes only the viewer', () => {
+  const robot = createRobot(true);
+  pose(robot, live('A', 24, 12));
+  const before = angles(robot);
+  const canvas = robot._renderer.domElement;
+  const pointer = (type, x, y) => {
+    const event = new Event(type);
+    Object.assign(event, { isPrimary: true, button: 0, pointerId: 1, clientX: x, clientY: y });
+    canvas.dispatchEvent(event);
+  };
+  pointer('pointerdown', 300, 200);
+  pointer('pointerup', 300, 200);
+  assert.equal(robot.getPoseSnapshot().gesture, 'hello');
+  assert.deepEqual(angles(robot), before);
+  robot._animateDetails(robot._elapsed + 5);
+  pointer('pointerdown', 300, 200);
+  pointer('pointermove', 340, 220);
+  pointer('pointerup', 340, 220);
+  assert.equal(robot.getPoseSnapshot().gesture, 'rest');
+  assert.notEqual(robot.getPoseSnapshot().view.azimuth_deg, 0.22 * 180 / Math.PI);
+  assert.deepEqual(angles(robot), before);
+  const enter = new Event('keydown', { cancelable: true });
+  Object.assign(enter, { key: 'Enter', repeat: false });
+  canvas.dispatchEvent(enter);
+  assert.equal(enter.defaultPrevented, true);
+  assert.equal(robot.getPoseSnapshot().gesture, 'hello');
+  assert.deepEqual(angles(robot), before);
 });

@@ -5,10 +5,12 @@ use crate::{
         Call, ContinueResult,
     },
     comparison_state::{ComparisonGuard, ComparisonOwner},
+    i18n::t,
     model::{
         list, recoverable_input, retry_unshown_turns, text, AudioTicket, ChatViewport, IntentGuard,
         ModuleDraft, RequestVersion,
     },
+    navigation::{AppView, RouteListener},
     preview_browser::{hidden, VisibilityListener},
     recording_draft::{FinalText, RecordingDraft, RecordingTicket, ReviewKind, SubmittedDraft},
     speech_intent::{SpeechIntent, SpeechKey},
@@ -23,6 +25,7 @@ use std::{
     collections::{HashMap, HashSet, VecDeque},
     rc::Rc,
 };
+use wasm_bindgen::JsCast;
 use yew::prelude::*;
 
 #[derive(Clone)]
@@ -45,6 +48,8 @@ pub enum Field {
 #[derive(Clone)]
 pub enum Action {
     Camera(bool),
+    LookAtCamera,
+    PlayVision,
     Track(String),
     ClearTrack,
     Send,
@@ -84,6 +89,8 @@ pub enum Msg {
     LoadMemories,
     Memories(u64, String, ApiResult),
     Field(Field, String),
+    Navigate(AppView),
+    RouteChanged(AppView),
     ToggleSpeak,
     PageVisibility(bool),
     CloseSegmentSpeech,
@@ -91,6 +98,10 @@ pub enum Msg {
     ToggleTeacher,
     OpenModuleConfirmation,
     FocusTodayPlan,
+    FocusComposer,
+    FocusVoice,
+    ConfirmTranscript,
+    ChooseActivity(String),
     Module(String, bool),
     FormDone(u64, AudioTicket, String, Option<Value>, ApiResult),
     Action(Action),
@@ -111,6 +122,9 @@ pub enum Msg {
     RetryContinuation,
     ContinuationDone(u64, ContinueRequest, ContinueResult),
     VoiceBegin,
+    VisionDone(u64, AudioTicket, String, ApiResult),
+    VisionAudioEnded(u64),
+    VisionPlaybackFailed(u64),
     VoiceEnabled(String, ApiResult),
     VoiceHeartbeat,
     VoiceHeartbeatResult(LoopKey, ApiResult),
@@ -129,6 +143,7 @@ pub enum Msg {
     ClearInputDraft,
     Delivered(AudioTicket, String, u64, u64, String, ApiResult),
     StreamProgress(String, String),
+    StreamComplete(String),
     StreamSync(String, String),
     ComparisonChanged(ComparisonGuard),
     ComparisonSettled(String, String),
@@ -139,6 +154,7 @@ pub enum Msg {
 }
 
 pub struct App {
+    pub view: AppView,
     pub data: Value,
     pub cameras: Vec<Value>,
     pub microphones: Vec<Value>,
@@ -148,6 +164,11 @@ pub struct App {
     pub busy: String,
     pub input: String,
     pub camera_id: String,
+    vision_audio: Option<web_sys::HtmlAudioElement>,
+    vision_audio_callback: Option<wasm_bindgen::closure::Closure<dyn FnMut()>>,
+    vision_request_id: Option<String>,
+    pub vision_speaking: bool,
+    pub vision_audio_ready: bool,
     pub microphone_id: String,
     pub auto_speak: bool,
     pub teacher: bool,
@@ -163,15 +184,20 @@ pub struct App {
     pub help_style: String,
     pub edit_memory: Option<String>,
     pub edit_text: String,
+    memory_edit_return: Option<String>,
     pub delete_target: Option<Value>,
     pub recording: bool,
     pub record_start_pending: bool,
     pub transcribing: bool,
     pub conversation: NodeRef,
     pub composer_input: NodeRef,
+    pub memory_edit_input: NodeRef,
+    pub voice_button: NodeRef,
+    pub teacher_toggle: NodeRef,
     pub module_confirmation: NodeRef,
     pub historical_records: NodeRef,
     focus_request: Option<FocusTarget>,
+    scroll_to_top: bool,
     pub chat_viewport: ChatViewport,
     pub history_before: Option<i64>,
     pub historical_activity: Option<HistoricalActivity>,
@@ -206,17 +232,36 @@ pub struct App {
     delivery_attempts: HashMap<String, u8>,
     delivery_retry_blocked: HashSet<String>,
     pending_read: Option<(AudioTicket, u64, String)>,
+    voice_auto_read: Option<(String, String)>,
     stream_blocked_request: Option<String>,
     speech_intent: SpeechIntent,
     speech_close_pending: Option<(u64, SpeechKey)>,
     speech_close_seq: u64,
     _visibility: Option<VisibilityListener>,
+    _route_listener: Option<RouteListener>,
 }
 
+#[derive(Clone, Copy)]
 enum FocusTarget {
     Modules,
     TodayPlan,
+    Composer,
+    VoiceButton,
+    MemoryEdit,
+    TeacherToggle,
     HistoricalRecords,
+}
+
+fn focus_waits_for_enabled_control(target: Option<FocusTarget>, busy: bool) -> bool {
+    busy && matches!(
+        target,
+        Some(
+            FocusTarget::TodayPlan
+                | FocusTarget::Composer
+                | FocusTarget::VoiceButton
+                | FocusTarget::MemoryEdit
+        )
+    )
 }
 
 impl App {
@@ -403,6 +448,24 @@ impl App {
     pub fn sending_request(&self) -> bool {
         self.submission_pending.is_some()
     }
+    pub fn stop_available(&self) -> bool {
+        self.vision_request_id.is_some()
+            || self.vision_speaking
+            || self.recording
+            || self.record_start_pending
+            || self.transcribing
+            || self.sending_request()
+            || self.voice_loop.active()
+            || self.pending_read.is_some()
+            || matches!(
+                self.data["session"]["status"].as_str(),
+                Some("generating" | "running")
+            )
+            || matches!(
+                self.data["audio"]["state"].as_str(),
+                Some("synthesizing" | "preparing" | "speaking" | "playing")
+            )
+    }
     fn set_input(&mut self, value: String) {
         self.recording_draft.edited();
         self.input = value;
@@ -422,9 +485,39 @@ impl App {
         self.data["tutor_delivery"]["mode"] == "segments"
             && self.data["tutor_delivery"]["segment_speech"] == "after_display"
     }
+    fn navigate(&mut self, ctx: &Context<Self>, next: AppView, update_history: bool) -> bool {
+        if next == self.view {
+            return false;
+        }
+        if self.recording || self.record_start_pending || self.transcribing {
+            self.error = t(&self.ui_language, "请先结束录音并处理转写，再切换页面。").to_owned();
+            if !update_history {
+                self.view.write_history(true);
+            }
+            return true;
+        }
+        self.pause_voice_loop(ctx, "navigation");
+        self.close_segment_speech(ctx, "navigation");
+        self.pending_read = None;
+        self.perform(ctx, Action::SpeechStop);
+        self.view = next;
+        self.scroll_to_top = true;
+        if next == AppView::Voice {
+            self.focus_request = Some(FocusTarget::VoiceButton);
+        }
+        if update_history {
+            next.write_history(false);
+        }
+        if next == AppView::Records && self.has_session() && self.busy.is_empty() {
+            ctx.link().send_message(Msg::LoadMemories);
+        }
+        true
+    }
+
     pub fn stream_ack_enabled(&self) -> bool {
-        SpeechKey::from_head(&self.session_id(), &self.data["session"]["tutor_stream"])
-            .is_none_or(|key| self.speech_intent.allows_ack(&key))
+        matches!(self.view, AppView::Conversation | AppView::Voice)
+            && SpeechKey::from_head(&self.session_id(), &self.data["session"]["tutor_stream"])
+                .is_none_or(|key| self.speech_intent.allows_ack(&key))
     }
     pub fn stream_speech_status(&self) -> Option<String> {
         let key = SpeechKey::from_head(&self.session_id(), &self.data["session"]["tutor_stream"])?;
@@ -472,7 +565,8 @@ impl App {
     }
     pub fn stream_display_enabled(&self) -> bool {
         let head = &self.data["session"]["tutor_stream"];
-        self.chat_viewport.stream_following()
+        matches!(self.view, AppView::Conversation | AppView::Voice)
+            && self.chat_viewport.stream_following()
             && !self.comparison_saving()
             && !self.activity_transition_pending()
             && head["generation"] == self.data["session"]["generation"]
@@ -481,11 +575,61 @@ impl App {
                 .is_some_and(|request| self.stream_blocked_request.as_deref() != Some(request))
     }
     fn automatic_speech_enabled(&self) -> bool {
-        self.auto_speak
+        matches!(self.view, AppView::Conversation | AppView::Voice)
+            && self.auto_speak
             && !self.comparison_saving()
             && self.data["tutor_delivery"]["automatic_speech"] != false
     }
+    fn autoplay_completed_stream(&mut self, ctx: &Context<Self>, previous_sid: &str) {
+        if self.view != AppView::Voice
+            || !self.auto_speak
+            || self.comparison_saving()
+            || self.activity_transition_pending()
+        {
+            return;
+        }
+        let stream = &self.data["session"]["tutor_stream"];
+        let sid = self.session_id();
+        let tid = text(&stream["turn_id"]);
+        if sid.is_empty()
+            || stream["session_id"] != sid
+            || stream["phase"] != "completed"
+            || stream["final_validated"] != true
+            || tid.is_empty()
+        {
+            return;
+        }
+        if self.state_seq == 1 || sid != previous_sid {
+            self.voice_auto_read = Some((sid, tid));
+            return;
+        }
+        if self
+            .voice_auto_read
+            .as_ref()
+            .is_some_and(|(session, turn)| session == &sid && turn == &tid)
+            || !self.busy.is_empty()
+        {
+            return;
+        }
+        let generation = self.data["session"]["generation"].as_u64().unwrap_or(0);
+        if !list(&self.data["session"]["turns"]).iter().any(|turn| {
+            turn["turn_id"] == tid
+                && turn["role"] == "assistant"
+                && turn["status"] == "shown"
+                && turn["generation"] == generation
+        }) {
+            return;
+        }
+        self.voice_auto_read = Some((sid, tid.clone()));
+        if self.busy.is_empty() {
+            self.perform(ctx, Action::Read(tid));
+        }
+    }
+
     fn retry_current_display(&mut self) {
+        if !matches!(self.view, AppView::Conversation | AppView::Voice) {
+            return;
+        }
         retry_unshown_turns(
             &self.data["session"]["turns"],
             &self.shown,
@@ -522,6 +666,23 @@ impl App {
         });
     }
     fn invalidate_audio(&mut self) {
+        if let Some(request_id) = self.vision_request_id.take() {
+            wasm_bindgen_futures::spawn_local(async move {
+                let _ = api(
+                    "/api/omni/cancel",
+                    "POST",
+                    Some(json!({"request_id":request_id})),
+                )
+                .await;
+            });
+        }
+        if let Some(audio) = self.vision_audio.take() {
+            audio.pause().ok();
+            audio.set_src("");
+        }
+        self.vision_audio_callback = None;
+        self.vision_speaking = false;
+        self.vision_audio_ready = false;
         let recording = self.recording_draft.active_binding();
         // The same actions also cancel/replace the current teaching request.
         // Revoke display receipts immediately, before the server call returns.
@@ -623,7 +784,11 @@ impl App {
                 | Action::ContinueActivity(_)
         ) && self.sending_request()
         {
-            self.error = "请先等待本次发送结果，再切换档案或活动。".into();
+            self.error = t(
+                &self.ui_language,
+                "请先等待本次发送结果，再切换档案或活动。",
+            )
+            .to_owned();
             return;
         }
         if matches!(
@@ -635,7 +800,11 @@ impl App {
                 | Action::ContinueActivity(_)
         ) && self.recording_draft.blocks_navigation(&self.input)
         {
-            self.error = "请先处理输入草稿和未采用文字，再切换档案或活动。".into();
+            self.error = t(
+                &self.ui_language,
+                "请先处理输入草稿和未采用文字，再切换档案或活动。",
+            )
+            .to_owned();
             return;
         }
         if matches!(
@@ -651,7 +820,11 @@ impl App {
             .is_some_and(|guard| guard.blocks_navigation(&self.comparison_owner()))
         {
             self.comparison_focus = self.comparison_focus.wrapping_add(1);
-            self.error = "请先保存或清空比较草稿，再切换档案或活动。".into();
+            self.error = t(
+                &self.ui_language,
+                "请先保存或清空比较草稿，再切换档案或活动。",
+            )
+            .to_owned();
             return;
         }
         if matches!(&action, Action::SaveMemory | Action::ConfirmDelete) {
@@ -661,18 +834,27 @@ impl App {
         }
         if matches!(&action, Action::ContinueActivity(_)) {
             if self.recording || self.record_start_pending || self.transcribing {
-                self.error = "请先结束录音并处理转写，再继续过去的活动。".into();
+                self.error = t(
+                    &self.ui_language,
+                    "请先结束录音并处理转写，再继续过去的活动。",
+                )
+                .to_owned();
                 return;
             }
             if self.form_payload().is_some() {
                 self.teacher = true;
-                self.error = "请先保存当前模块或观察报告，再继续过去的活动。".into();
+                self.error = t(
+                    &self.ui_language,
+                    "请先保存当前模块或观察报告，再继续过去的活动。",
+                )
+                .to_owned();
                 return;
             }
         }
         if matches!(
             &action,
             Action::Send
+                | Action::LookAtCamera
                 | Action::RecoverInput
                 | Action::Switch(_)
                 | Action::Create
@@ -732,6 +914,86 @@ impl App {
                 false,
             ),
             Action::Discover => ctx.link().send_message(Msg::Discover),
+            Action::PlayVision => {
+                if !self.vision_audio_ready {
+                    return;
+                }
+                let Some(audio) = self.vision_audio.as_ref() else {
+                    return;
+                };
+                match audio.play() {
+                    Ok(playing) => {
+                        self.vision_audio_ready = false;
+                        self.vision_speaking = true;
+                        self.error.clear();
+                        let seq = self.action_seq;
+                        let link = ctx.link().clone();
+                        wasm_bindgen_futures::spawn_local(async move {
+                            if wasm_bindgen_futures::JsFuture::from(playing).await.is_err() {
+                                link.send_message(Msg::VisionPlaybackFailed(seq));
+                            }
+                        });
+                    }
+                    Err(_) => {
+                        self.error = t(&self.ui_language, "语音播放被浏览器暂停，请允许播放声音。").to_owned();
+                    }
+                }
+            }
+            Action::LookAtCamera => {
+                if lid.is_empty()
+                    || self.input_disabled()
+                    || self.data["teaching"]["provider"] != "qwen_omni"
+                    || self.data["teaching"]["available"] != true
+                    || self.data["camera"]["state"] != "running"
+                {
+                    return;
+                }
+                self.invalidate_audio();
+                let ticket = self.guard.borrow().capture();
+                self.action_seq = self.action_seq.wrapping_add(1);
+                let seq = self.action_seq;
+                let request_id = format!(
+                    "vision-{:x}-{:x}",
+                    js_sys::Date::now() as u64,
+                    (js_sys::Math::random() * u64::MAX as f64) as u64
+                );
+                self.vision_request_id = Some(request_id.clone());
+                self.busy = if self.ui_language == "en" {
+                    "Xiao Yu is looking"
+                } else {
+                    "小宇正在看"
+                }
+                .into();
+                self.error.clear();
+                let language = self.ui_language.clone();
+                let request_payload_id = request_id.clone();
+                ctx.link().send_future(async move {
+                    let result = async {
+                        api("/api/audio/playback/stop", "POST", Some(json!({}))).await?;
+                        let frame = api("/api/camera/frame-meta", "GET", None).await?;
+                        let camera_session_id = text(&frame["camera_session_id"]);
+                        let frame_id = frame["frame_id"].as_u64()
+                            .ok_or_else(|| if language == "en" { "No fresh camera frame" } else { "当前没有新鲜画面" }.to_owned())?;
+                        if frame["preview_available"] != true || camera_session_id.is_empty() {
+                            return Err(if language == "en" { "The camera frame is no longer available" } else { "当前画面已不可用，请再试一次" }.to_owned());
+                        }
+                        let (system, question) = if language == "en" {
+                            ("You are Xiao Yu, a warm companion for a child. Describe only what is directly visible in this one explicitly submitted image in simple spoken English. Do not identify anyone, infer emotions, give a score, or control devices. Keep the answer under 70 words.",
+                             "What can you see here? Tell me one interesting detail.")
+                        } else {
+                            ("你是小宇，一位温暖的儿童伙伴。只用简单、适合朗读的中文描述这张由孩子明确提交的单张图片里直接可见的内容。不要识别身份、推断情绪、评分或控制设备。回答不超过70字。",
+                             "你看到了什么？告诉我一个有趣的细节。")
+                        };
+                        api("/api/omni/infer", "POST", Some(json!({
+                            "request_id":request_payload_id,"learner_id":lid,
+                            "messages":[{"role":"system","content":system},{"role":"user","content":question}],
+                            "modalities":["text","audio"],"audio":{"voice":"Chelsie","format":"wav"},"max_tokens":160,
+                            "include_current_frame":true,"camera_session_id":camera_session_id,"frame_id":frame_id
+                        }))).await
+                    }.await;
+                    Msg::VisionDone(seq, ticket, request_id, result)
+                });
+            }
             Action::Camera(open) => {
                 self.launch(
                     ctx,
@@ -1057,7 +1319,9 @@ impl Component for App {
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link().send_message(Msg::FetchState(true));
         ctx.link().send_message(Msg::Discover);
+        let route_listener = RouteListener::new(ctx.link().callback(Msg::RouteChanged));
         Self {
+            view: AppView::current(),
             data: json!({"learners":[],"session":null,"camera":{},"kimi":{},"audio":{},"metrics":{}}),
             cameras: vec![],
             microphones: vec![],
@@ -1067,6 +1331,11 @@ impl Component for App {
             busy: String::new(),
             input: String::new(),
             camera_id: String::new(),
+            vision_audio: None,
+            vision_audio_callback: None,
+            vision_request_id: None,
+            vision_speaking: false,
+            vision_audio_ready: false,
             microphone_id: String::new(),
             auto_speak: true,
             teacher: false,
@@ -1082,15 +1351,20 @@ impl Component for App {
             help_style: "one_step".into(),
             edit_memory: None,
             edit_text: String::new(),
+            memory_edit_return: None,
             delete_target: None,
             recording: false,
             record_start_pending: false,
             transcribing: false,
             conversation: NodeRef::default(),
             composer_input: NodeRef::default(),
+            memory_edit_input: NodeRef::default(),
+            voice_button: NodeRef::default(),
+            teacher_toggle: NodeRef::default(),
             module_confirmation: NodeRef::default(),
             historical_records: NodeRef::default(),
             focus_request: None,
+            scroll_to_top: false,
             chat_viewport: ChatViewport::default(),
             history_before: None,
             historical_activity: None,
@@ -1125,11 +1399,13 @@ impl Component for App {
             delivery_attempts: HashMap::new(),
             delivery_retry_blocked: HashSet::new(),
             pending_read: None,
+            voice_auto_read: None,
             stream_blocked_request: None,
             speech_intent: SpeechIntent::default(),
             speech_close_pending: None,
             speech_close_seq: 0,
             _visibility: VisibilityListener::new(ctx.link().callback(Msg::PageVisibility)),
+            _route_listener: route_listener,
         }
     }
     fn update(&mut self, ctx: &Context<Self>, msg: Msg) -> bool {
@@ -1462,6 +1738,7 @@ impl Component for App {
                         if sid != old_sid || old_generation != self.data["session"]["generation"] {
                             ctx.link().send_message(Msg::LoadMemories);
                         }
+                        self.autoplay_completed_stream(ctx, &old_sid);
                     }
                     Err(error) => {
                         self.online = false;
@@ -1538,6 +1815,8 @@ impl Component for App {
                     Err(error) => self.error = error,
                 }
             }
+            Msg::Navigate(view) => return self.navigate(ctx, view, true),
+            Msg::RouteChanged(view) => return self.navigate(ctx, view, false),
             Msg::Field(field, value) => match field {
                 Field::Input => {
                     self.pause_voice_loop(ctx, "edited");
@@ -1652,7 +1931,14 @@ impl Component for App {
                     self.drive_speech_close(ctx);
                 }
             }
-            Msg::ToggleTeacher => self.teacher = !self.teacher,
+            Msg::ToggleTeacher => {
+                self.teacher = !self.teacher;
+                if self.teacher {
+                    self.scroll_to_top = true;
+                } else {
+                    self.focus_request = Some(FocusTarget::TeacherToggle);
+                }
+            }
             Msg::OpenModuleConfirmation => {
                 self.teacher = true;
                 self.focus_request = Some(FocusTarget::Modules);
@@ -1660,9 +1946,103 @@ impl Component for App {
             Msg::FocusTodayPlan => {
                 self.focus_request = Some(FocusTarget::TodayPlan);
             }
+            Msg::FocusComposer => {
+                self.navigate(ctx, AppView::Conversation, true);
+                self.focus_request = Some(FocusTarget::Composer);
+            }
+            Msg::FocusVoice => {
+                self.navigate(ctx, AppView::Voice, true);
+            }
+            Msg::ChooseActivity(prompt) => {
+                if self.input_disabled() || !self.busy.is_empty() || !self.input.trim().is_empty() {
+                    return false;
+                }
+                self.pause_voice_loop(ctx, "edited");
+                self.set_input(prompt);
+                self.navigate(ctx, AppView::Voice, true);
+            }
             Msg::Module(id, checked) => {
                 self.inventory.set_module(&id, checked);
                 self.report_notice.clear();
+            }
+            Msg::VisionDone(seq, ticket, request_id, result) => {
+                if seq != self.action_seq || self.vision_request_id.as_deref() != Some(&request_id)
+                {
+                    return false;
+                }
+                self.vision_request_id = None;
+                self.busy.clear();
+                if !self.guard.borrow().valid(&ticket) {
+                    return false;
+                }
+                match result {
+                    Ok(value) => {
+                        let audio_data = value["choices"][0]["message"]["audio"]["data"].as_str();
+                        if let Some(data) = audio_data {
+                            match web_sys::HtmlAudioElement::new_with_src(&format!(
+                                "data:audio/wav;base64,{data}"
+                            )) {
+                                Ok(audio) => {
+                                    let link = ctx.link().clone();
+                                    let callback =
+                                        wasm_bindgen::closure::Closure::<dyn FnMut()>::new(
+                                            move || {
+                                                link.send_message(Msg::VisionAudioEnded(seq));
+                                            },
+                                        );
+                                    audio.set_onended(Some(callback.as_ref().unchecked_ref()));
+                                    audio.set_onerror(Some(callback.as_ref().unchecked_ref()));
+                                    self.vision_audio_callback = Some(callback);
+                                    let playing = audio.play();
+                                    self.vision_audio = Some(audio);
+                                    match playing {
+                                        Ok(playing) => {
+                                            self.vision_speaking = true;
+                                            let link = ctx.link().clone();
+                                            wasm_bindgen_futures::spawn_local(async move {
+                                                if wasm_bindgen_futures::JsFuture::from(playing)
+                                                    .await
+                                                    .is_err()
+                                                {
+                                                    link.send_message(Msg::VisionPlaybackFailed(seq));
+                                                }
+                                            });
+                                        }
+                                        Err(_) => {
+                                            self.vision_audio_ready = true;
+                                        }
+                                    }
+                                }
+                                Err(_) => {
+                                    self.error =
+                                        t(&self.ui_language, "语音结果无法播放，请再试一次。")
+                                            .to_owned()
+                                }
+                            }
+                        } else {
+                            self.error = t(&self.ui_language, "小宇这次没有说出答案，请再试一次。")
+                                .to_owned();
+                        }
+                    }
+                    Err(error) => self.error = error,
+                }
+            }
+            Msg::VisionAudioEnded(seq) => {
+                if seq != self.action_seq {
+                    return false;
+                }
+                self.vision_audio = None;
+                self.vision_audio_callback = None;
+                self.vision_speaking = false;
+                self.vision_audio_ready = false;
+            }
+            Msg::VisionPlaybackFailed(seq) => {
+                if seq != self.action_seq {
+                    return false;
+                }
+                self.vision_speaking = false;
+                self.vision_audio_ready = self.vision_audio.is_some();
+
             }
             Msg::FormDone(seq, ticket, label, payload, result) => {
                 if seq == self.action_seq {
@@ -1697,7 +2077,11 @@ impl Component for App {
                         .as_ref()
                         .is_some_and(|guard| guard.blocks_navigation(&self.comparison_owner()))
                 {
-                    self.error = "请先处理输入草稿和未采用文字，再切换档案或活动。".into();
+                    self.error = t(
+                        &self.ui_language,
+                        "请先处理输入草稿和未采用文字，再切换档案或活动。",
+                    )
+                    .to_owned();
                     return true;
                 }
                 let Some(request) = self.continuation.retry() else {
@@ -1724,7 +2108,8 @@ impl Component for App {
                     }
                     ContinueResult::Rejected(_detail) => {
                         self.continuation.clear(&request);
-                        self.error = "请求未被接受，请核对当前活动。".into();
+                        self.error =
+                            t(&self.ui_language, "请求未被接受，请核对当前活动。").to_owned();
                     }
                     ContinueResult::Unknown(error) => {
                         self.continuation.unknown(&request);
@@ -1810,6 +2195,35 @@ impl Component for App {
                 }
             }
             Msg::ClearError => self.error.clear(),
+            Msg::ConfirmTranscript => {
+                self.pause_voice_loop(ctx, "edited");
+                if self.input_disabled()
+                    || !self.busy.is_empty()
+                    || self
+                        .recording_draft
+                        .review(ReviewKind::Transcript)
+                        .is_none()
+                {
+                    return false;
+                }
+                match self
+                    .recording_draft
+                    .adopt(ReviewKind::Transcript, false, &self.input)
+                {
+                    Ok(Some(text)) => {
+                        self.set_input(text);
+                        self.perform(ctx, Action::Send);
+                    }
+                    Ok(None) => return false,
+                    Err(()) => {
+                        self.error = t(
+                            &self.ui_language,
+                            "合并后超过4000字，请先精简草稿；未采用文字仍已保留。",
+                        )
+                        .to_owned();
+                    }
+                }
+            }
             Msg::AdoptRecordingText(kind, append) => {
                 self.pause_voice_loop(ctx, "edited");
                 if self.input_disabled() || !self.busy.is_empty() {
@@ -1819,7 +2233,11 @@ impl Component for App {
                     Ok(Some(text)) => self.set_input(text),
                     Ok(None) => return false,
                     Err(()) => {
-                        self.error = "合并后超过4000字，请先精简草稿；未采用文字仍已保留。".into()
+                        self.error = t(
+                            &self.ui_language,
+                            "合并后超过4000字，请先精简草稿；未采用文字仍已保留。",
+                        )
+                        .to_owned()
                     }
                 }
             }
@@ -1856,6 +2274,9 @@ impl Component for App {
                 // receipts gated until the subsequent current state is known.
                 self.comparison_refresh_after = Some(self.state_seq.wrapping_add(1));
                 ctx.link().send_message(Msg::FetchState(true));
+            }
+            Msg::StreamComplete(sid) => {
+                self.autoplay_completed_stream(ctx, &sid);
             }
             Msg::StreamProgress(sid, tid) => {
                 if sid != self.session_id()
@@ -1922,6 +2343,7 @@ impl Component for App {
                 self.pending_read = None;
                 self.perform(ctx, Action::SpeechStop);
                 self.focus_request = Some(FocusTarget::HistoricalRecords);
+                self.navigate(ctx, AppView::Conversation, true);
             }
             Msg::CloseHistory => {
                 self.retry_current_display();
@@ -2017,7 +2439,11 @@ impl Component for App {
                 match result {
                     Ok(value) => {
                         let Some(binding) = RecordingTicket::parse(&value) else {
-                            self.error = "录音响应缺少有效编号，请停止后重新录音。".into();
+                            self.error = t(
+                                &self.ui_language,
+                                "录音响应缺少有效编号，请停止后重新录音。",
+                            )
+                            .to_owned();
                             self.pause_voice_loop(ctx, "start_failed");
                             self.clear_recording();
                             return true;
@@ -2025,7 +2451,8 @@ impl Component for App {
                         if !self.recording_draft.bind(&ticket, binding.clone()) {
                             Self::discard_bound_recording(binding);
                             self.clear_recording();
-                            self.error = "录音请求已过期，请重新录音。".into();
+                            self.error =
+                                t(&self.ui_language, "录音请求已过期，请重新录音。").to_owned();
                             self.pause_voice_loop(ctx, "start_failed");
                             return true;
                         }
@@ -2121,7 +2548,8 @@ impl Component for App {
                 match result {
                     Ok(value) => {
                         if RecordingTicket::parse(&value).as_ref() != Some(&binding) {
-                            self.error = "录音请求已过期，请重新录音。".into();
+                            self.error =
+                                t(&self.ui_language, "录音请求已过期，请重新录音。").to_owned();
                             self.clear_recording();
                         } else if let Some(error) = value["error"].as_str() {
                             if !error.is_empty() {
@@ -2150,7 +2578,11 @@ impl Component for App {
                                 self.pause_voice_loop(ctx, "edited");
                             }
                         } else {
-                            self.error = "没有识别到清楚的语音，请重录或输入文字。".into();
+                            self.error = t(
+                                &self.ui_language,
+                                "没有识别到清楚的语音，请重录或输入文字。",
+                            )
+                            .to_owned();
                             self.clear_recording();
                         }
                     }
@@ -2193,28 +2625,84 @@ impl Component for App {
                 }
             }
             Msg::Edit(memory) => {
+                if self.edit_memory.is_some() || !self.busy.is_empty() {
+                    return false;
+                }
                 self.edit_memory = Some(text(&memory["memory_id"]));
                 self.edit_text = text(&memory["content"]);
+                self.memory_edit_return = None;
+                self.focus_request = Some(FocusTarget::MemoryEdit);
             }
             Msg::Delete(memory) => self.delete_target = Some(memory),
             Msg::CancelDelete => self.delete_target = None,
-            Msg::CancelEdit => self.edit_memory = None,
+            Msg::CancelEdit => {
+                if let Some(id) = self.edit_memory.take() {
+                    self.memory_edit_return = Some(id);
+                    self.edit_text.clear();
+                }
+            }
         }
         true
     }
     fn rendered(&mut self, ctx: &Context<Self>, _first: bool) {
+        if let Some(document) = web_sys::window().and_then(|window| window.document()) {
+            if let Some(root) = document.document_element() {
+                let _ = root.set_attribute(
+                    "lang",
+                    if self.ui_language == "en" {
+                        "en"
+                    } else {
+                        "zh-CN"
+                    },
+                );
+            }
+            document.set_title(if self.ui_language == "en" {
+                "AI Tutor · Learning companion"
+            } else {
+                "AI Tutor · 儿童成长陪伴空间"
+            });
+        }
+        if self.scroll_to_top {
+            self.scroll_to_top = false;
+            if let Some(window) = web_sys::window() {
+                window.scroll_to_with_x_and_y(0.0, 0.0);
+            }
+        }
         // These explicit navigation requests reveal existing controls only;
         // they do not change drafts, current facts, devices or lesson requests.
-        if let Some(target) = self.focus_request.take() {
-            let reference = match target {
-                FocusTarget::Modules => &self.module_confirmation,
-                FocusTarget::TodayPlan => &self.composer_input,
-                FocusTarget::HistoricalRecords => &self.historical_records,
-            };
-            if let Some(node) = reference.cast::<web_sys::HtmlElement>() {
-                node.scroll_into_view();
-                let _ = node.focus();
+        if !focus_waits_for_enabled_control(self.focus_request, !self.busy.is_empty()) {
+            if let Some(target) = self.focus_request.take() {
+                let reference = match target {
+                    FocusTarget::Modules => &self.module_confirmation,
+                    FocusTarget::TodayPlan | FocusTarget::Composer => &self.composer_input,
+                    FocusTarget::VoiceButton => &self.voice_button,
+                    FocusTarget::MemoryEdit => &self.memory_edit_input,
+                    FocusTarget::TeacherToggle => &self.teacher_toggle,
+                    FocusTarget::HistoricalRecords => &self.historical_records,
+                };
+                if let Some(node) = reference.cast::<web_sys::HtmlElement>() {
+                    if matches!(target, FocusTarget::VoiceButton) {
+                        let options = web_sys::FocusOptions::new();
+                        options.set_prevent_scroll(true);
+                        let _ = node.focus_with_options(&options);
+                    } else {
+                        node.scroll_into_view();
+                        let _ = node.focus();
+                    }
+                }
             }
+        }
+        if let Some(id) = self.memory_edit_return.take() {
+            if let Some(element) = web_sys::window()
+                .and_then(|window| window.document())
+                .and_then(|document| document.get_element_by_id(&format!("memory-edit-{id}")))
+                .and_then(|element| element.dyn_into::<web_sys::HtmlElement>().ok())
+            {
+                let _ = element.focus();
+            }
+        }
+        if !matches!(self.view, AppView::Conversation | AppView::Voice) {
+            return;
         }
         if self.chat_viewport.history_open()
             || self.comparison_saving()
@@ -2272,6 +2760,28 @@ impl Component for App {
 #[cfg(test)]
 mod ui_control_tests {
     use super::*;
+
+    #[test]
+    fn navigation_focus_waits_for_enabled_controls() {
+        for target in [
+            FocusTarget::TodayPlan,
+            FocusTarget::Composer,
+            FocusTarget::VoiceButton,
+            FocusTarget::MemoryEdit,
+        ] {
+            assert!(focus_waits_for_enabled_control(Some(target), true));
+            assert!(!focus_waits_for_enabled_control(Some(target), false));
+        }
+        for target in [
+            FocusTarget::Modules,
+            FocusTarget::TeacherToggle,
+            FocusTarget::HistoricalRecords,
+        ] {
+            assert!(!focus_waits_for_enabled_control(Some(target), true));
+        }
+        assert!(!focus_waits_for_enabled_control(None, true));
+    }
+
     #[test]
     fn stop_controls_remain_available_while_conflicting_mutations_wait() {
         for action in [

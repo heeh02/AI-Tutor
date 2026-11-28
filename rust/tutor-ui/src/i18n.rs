@@ -88,6 +88,11 @@ pub fn t<'a>(language: &str, source: &'a str) -> &'a str {
             "Select a profile to save and recall this learner's progress."
         }
         "设置学习者" => "Choose learner",
+        "请先结束录音并处理转写，再切换页面。" => "Finish recording and review the transcript before changing pages.",
+        "陪伴回复" => "Companion reply",
+        "家长与教师" => "Grown-ups",
+        "说说你的问题、想法或新发现…" => "Share a question, an idea, or something you discovered…",
+        "给小宇的问题或新发现" => "A question or discovery for Xiao Yu",
         "当前为独立模拟空间。模块、活动和记忆均标记为模拟，不作为真实硬件验证。" => {
             "Simulation space: modules, activities and memories are simulated, not hardware verification."
         }
@@ -139,7 +144,8 @@ pub fn t<'a>(language: &str, source: &'a str) -> &'a str {
         "取回上次问题，检查后再发送" => "Restore the last question for review",
         "结束并保存" => "Finish and save",
         "本次学习回顾" => "Activity review",
-        "学习正在发生" => "Learning in progress",
+        "当前活动" => "Current activity",
+        "活动回顾" => "Activity review",
         "当前目标" => "Current goal",
         "功能模块" => "Functional modules",
         "当前活动会自动保存" => "This activity is saved automatically",
@@ -319,7 +325,7 @@ pub fn t<'a>(language: &str, source: &'a str) -> &'a str {
         "本次观察已保存，当前模块保持原有报告。" => {
             "Observation saved; the reported module list is unchanged."
         }
-        "可检查，也可忘记" => "Review or forget records",
+        "数据与隐私" => "Data and privacy",
         "默认不保存原始视频、脸部裁剪或录音。教学文本通过 Kimi 远程处理。教师可纠正记忆或清除此档案的数据。" => {
             "Raw video, face crops and recordings are not saved by default. Teaching text is processed remotely by Kimi. Teachers can correct memories or clear this profile's data."
         }
@@ -406,6 +412,29 @@ mod tests {
                 .chars()
                 .any(|c| ('\u{4e00}'..='\u{9fff}').contains(&c)));
         }
+    }
+    #[test]
+    fn generated_operation_errors_are_bilingual_and_backend_text_is_verbatim() {
+        for label in [
+            "请先等待本次发送结果，再切换档案或活动。",
+            "请先处理输入草稿和未采用文字，再切换档案或活动。",
+            "请先保存或清空比较草稿，再切换档案或活动。",
+            "请先结束录音并处理转写，再继续过去的活动。",
+            "请先保存当前模块或观察报告，再继续过去的活动。",
+            "请求未被接受，请核对当前活动。",
+            "合并后超过4000字，请先精简草稿；未采用文字仍已保留。",
+            "录音响应缺少有效编号，请停止后重新录音。",
+            "录音请求已过期，请重新录音。",
+            "没有识别到清楚的语音，请重录或输入文字。",
+        ] {
+            assert_eq!(t("zh", label), label);
+            let english = t("en", label);
+            assert_ne!(english, label);
+            assert!(!english
+                .chars()
+                .any(|c| ('\u{4e00}'..='\u{9fff}').contains(&c)));
+        }
+        assert_eq!(t("en", "后端原始错误：保留原文"), "后端原始错误：保留原文");
     }
     #[test]
     fn session_preference_notice_keeps_explicit_requests_verbatim() {

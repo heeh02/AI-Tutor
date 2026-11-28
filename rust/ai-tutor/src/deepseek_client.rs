@@ -3,12 +3,12 @@ use super::*;
 use axum::body::Bytes;
 use futures_util::{Stream, StreamExt};
 use reqwest::{
+    header::{HeaderValue, AUTHORIZATION, CONTENT_TYPE},
     Client,
-    header::{AUTHORIZATION, CONTENT_TYPE, HeaderValue},
 };
 use windows::Win32::{
-    Foundation::{HLOCAL, LocalFree},
-    Security::Cryptography::{CRYPT_INTEGER_BLOB, CRYPTPROTECT_UI_FORBIDDEN, CryptUnprotectData},
+    Foundation::{LocalFree, HLOCAL},
+    Security::Cryptography::{CryptUnprotectData, CRYPTPROTECT_UI_FORBIDDEN, CRYPT_INTEGER_BLOB},
 };
 
 #[path = "deepseek_flash_sse.rs"]
@@ -180,6 +180,7 @@ struct ResponseState {
     #[cfg(test)]
     first_contract_error: Option<&'static str>,
     diagnostic: bool,
+    expected_model: &'static str,
 }
 struct FrameContent {
     content: Option<String>,
@@ -192,6 +193,19 @@ impl ResponseState {
     }
     fn production(request: &Value, generation: u64, contract: StreamContract) -> Result<Self> {
         Self::with_mode(request, generation, false, contract)
+    }
+    fn with_model(
+        request: &Value,
+        generation: u64,
+        contract: StreamContract,
+        expected_model: &'static str,
+    ) -> Result<Self> {
+        if expected_model == MODEL {
+            return Self::production(request, generation, contract);
+        }
+        let mut state = Self::with_mode(request, generation, false, contract)?;
+        state.expected_model = expected_model;
+        Ok(state)
     }
     fn with_mode(
         request: &Value,
@@ -227,6 +241,7 @@ impl ResponseState {
             #[cfg(test)]
             first_contract_error: None,
             diagnostic,
+            expected_model: MODEL,
         })
     }
     fn identity(&mut self, frame: &Value, key: &str, target: &str) -> Result<()> {
@@ -255,7 +270,8 @@ impl ResponseState {
         );
         self.identity(&frame, "model", "reported_model")?;
         ensure!(
-            self.metrics["reported_model"].is_null() || self.metrics["reported_model"] == MODEL,
+            self.metrics["reported_model"].is_null()
+                || self.metrics["reported_model"] == self.expected_model,
             "response_model_mismatch"
         );
         self.identity(&frame, "id", "completion_id")?;
@@ -395,12 +411,11 @@ impl ResponseState {
     fn observations(&self, row: &mut Value) {
         row["metrics"] = self.metrics.clone();
         row["validated_segments"] = json!(self.segments);
-        row["collected_text"] = json!(
-            self.segments
-                .iter()
-                .map(|v| s(v, "text"))
-                .collect::<String>()
-        );
+        row["collected_text"] = json!(self
+            .segments
+            .iter()
+            .map(|v| s(v, "text"))
+            .collect::<String>());
         row["contract_diagnostics"] = self.decoder.diagnostics();
         row["contract_failure_code"] = self.metrics["contract_failure_code"].clone();
         row["contract_failure_phase"] = self.metrics["contract_failure_phase"].clone();
@@ -418,7 +433,7 @@ impl ResponseState {
             "incomplete_api_stream"
         );
         ensure!(
-            self.metrics["reported_model"] == MODEL,
+            self.metrics["reported_model"] == self.expected_model,
             "response_model_mismatch_or_absent"
         );
         if let Some(code) = self.first_contract_error {
@@ -481,7 +496,7 @@ fn finish_call(
             && row["http_eof"] == true
             && state.done
             && state.finish.as_deref() == Some("stop")
-            && state.metrics["reported_model"] == MODEL
+            && state.metrics["reported_model"] == state.expected_model
     );
     if let Err(error) = transport {
         state.observations(row);
@@ -675,8 +690,29 @@ async fn production_chunks_with_contract<S>(
 where
     S: Stream<Item = Result<Bytes>>,
 {
+    production_chunks_for_model(
+        chunks, request, generation, contract, MODEL, sender, cancel, metrics, started, deadline,
+    )
+    .await
+}
+
+async fn production_chunks_for_model<S>(
+    chunks: S,
+    request: &Value,
+    generation: u64,
+    contract: StreamContract,
+    expected_model: &'static str,
+    sender: &mpsc::Sender<TutorSegment>,
+    cancel: &mut watch::Receiver<bool>,
+    metrics: &mut Value,
+    started: &Instant,
+    deadline: tokio::time::Instant,
+) -> Result<ValidatedTutorReply>
+where
+    S: Stream<Item = Result<Bytes>>,
+{
     production_preflight(request, generation, sender, cancel)?;
-    let mut state = ResponseState::production(request, generation, contract)?;
+    let mut state = ResponseState::with_model(request, generation, contract, expected_model)?;
     let mut framing = SseDecoder::default();
     metrics["segments_enqueued"] = json!(0);
     metrics["http_eof"] = json!(false);
@@ -707,7 +743,7 @@ where
                     if let Some(content) = frame.content.as_deref() {
                         // A later identity check cannot authorize an already
                         // published prefix. Earlier valid metadata may bind it.
-                        ensure!(state.metrics["reported_model"] == MODEL, "response_model_mismatch_or_absent");
+                        ensure!(state.metrics["reported_model"] == state.expected_model, "response_model_mismatch_or_absent");
                         ensure!(state.finish.is_none(), "content_after_finish");
                         // Publish each returned, typed segment before parsing a
                         // later record in the same API content delta.
@@ -741,7 +777,7 @@ where
         metrics["http_eof"] = json!(true);
         framing.finish().map_err(|_| anyhow!("truncated_sse_frame"))?;
         ensure!(state.done && state.finish.as_deref() == Some("stop"), "incomplete_api_stream");
-        ensure!(state.metrics["reported_model"] == MODEL, "response_model_mismatch_or_absent");
+        ensure!(state.metrics["reported_model"] == state.expected_model, "response_model_mismatch_or_absent");
         metrics["api_stream_complete"] = json!(true);
         Ok::<(), anyhow::Error>(())
     }.await;
@@ -749,6 +785,135 @@ where
     result?;
     // Production propagates the original typed ContractError unchanged.
     state.decoder.finish_clean_end()
+}
+
+fn split_complete_omni_text(text: &str) -> Result<Vec<String>> {
+    ensure!(
+        !text.trim().is_empty() && text.chars().count() <= 1600,
+        "omni_reply_text_invalid"
+    );
+    let mut remaining = text;
+    let mut segments = Vec::new();
+    while !remaining.is_empty() {
+        if remaining.chars().count() <= MAX_SEGMENT_CHARS {
+            segments.push(remaining.to_owned());
+            break;
+        }
+        let cutoff = remaining
+            .char_indices()
+            .nth(MAX_SEGMENT_CHARS)
+            .map(|(index, _)| index)
+            .unwrap_or(remaining.len());
+        let candidate = &remaining[..cutoff];
+        let boundary = candidate
+            .char_indices()
+            .filter(|(_, character)| {
+                matches!(
+                    character,
+                    '。' | '！' | '？' | '!' | '?' | '；' | ';' | '\n' | '.'
+                )
+            })
+            .map(|(index, character)| index + character.len_utf8())
+            .last()
+            .or_else(|| {
+                candidate
+                    .char_indices()
+                    .filter(|(_, character)| character.is_whitespace())
+                    .map(|(index, character)| index + character.len_utf8())
+                    .last()
+            })
+            .filter(|boundary| *boundary >= cutoff / 2)
+            .unwrap_or(cutoff);
+        segments.push(remaining[..boundary].to_owned());
+        remaining = &remaining[boundary..];
+        ensure!(
+            segments.len() < MAX_SEGMENTS || remaining.is_empty(),
+            "omni_reply_segments_exceeded"
+        );
+    }
+    ensure!(
+        !segments.is_empty()
+            && segments.len() <= MAX_SEGMENTS
+            && segments.iter().all(|segment| {
+                !segment.trim().is_empty() && segment.chars().count() <= MAX_SEGMENT_CHARS
+            })
+            && segments.concat() == text,
+        "omni_reply_segmentation_invalid"
+    );
+    Ok(segments)
+}
+
+fn complete_omni_records(content: &str, request: &Value) -> Result<String> {
+    let reply: Value =
+        serde_json::from_str(content).map_err(|_| anyhow!("omni_tutor_json_invalid"))?;
+    validate_reply(&reply, request)?;
+    let text = reply["reply_text"]
+        .as_str()
+        .ok_or_else(|| anyhow!("omni_reply_text_missing"))?;
+    let segments = split_complete_omni_text(text)?;
+    let mut metadata = reply.clone();
+    metadata.as_object_mut().unwrap().remove("reply_text");
+    let request_id = request["request_id"]
+        .as_str()
+        .ok_or_else(|| anyhow!("omni_request_id_missing"))?;
+    let mut records = String::new();
+    for (sequence, text) in segments.iter().enumerate() {
+        records.push_str(
+            &json!({"schema_version":"1.0","type":"segment","request_id":request_id,
+            "sequence":sequence,"text":text,"used_evidence_ids":[]})
+            .to_string(),
+        );
+        records.push('\n');
+    }
+    records.push_str(
+        &json!({"schema_version":"1.0","type":"final_metadata","request_id":request_id,
+        "segment_count":segments.len(),"reply":metadata})
+        .to_string(),
+    );
+    records.push('\n');
+    Ok(records)
+}
+
+pub(super) async fn complete_omni_reply(
+    content: &str,
+    request: &Value,
+    generation: u64,
+    sender: &mpsc::Sender<TutorSegment>,
+    cancel: &mut watch::Receiver<bool>,
+    metrics: &mut Value,
+) -> Result<ValidatedTutorReply> {
+    let records = complete_omni_records(content, request)?;
+    complete_omni(&records, request, generation, sender, cancel, metrics).await
+}
+
+pub(super) async fn complete_omni(
+    content: &str,
+    request: &Value,
+    generation: u64,
+    sender: &mpsc::Sender<TutorSegment>,
+    cancel: &mut watch::Receiver<bool>,
+    metrics: &mut Value,
+) -> Result<ValidatedTutorReply> {
+    let frame = serde_json::to_vec(&json!({"id":"local_complete","model":OMNI_MODEL,
+        "choices":[{"index":0,"delta":{"content":content},"finish_reason":"stop"}]}))?;
+    let mut wire = b"data: ".to_vec();
+    wire.extend(frame);
+    wire.extend(b"\n\ndata: [DONE]\n\n");
+    let chunks = futures_util::stream::once(async { Ok(Bytes::from(wire)) });
+    let started = Instant::now();
+    production_chunks_for_model(
+        chunks,
+        request,
+        generation,
+        StreamContract::MetadataV2,
+        OMNI_MODEL,
+        sender,
+        cancel,
+        metrics,
+        &started,
+        tokio::time::Instant::from_std(started + Duration::from_secs(300)),
+    )
+    .await
 }
 
 /// Production streaming only; provider ownership and the single shared gate
@@ -936,14 +1101,12 @@ fn reasoning_is_never_fed_to_tutor_decoder_and_stop_is_not_done() -> Result<()> 
 fn wrong_model_or_premature_done_cannot_pass_a_flash_call() -> Result<()> {
     let request = json!({"request_id":"fixture","context":{"evidence":[]}});
     let mut wrong = ResponseState::new(&request, 1)?;
-    assert!(
-        wrong
-            .consume(
-                &serde_json::to_vec(&json!({"model":"deepseek-pro","choices":[]}))?,
-                1.0
-            )
-            .is_err()
-    );
+    assert!(wrong
+        .consume(
+            &serde_json::to_vec(&json!({"model":"deepseek-pro","choices":[]}))?,
+            1.0
+        )
+        .is_err());
     assert_eq!(wrong.metrics["reported_model"], "deepseek-pro");
     assert!(wrong.complete(&mut json!({})).is_err());
     let mut early = ResponseState::new(&request, 1)?;
@@ -1037,8 +1200,8 @@ fn drain_frame(delta: Value, finish: Value) -> Vec<u8> {
 }
 
 #[test]
-fn same_content_chunk_preserves_prefix_and_drains_usage_done_without_losing_first_error()
--> Result<()> {
+fn same_content_chunk_preserves_prefix_and_drains_usage_done_without_losing_first_error(
+) -> Result<()> {
     let (request, segment, final_record) = drain_fixture();
     let bad_batch = format!("{segment}{final_record}");
     let after = "not another tutor record after the first failure\n";
@@ -1250,8 +1413,8 @@ fn metadata_records() -> (Value, Value, String, String, String) {
 }
 
 #[tokio::test]
-async fn metadata_stream_publishes_before_final_and_derives_the_standard_reply_without_repeating_text()
--> Result<()> {
+async fn metadata_stream_publishes_before_final_and_derives_the_standard_reply_without_repeating_text(
+) -> Result<()> {
     for newline in [false, true] {
         let (request, metadata, first, second, joined) = metadata_records();
         let final_record = json!({"schema_version":"1.0","type":"final_metadata","request_id":"production-fixture","segment_count":2,"reply":metadata});
@@ -1352,8 +1515,8 @@ fn diagnostic_contract_is_explicit_and_legacy_never_accepts_metadata_final() -> 
 }
 
 #[tokio::test]
-async fn metadata_stream_rejects_legacy_final_or_any_repeated_body_without_losing_the_prefix()
--> Result<()> {
+async fn metadata_stream_rejects_legacy_final_or_any_repeated_body_without_losing_the_prefix(
+) -> Result<()> {
     for legacy in [false, true] {
         let (request, mut metadata, first, _, _) = metadata_records();
         metadata["reply_text"] = if legacy {
@@ -1392,6 +1555,45 @@ async fn metadata_stream_rejects_legacy_final_or_any_repeated_body_without_losin
     Ok(())
 }
 
+#[tokio::test]
+async fn omni_complete_reply_uses_the_same_strict_contract_and_its_own_model_identity() -> Result<()>
+{
+    let (request, metadata, first, second, joined) = metadata_records();
+    let content = format!(
+        "{first}{second}{}\n",
+        json!({"schema_version":"1.0","type":"final_metadata","request_id":"production-fixture","segment_count":2,"reply":metadata})
+    );
+    let (sender, mut receiver) = mpsc::channel(2);
+    let (_cancel_owner, mut cancel) = watch::channel(false);
+    let mut metrics = production_test_metrics();
+    let reply = complete_omni(&content, &request, 7, &sender, &mut cancel, &mut metrics).await?;
+    assert_eq!(reply.reply()["reply_text"], joined);
+    assert_eq!(
+        [
+            receiver.try_recv()?.text().to_owned(),
+            receiver.try_recv()?.text().to_owned()
+        ]
+        .concat(),
+        joined
+    );
+    assert!(receiver.try_recv().is_err());
+    assert_eq!(metrics["reported_model"], OMNI_MODEL);
+    assert_eq!(metrics["api_stream_complete"], true);
+    assert_private_production_metrics(&metrics);
+    let (sender, _receiver) = mpsc::channel(2);
+    let error = complete_omni(
+        "not a tutor record",
+        &request,
+        7,
+        &sender,
+        &mut cancel,
+        &mut production_test_metrics(),
+    )
+    .await;
+    assert!(error.is_err());
+    Ok(())
+}
+
 #[cfg(test)]
 fn assert_private_production_metrics(metrics: &Value) {
     let text = metrics.to_string();
@@ -1414,8 +1616,8 @@ fn assert_private_production_metrics(metrics: &Value) {
 }
 
 #[tokio::test]
-async fn production_publishes_typed_segments_and_validates_clean_eof_without_raw_metrics()
--> Result<()> {
+async fn production_publishes_typed_segments_and_validates_clean_eof_without_raw_metrics(
+) -> Result<()> {
     let (request, wire, joined) =
         production_test_wire(&["Check one variable.", " Record the observation."], false);
     let content = std::str::from_utf8(&wire)?
@@ -1499,8 +1701,8 @@ async fn production_publishes_typed_segments_and_validates_clean_eof_without_raw
 }
 
 #[tokio::test]
-async fn production_same_delta_prefix_is_published_before_original_contract_error_returns()
--> Result<()> {
+async fn production_same_delta_prefix_is_published_before_original_contract_error_returns(
+) -> Result<()> {
     let (request, wire, _) = production_test_wire(&["Check one variable."], true);
     let (sender, mut receiver) = mpsc::channel(2);
     let (_cancel_owner, mut cancel) = watch::channel(false);
@@ -1630,8 +1832,8 @@ async fn production_deadline_bounds_full_queue_and_pending_read_is_cancellable()
 }
 
 #[tokio::test]
-async fn production_preflight_and_fixed_failure_projection_do_not_poll_or_expose_context()
--> Result<()> {
+async fn production_preflight_and_fixed_failure_projection_do_not_poll_or_expose_context(
+) -> Result<()> {
     let (request, _, _) = production_test_wire(&["Safe."], false);
     for (generation, capacity, expected) in [
         (8, 2, "request_generation_mismatch"),
@@ -1703,5 +1905,55 @@ async fn production_preflight_and_fixed_failure_projection_do_not_poll_or_expose
     assert_eq!(metrics["failure_code"], "http_status_failure");
     assert_eq!(metrics["http_status"], 401);
     assert_private_production_metrics(&metrics);
+    Ok(())
+}
+
+#[tokio::test]
+async fn omni_single_json_is_validated_then_split_without_changing_reply_text() -> Result<()> {
+    let request =
+        json!({"request_id":"production-fixture","generation":7,"context":{"evidence":[]}});
+    let reply = json!({"schema_version":"1.0","request_id":"production-fixture",
+        "reply_text":"先观察阳光穿过水珠。 Then notice how the colours separate.",
+        "teaching_move":"answer","task_update_candidates":[],"memory_candidates":[],
+        "used_evidence_ids":[],"needs_clarification":false});
+    let content = serde_json::to_string(&reply)?;
+    let records = complete_omni_records(&content, &request)?;
+    assert!(records.contains("\"type\":\"final_metadata\""));
+    assert!(!records.contains("```"));
+    let (sender, mut receiver) = mpsc::channel(2);
+    let (_cancel_owner, mut cancel) = watch::channel(false);
+    let mut metrics = production_test_metrics();
+    let validated =
+        complete_omni_reply(&content, &request, 7, &sender, &mut cancel, &mut metrics).await?;
+    assert_eq!(validated.into_reply(), reply);
+    let mut displayed = String::new();
+    while let Ok(segment) = receiver.try_recv() {
+        displayed.push_str(segment.text());
+        assert!(segment.used_evidence_ids().is_empty());
+    }
+    assert_eq!(displayed, reply["reply_text"]);
+    for invalid in [
+        format!("```json\n{content}\n```"),
+        content.trim_end_matches('}').to_owned() + ",\"unexpected\":true}",
+    ] {
+        assert!(complete_omni_records(&invalid, &request).is_err());
+    }
+    Ok(())
+}
+
+#[test]
+fn omni_long_text_split_is_bounded_lossless_and_never_creates_empty_segments() -> Result<()> {
+    for text in [
+        "界".repeat(700),
+        "First sentence. Second sentence. Third sentence.".repeat(30),
+        "第一句！第二句？第三句；第四句。".repeat(40),
+    ] {
+        let segments = split_complete_omni_text(&text)?;
+        assert!(segments.len() <= MAX_SEGMENTS);
+        assert!(segments.iter().all(|segment| {
+            !segment.trim().is_empty() && segment.chars().count() <= MAX_SEGMENT_CHARS
+        }));
+        assert_eq!(segments.concat(), text);
+    }
     Ok(())
 }

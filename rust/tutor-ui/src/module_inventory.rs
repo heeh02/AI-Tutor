@@ -2,7 +2,7 @@ use crate::{
     evidence_labels::source_label,
     i18n::t,
     model::MODULES,
-    view::{SelectControl, icon},
+    view::{icon, SelectControl},
 };
 use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 use yew::prelude::*;
@@ -35,7 +35,7 @@ pub fn module_inventory(props: &ModuleInventoryProps) -> Html {
         <label class="field-label">{t(language,"来源")}<SelectControl value={if props.simulated{"simulated".to_owned()}else{props.source.clone()}} disabled={props.simulated||props.inactive} onchange={Callback::from(move |event:Event|source.emit(event.target_unchecked_into::<HtmlSelectElement>().value()))} label={t(language,"报告来源")}>
             {if props.simulated{html!{<option value="simulated">{source_label(language,"simulated")}</option>}}else{html!{<><option value="operator_confirmed">{source_label(language,"operator_confirmed")}</option><option value="learner_report">{source_label(language,"learner_report")}</option></>}}}
         </SelectControl></label>
-        <button class="text-button" disabled={props.inactive||props.busy} onclick={props.on_confirm.clone()}>{t(language,"确认当前勾选模块")}</button>
+        <button class="secondary" disabled={props.inactive||props.busy} onclick={props.on_confirm.clone()}>{t(language,"确认当前勾选模块")}</button>
         <p class="fine-print">{t(language,"仅填写观察不会改变模块。全部取消勾选并确认，可明确记录当前未连接模块。")}</p>
         <textarea class="small-textarea" aria-label={t(language,"教师活动报告")} placeholder={t(language,"本次试验的观察，如：停车亮灯成功，想让间隙更大")} disabled={props.inactive} value={props.report.clone()} maxlength="1000" oninput={Callback::from(move |event:InputEvent|report.emit(event.target_unchecked_into::<HtmlTextAreaElement>().value()))}/>
         <button class="secondary" disabled={props.inactive||props.busy||!props.can_save} onclick={props.on_save.clone()}>{icon("check")}{t(language,if props.modules_dirty{"保存模块变更与报告"}else{"记录本次观察"})}</button>

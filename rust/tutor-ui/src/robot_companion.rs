@@ -1,5 +1,6 @@
 //! Read-only camera companion. Demo poses never enter a hardware command path.
 use crate::api::{api, ApiResult};
+use crate::view::icon;
 use gloo_timers::callback::Interval;
 use serde_json::{json, Value};
 use wasm_bindgen::JsCast;
@@ -11,6 +12,7 @@ pub struct Props {
     pub camera: Value,
     pub audio: Value,
     pub ui_language: String,
+    pub generating: bool,
 }
 
 pub enum Msg {
@@ -19,6 +21,7 @@ pub enum Msg {
     ToggleDemo,
     DemoPose(f64, f64),
     ResetView,
+    Greet,
 }
 
 pub struct RobotCompanion {
@@ -189,6 +192,16 @@ impl Component for RobotCompanion {
                 }
                 false
             }
+            Msg::Greet => {
+                if let Some(node) = self.node.cast::<web_sys::HtmlElement>() {
+                    if let Ok(method) = js_sys::Reflect::get(node.as_ref(), &"greet".into()) {
+                        if let Some(method) = method.dyn_ref::<js_sys::Function>() {
+                            let _ = method.call0(node.as_ref());
+                        }
+                    }
+                }
+                false
+            }
         }
     }
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -226,6 +239,27 @@ impl Component for RobotCompanion {
             } else {
                 "演示动作"
             }
+        } else if ctx.props().audio["recording"] == true {
+            if en {
+                "I'm listening"
+            } else {
+                "我在认真听"
+            }
+        } else if ctx.props().generating {
+            if en {
+                "Let me think…"
+            } else {
+                "让我想一想…"
+            }
+        } else if matches!(
+            ctx.props().audio["state"].as_str(),
+            Some("speaking" | "playing")
+        ) {
+            if en {
+                "Sharing an idea"
+            } else {
+                "说给你听"
+            }
         } else if live {
             if en {
                 "Camera synced"
@@ -240,9 +274,9 @@ impl Component for RobotCompanion {
             }
         } else {
             if en {
-                "Ready to meet you"
+                "Ready to chat"
             } else {
-                "等你一起探索"
+                "可以开始对话"
             }
         };
         let source = if self.demo {
@@ -275,7 +309,9 @@ impl Component for RobotCompanion {
             "listening"
         } else if matches!(audio["state"].as_str(), Some("speaking" | "playing")) {
             "speaking"
-        } else if matches!(audio["state"].as_str(), Some("synthesizing" | "preparing")) {
+        } else if matches!(audio["state"].as_str(), Some("synthesizing" | "preparing"))
+            || ctx.props().generating
+        {
             "thinking"
         } else {
             "idle"
@@ -284,22 +320,27 @@ impl Component for RobotCompanion {
             <div class={classes!("robot-companion",self.demo.then_some("is-demo"),live.then_some("is-live"))} data-pose-source={if self.demo {"demo"} else if live {"controller_readback"} else {"unknown"}}>
                 <style>{include_str!("../../../frontend/robot-companion.css")}</style>
                 <div class="robot-topline"><span class="robot-presence"><i/>{status}</span>
-                    <button class="robot-reset" onclick={ctx.link().callback(|_|Msg::ResetView)} title={if en {"Reset viewing angle"} else {"恢复观察视角"}} aria-label={if en {"Reset viewing angle"} else {"恢复观察视角"}}>{"↺"}</button>
+                    <button class="robot-reset" onclick={ctx.link().callback(|_|Msg::ResetView)} title={if en {"Reset viewing angle"} else {"恢复观察视角"}} aria-label={if en {"Reset viewing angle"} else {"恢复观察视角"}}>{icon("refresh")}</button>
                 </div>
                 <div class="robot-canvas-wrap"><ai-tutor-robot ref={self.node.clone()} pose={pose.to_string()} mood={mood} lang={if en {"en"} else {"zh"}} aria-label={if en {"3D robot showing camera orientation"} else {"显示摄像头转动姿态的3D机器人"}}/></div>
                 <div class="robot-view-hint">{if en {"Drag to look around · double-click to reset"} else {"拖动看看小宇 · 双击恢复视角"}}</div>
-                <div class="robot-pose-strip">
-                    <div class="robot-angle"><span>{if en {"PAN"} else {"水平转动"}}</span><strong>{pan}</strong></div>
-                    <div class="robot-angle"><span>{if en {"TILT"} else {"抬头低头"}}</span><strong>{tilt}</strong></div>
-                    <button class={classes!("robot-demo-toggle",self.demo.then_some("selected"))} aria-pressed={self.demo.to_string()} onclick={ctx.link().callback(|_|Msg::ToggleDemo)}>{if self.demo {if en {"Back to live"} else {"回到真实同步"}} else if en {"Try a pose"} else {"体验动作"}}</button>
-                </div>
-                <p class="robot-source-note" role="status">{source}</p>
-                {if self.demo {html!{<div class="robot-demo-poses" aria-label={if en {"Demo poses only"} else {"仅演示姿态"}}>
-                    <button onclick={ctx.link().callback(|_|Msg::DemoPose(25.0,0.0))}>{if en {"Look left"} else {"向左看"}}</button>
-                    <button onclick={ctx.link().callback(|_|Msg::DemoPose(0.0,18.0))}>{if en {"Look up"} else {"抬抬头"}}</button>
-                    <button onclick={ctx.link().callback(|_|Msg::DemoPose(-25.0,0.0))}>{if en {"Look right"} else {"向右看"}}</button>
-                    <button onclick={ctx.link().callback(|_|Msg::DemoPose(0.0,0.0))}>{if en {"Hello!"} else {"看这里"}}</button>
-                </div>}} else {Html::default()}}
+                <details class="robot-motion-panel">
+                    <summary onclick={ctx.link().callback(|_|Msg::Greet)} title={if en {"Tap the robot to say hello, or try a pose"} else {"轻点机器人打个招呼，或体验动作"}}>{icon("hand")}<span>{if en {"Say hello"} else {"和小宇互动"}}</span>{icon("chevron")}</summary>
+                    <div class="robot-motion-content">
+                        <div class="robot-pose-strip">
+                            <div class="robot-angle"><span>{if en {"PAN"} else {"水平转动"}}</span><strong>{pan}</strong></div>
+                            <div class="robot-angle"><span>{if en {"TILT"} else {"抬头低头"}}</span><strong>{tilt}</strong></div>
+                            <button class={classes!("robot-demo-toggle",self.demo.then_some("selected"))} aria-pressed={self.demo.to_string()} onclick={ctx.link().callback(|_|Msg::ToggleDemo)}>{if self.demo {if en {"Back to live"} else {"回到真实同步"}} else if en {"Try a pose"} else {"体验动作"}}</button>
+                        </div>
+                        <p class="robot-source-note" role="status">{source}</p>
+                        {if self.demo {html!{<div class="robot-demo-poses" aria-label={if en {"Demo poses only"} else {"仅演示姿态"}}>
+                            <button onclick={ctx.link().callback(|_|Msg::DemoPose(25.0,0.0))}>{if en {"Look left"} else {"向左看"}}</button>
+                            <button onclick={ctx.link().callback(|_|Msg::DemoPose(0.0,18.0))}>{if en {"Look up"} else {"抬抬头"}}</button>
+                            <button onclick={ctx.link().callback(|_|Msg::DemoPose(-25.0,0.0))}>{if en {"Look right"} else {"向右看"}}</button>
+                            <button onclick={ctx.link().callback(|_|Msg::DemoPose(0.0,0.0))}>{if en {"Hello!"} else {"看这里"}}</button>
+                        </div>}} else {Html::default()}}
+                    </div>
+                </details>
             </div>
         }
     }

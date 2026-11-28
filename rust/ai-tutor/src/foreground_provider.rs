@@ -1,6 +1,9 @@
 //! Startup-fixed foreground selection on the existing provider owner and gate.
 use super::*;
 use serde::Deserialize;
+use std::sync::Arc;
+#[path = "omni.rs"]
+mod omni;
 
 const POLICY_PATH: &str = "runtime/teaching-provider-policy.json";
 const UNAVAILABLE: &str =
@@ -11,6 +14,7 @@ enum Selection {
     Kimi,
     FlashOff,
     FlashLow,
+    Omni,
     Invalid,
 }
 impl Selection {
@@ -39,6 +43,7 @@ fn parse_policy(bytes: &[u8]) -> Result<Selection> {
         ("kimi", None) => Ok(Selection::Kimi),
         ("deepseek_flash", Some("non_thinking")) => Ok(Selection::FlashOff),
         ("deepseek_flash", Some("thinking_low")) => Ok(Selection::FlashLow),
+        ("qwen_omni", None) => Ok(Selection::Omni),
         _ => bail!("foreground_policy_selection"),
     }
 }
@@ -67,6 +72,7 @@ pub(crate) struct ForegroundRuntime {
     last: Mutex<Value>,
     #[cfg(windows)]
     client: Option<reqwest::Client>,
+    omni: Option<Arc<omni::OmniRuntime>>,
 }
 impl ForegroundRuntime {
     pub(crate) fn kimi() -> Self {
@@ -77,6 +83,7 @@ impl ForegroundRuntime {
             last: Mutex::new(Value::Null),
             #[cfg(windows)]
             client: None,
+            omni: None,
         }
     }
     fn load(root: &Path) -> Self {
@@ -90,6 +97,19 @@ impl ForegroundRuntime {
             }
         };
         if runtime.is_kimi() {
+            return runtime;
+        }
+        if runtime.selected == Selection::Omni {
+            match omni::OmniRuntime::prepare(root).and_then(|service| {
+                service.start(root)?;
+                Ok(service)
+            }) {
+                Ok(service) => {
+                    runtime.omni = Some(service);
+                    runtime.local_ready = true;
+                }
+                Err(error) => runtime.error = Some(error.to_string()),
+            }
             return runtime;
         }
         #[cfg(windows)]
@@ -117,11 +137,23 @@ impl ForegroundRuntime {
         self.selected == Selection::Kimi
     }
     pub(crate) fn ensure_ready(&self) -> Result<()> {
+        if self.selected == Selection::Omni {
+            ensure!(
+                self.omni.as_ref().is_some_and(|service| service.ready()),
+                UNAVAILABLE
+            );
+            return Ok(());
+        }
         ensure!(
             self.local_ready && self.selected != Selection::Invalid,
             UNAVAILABLE
         );
         Ok(())
+    }
+    pub(crate) async fn stop(&self) {
+        if let Some(service) = &self.omni {
+            service.stop().await;
+        }
     }
     pub(crate) fn record(&self, metrics: &Value, success: bool) {
         *self.last.lock().unwrap() = json!({"succeeded":success,"at":now(),"metrics":metrics});
@@ -157,6 +189,19 @@ impl KimiProvider {
                 "readiness_basis":"existing_kimi_profile_verification","verified":kimi["verified"],
                 "error":kimi["error"],"running":running,"tools":[],"startup_fixed":true});
         }
+        if self.foreground.selected == Selection::Omni {
+            let service = self
+                .foreground
+                .omni
+                .as_ref()
+                .map(|service| service.status());
+            return json!({"provider":"qwen_omni","available":self.foreground.omni.as_ref().is_some_and(|service| service.ready()),
+                "model":OMNI_MODEL,"local":true,"running":running,"tools":[],"startup_fixed":true,
+                "readiness_basis":"local_model_health_and_text_speech_warmup",
+                "stream_contract":"metadata_v2_complete_local_json","reply_text_origin":"local_complete_json_validated_server_sentence_split",
+                "input_modalities":["text","image","audio"],"output_modalities":["text","audio"],
+                "service":service,"error":self.foreground.error});
+        }
         let invalid = self.foreground.selected == Selection::Invalid;
         json!({"provider":if invalid {"invalid"} else {"deepseek_flash"},
             "available":self.foreground.local_ready,"model":if invalid {Value::Null} else {json!("deepseek-flash")},
@@ -167,6 +212,36 @@ impl KimiProvider {
             "remote_verified_by_status_poll":false,"last_request":self.foreground.last.lock().unwrap().clone(),
             "error_code":self.foreground.error,
             "error":if self.foreground.local_ready {Value::Null} else {json!(UNAVAILABLE)}})
+    }
+    pub async fn infer_omni(&self, payload: Value) -> Result<Value> {
+        ensure!(
+            self.foreground.selected == Selection::Omni,
+            "omni_not_selected"
+        );
+        self.foreground.ensure_ready()?;
+        let request_id = s(&payload, "request_id");
+        let learner_id = s(&payload, "learner_id");
+        ensure!(
+            !request_id.is_empty() && !learner_id.is_empty(),
+            "omni_request_identity_required"
+        );
+        let service = self
+            .foreground
+            .omni
+            .as_ref()
+            .ok_or_else(|| anyhow!("omni_not_ready"))?
+            .clone();
+        let (_call, _, mut cancellation) = self.register_call(&request_id, &learner_id, false)?;
+        let _permit = tokio::select! {
+            biased;
+            _ = cancellation.changed() => bail!("foreground_cancelled"),
+            permit = self.gate.acquire() => permit?,
+        };
+        tokio::select! {
+            biased;
+            _ = cancellation.changed() => bail!("foreground_cancelled"),
+            result = service.infer(payload) => result,
+        }
     }
     pub(crate) async fn generate_flash_whole(&self, request: &Value) -> Result<Value> {
         let generation = request["generation"]
@@ -183,9 +258,74 @@ impl KimiProvider {
         request: &Value,
         generation: u64,
         sender: mpsc::Sender<TutorSegment>,
-        cancellation: watch::Receiver<bool>,
+        mut cancellation: watch::Receiver<bool>,
         metrics: &mut Value,
     ) -> Result<ValidatedTutorReply> {
+        if self.foreground.selected == Selection::Omni {
+            let policy = String::from_utf8(read_bounded_file(
+                &self.root.join("prompts/tutor_core.md"),
+                32 * 1024,
+            )?)
+            .map_err(|_| anyhow!("teaching_policy_utf8_invalid"))?;
+            let schema = serde_json::from_slice(&read_bounded_file(
+                &self.root.join("implementation-package/AI_Tutor_Codex_Implementation_Package/schemas/tutor_reply.schema.json"),
+                128 * 1024,
+            )?)?;
+            let prompt = complete_prompt(&policy, schema, request)?;
+            let agent = String::from_utf8(read_bounded_file(
+                &self.root.join("prompts/tutor-agent.md"),
+                32 * 1024,
+            )?)
+            .map_err(|_| anyhow!("teaching_agent_utf8_invalid"))?
+            .replace("\r\n", "\n");
+            ensure!(agent.starts_with("---\n"), "teaching_agent_header_invalid");
+            let system = agent[4..]
+                .split_once("\n---\n")
+                .ok_or_else(|| anyhow!("teaching_agent_body_missing"))?
+                .1
+                .trim();
+            self.foreground.ensure_ready()?;
+            ensure!(!*cancellation.borrow(), "foreground_cancelled");
+            let service = self
+                .foreground
+                .omni
+                .as_ref()
+                .ok_or_else(|| anyhow!("omni_not_ready"))?
+                .clone();
+            self.increment("requests");
+            self.increment("omni_requests");
+            metrics["transport"] = json!("local_omni_http_complete");
+            metrics["reply_text_origin"] =
+                json!("local_complete_json_validated_server_sentence_split");
+            metrics["omni_output_contract"] = json!("single_json_object");
+            let payload = json!({"messages":[{"role":"system","content":system},{"role":"user","content":prompt}],
+                "modalities":["text"],"max_tokens":2048});
+            let response = tokio::select! {
+                biased;
+                _ = cancellation.changed() => bail!("foreground_cancelled"),
+                response = service.infer(payload) => response?,
+            };
+            let content = response["choices"][0]["message"]["content"]
+                .as_str()
+                .ok_or_else(|| anyhow!("omni_empty_response"))?;
+            let result = deepseek_client::complete_omni_reply(
+                content,
+                request,
+                generation,
+                &sender,
+                &mut cancellation,
+                metrics,
+            )
+            .await;
+            self.increment(if result.is_ok() {
+                "completed"
+            } else if *cancellation.borrow() {
+                "cancelled"
+            } else {
+                "errors"
+            });
+            return result;
+        }
         #[cfg(windows)]
         {
             let contract = deepseek_client::StreamContract::MetadataV2;

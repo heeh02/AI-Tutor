@@ -1,0 +1,952 @@
+:root {
+  --layout-safe-top: env(safe-area-inset-top, 0px);
+  --layout-safe-right: env(safe-area-inset-right, 0px);
+  --layout-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --layout-safe-left: env(safe-area-inset-left, 0px);
+  --layout-header-height: 84px;
+  --layout-header-block: calc(var(--layout-header-height) + var(--layout-safe-top));
+  --layout-nav-block: 0px;
+  --layout-main-vertical: 60px;
+  --layout-page-gutter: 32px;
+  --layout-touch-target: 44px;
+  --layout-z-scene: 1;
+  --layout-z-content: 2;
+  --layout-z-action: 20;
+  --layout-z-header: 40;
+  --layout-z-nav: 50;
+  --layout-z-modal: 1000;
+}
+
+html {
+  scroll-padding-top: calc(var(--layout-header-block) + 16px);
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-bottom: var(--layout-nav-block);
+  overflow-x: clip;
+}
+
+.app-shell:has(.home-view) {
+  padding-bottom: var(--layout-nav-block);
+}
+
+.ambient-scene,
+.ambient-scene *,
+body::before,
+.home-topbar::before,
+.home-robot-scene::before,
+.home-robot-scene .robot-canvas-wrap::after,
+.home-primary-actions::before,
+.home-primary-actions::after,
+.robot-view-hint {
+  pointer-events: none;
+}
+
+.topbar,
+.home-topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--layout-z-header);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: calc(100% - var(--layout-page-gutter) - var(--layout-page-gutter));
+  max-width: 1344px;
+  min-width: 0;
+  height: auto;
+  min-height: var(--layout-header-block);
+  margin: 0 auto;
+  padding: calc(12px + var(--layout-safe-top)) 16px 12px;
+}
+
+.topbar > *,
+.brand,
+.brand > span:last-child,
+.top-actions,
+.top-actions > * {
+  min-width: 0;
+}
+
+.brand {
+  min-height: var(--layout-touch-target);
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.teacher-toggle,
+.ui-language-picker select {
+  min-height: var(--layout-touch-target);
+}
+
+.teacher-toggle {
+  min-width: var(--layout-touch-target);
+}
+
+.topbar .learning-nav {
+  position: relative;
+  inset: auto;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  justify-self: center;
+  justify-content: center;
+  gap: 4px;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 4px;
+}
+
+.topbar .learning-nav a {
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  padding: 8px 10px;
+  line-height: 1.4;
+}
+
+.app-shell > main.app-main {
+  position: relative;
+  z-index: var(--layout-z-content);
+  width: 100%;
+  max-width: 1408px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 28px max(var(--layout-page-gutter), var(--layout-safe-right)) calc(32px + var(--layout-safe-bottom)) max(var(--layout-page-gutter), var(--layout-safe-left));
+}
+
+main.home-view {
+  min-height: calc(100svh - var(--layout-header-block) - var(--layout-nav-block));
+  padding: 0 max(var(--layout-page-gutter), var(--layout-safe-right)) 0 max(var(--layout-page-gutter), var(--layout-safe-left));
+}
+
+.robot-home,
+.home-view .robot-home {
+  position: relative;
+  z-index: var(--layout-z-content);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: calc(100svh - var(--layout-header-block) - var(--layout-nav-block));
+  padding: 16px 0 48px;
+}
+
+.robot-home .home-profile,
+.home-view .home-profile {
+  position: relative;
+  inset: auto;
+  z-index: var(--layout-z-action);
+  justify-self: end;
+  align-self: start;
+  max-width: 100%;
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  margin: 0;
+}
+
+.home-robot-scene,
+.home-view .home-robot-scene {
+  position: relative;
+  z-index: var(--layout-z-scene);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 660px);
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+
+.home-robot-scene .robot-companion {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.home-robot-scene .robot-topline {
+  position: relative;
+  inset: auto;
+  z-index: var(--layout-z-content);
+  display: flex;
+  width: 100%;
+  max-width: 420px;
+  min-height: var(--layout-touch-target);
+  padding: 0 4px;
+  transform: none;
+}
+
+.home-robot-scene .robot-presence {
+  min-width: 0;
+  min-height: var(--layout-touch-target);
+}
+
+.home-robot-scene .robot-reset {
+  flex: 0 0 var(--layout-touch-target);
+  width: var(--layout-touch-target);
+  height: var(--layout-touch-target);
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+}
+
+.home-robot-scene .robot-canvas-wrap,
+.home-view .home-robot-scene .robot-canvas-wrap {
+  width: 100%;
+  max-width: 100%;
+  height: clamp(300px, 48svh, 500px);
+  min-height: 0;
+  margin: 0;
+}
+
+.home-robot-scene .robot-canvas-wrap ai-tutor-robot {
+  max-width: 100%;
+}
+
+.home-robot-scene .robot-motion-panel,
+.home-view .home-robot-scene .robot-motion-panel {
+  position: relative;
+  inset: auto;
+  z-index: var(--layout-z-content);
+  width: min(100%, 240px);
+  max-width: 100%;
+  margin: 0 auto;
+  transform: none;
+}
+
+.home-robot-scene .robot-motion-panel > summary {
+  min-height: var(--layout-touch-target);
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+
+.home-primary-actions,
+.home-view .home-primary-actions {
+  position: relative;
+  inset: auto;
+  z-index: var(--layout-z-action);
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 480px);
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 8px;
+  overflow: hidden;
+  transform: none;
+}
+
+.home-primary-actions::before,
+.home-primary-actions::after {
+  inset: 0;
+}
+
+.home-primary-actions button,
+.home-view .home-primary-actions button {
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+.home-primary-actions button > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.voice-companion {
+  position: relative;
+  z-index: var(--layout-z-content);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  min-height: calc(100svh - var(--layout-header-block) - var(--layout-nav-block) - var(--layout-main-vertical));
+  margin: 0 auto;
+  padding: 8px 0 24px;
+}
+
+.voice-companion .voice-links {
+  position: relative;
+  inset: auto;
+  z-index: var(--layout-z-action);
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 0 8px;
+}
+
+.voice-links a {
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  padding: 10px 4px;
+  line-height: 1.5;
+}
+
+.voice-companion .voice-robot-scene {
+  flex: 1 0 auto;
+  width: min(100%, 580px);
+  margin: 0;
+}
+
+.voice-companion .voice-robot-scene .robot-canvas-wrap {
+  height: clamp(260px, 40svh, 420px);
+  min-height: 0;
+  margin: 0;
+}
+
+.voice-status {
+  flex-shrink: 0;
+  max-width: 100%;
+  margin-top: 8px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.voice-controls {
+  position: relative;
+  z-index: var(--layout-z-action);
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 480px);
+  max-width: 100%;
+  min-width: 0;
+  margin: 12px auto 0;
+  padding: 8px;
+}
+
+.voice-controls:has(.look-button) {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.voice-controls .ptt,
+.voice-controls .look-button,
+.voice-controls .stop-button {
+  min-width: 0;
+  min-height: 48px;
+  line-height: 1.45;
+}
+
+.voice-controls .stop-button {
+  min-width: 72px;
+  padding: 10px 12px;
+}
+
+.voice-draft {
+  position: relative;
+  z-index: var(--layout-z-action);
+  width: min(100%, 520px);
+  max-width: 100%;
+  min-width: 0;
+  margin: 12px auto 0;
+}
+
+.voice-draft > summary {
+  min-height: var(--layout-touch-target);
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+
+.voice-draft-body {
+  max-width: 100%;
+  min-width: 0;
+  padding: 14px;
+}
+
+.voice-draft-body textarea {
+  max-width: 100%;
+  min-height: 72px;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.voice-draft-body > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.voice-draft-body button,
+.voice-confirm button {
+  min-height: var(--layout-touch-target);
+}
+
+.voice-confirm,
+.voice-caption,
+.voice-live-caption,
+.voice-companion .recording-review {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.activity-page {
+  position: relative;
+  z-index: var(--layout-z-content);
+  width: 100%;
+  max-width: 1120px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.activity-page > *,
+.activity-page-grid > *,
+.activity-page .activity-card,
+.activity-page .activity-copy,
+.activity-page .activity-preview-copy {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.activity-page-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.activity-page button,
+.activity-page summary {
+  min-height: var(--layout-touch-target);
+}
+
+.activity-page .activity-card > summary {
+  min-height: 94px;
+}
+
+.activity-page .activity-copy strong,
+.activity-page .activity-copy small,
+.activity-page .activity-prompt,
+.activity-draft-note {
+  overflow-wrap: anywhere;
+}
+
+.parent-center {
+  position: relative;
+  z-index: var(--layout-z-content);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.parent-center .parent-center-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 20px 22px;
+}
+
+.parent-center-header > div,
+.parent-child-heading > div,
+.parent-record-card,
+.parent-setting-grid > label,
+.parent-privacy > div {
+  min-width: 0;
+}
+
+.parent-center-header h2,
+.parent-center-header p,
+.parent-child-heading h3 {
+  overflow-wrap: anywhere;
+}
+
+.parent-center .parent-center-close {
+  flex-shrink: 0;
+  width: var(--layout-touch-target);
+  height: var(--layout-touch-target);
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  margin: 0;
+}
+
+.parent-child-heading h3 {
+  max-width: 100%;
+}
+
+.parent-center button,
+.parent-center summary,
+.parent-center select {
+  min-height: var(--layout-touch-target);
+}
+
+.parent-center select {
+  max-width: 100%;
+}
+
+.parent-center .parent-teacher-tools > summary {
+  min-height: 64px;
+}
+
+.parent-privacy .danger-link {
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  padding: 8px 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layout-z-modal);
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: max(16px, var(--layout-safe-top)) max(16px, var(--layout-safe-right)) max(16px, var(--layout-safe-bottom)) max(16px, var(--layout-safe-left));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.modal-backdrop > *,
+.modal-backdrop .confirm-modal {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.modal-backdrop .confirm-modal {
+  max-height: calc(100vh - 32px);
+  max-height: calc(100svh - var(--layout-safe-top) - var(--layout-safe-bottom) - 32px);
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.modal-backdrop .confirm-modal > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-backdrop .confirm-modal button {
+  min-width: var(--layout-touch-target);
+  min-height: var(--layout-touch-target);
+  line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --layout-page-gutter: 24px;
+  }
+
+  .topbar,
+  .home-topbar {
+    gap: 12px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .topbar .learning-nav a {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --layout-header-height: 76px;
+  }
+
+  .home-robot-scene .robot-canvas-wrap,
+  .home-view .home-robot-scene .robot-canvas-wrap {
+    height: clamp(280px, 42svh, 420px);
+  }
+
+  .voice-companion .voice-robot-scene .robot-canvas-wrap {
+    height: clamp(240px, 38svh, 360px);
+  }
+
+  .home-active-camera,
+  .voice-companion .home-active-camera {
+    position: relative;
+    inset: auto;
+    width: min(100%, 560px);
+    max-width: 100%;
+    margin: 16px auto 0;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --layout-header-height: 64px;
+    --layout-nav-block: 0px;
+    --layout-main-vertical: 40px;
+    --layout-page-gutter: 14px;
+  }
+
+  .app-shell,
+  .app-shell:has(.home-view) {
+    padding-bottom: var(--layout-nav-block);
+  }
+
+  .topbar,
+  .home-topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--layout-header-block);
+    margin: 0;
+    padding: calc(8px + var(--layout-safe-top)) max(12px, var(--layout-safe-right)) 8px max(12px, var(--layout-safe-left));
+    border-radius: 0 0 18px 18px;
+  }
+
+  .top-actions {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .topbar .learning-nav,
+  .home-topbar .learning-nav {
+    position: fixed;
+    inset: auto max(8px, var(--layout-safe-right)) 0 max(8px, var(--layout-safe-left));
+    z-index: var(--layout-z-nav);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-self: auto;
+    gap: 6px;
+    width: auto;
+    max-width: none;
+    height: auto;
+    min-height: calc(60px + var(--layout-safe-bottom));
+    margin: 0;
+    padding: 6px 6px calc(6px + var(--layout-safe-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .learning-nav a,
+  .home-topbar .learning-nav a {
+    min-width: 0;
+    min-height: 48px;
+    padding: 6px 4px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .learning-nav a > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .teacher-toggle,
+  .ui-language-picker select {
+    min-height: var(--layout-touch-target);
+  }
+
+  .app-shell > main.app-main {
+    padding: 16px max(var(--layout-page-gutter), var(--layout-safe-right)) 24px max(var(--layout-page-gutter), var(--layout-safe-left));
+  }
+
+  main.home-view {
+    padding: 0 max(12px, var(--layout-safe-right)) 0 max(12px, var(--layout-safe-left));
+  }
+
+  .robot-home,
+  .home-view .robot-home {
+    gap: 8px;
+    min-height: calc(100svh - var(--layout-header-block) - var(--layout-nav-block));
+    padding: 12px 0 28px;
+  }
+
+  .home-robot-scene,
+  .home-view .home-robot-scene {
+    width: min(100%, 420px);
+  }
+
+  .home-robot-scene .robot-canvas-wrap,
+  .home-view .home-robot-scene .robot-canvas-wrap {
+    height: clamp(230px, 34svh, 340px);
+  }
+
+  .home-primary-actions,
+  .home-view .home-primary-actions {
+    width: min(100%, 440px);
+    padding: 7px;
+  }
+
+  .home-primary-actions button,
+  .home-view .home-primary-actions button {
+    min-height: 48px;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+
+  .voice-companion {
+    max-width: 620px;
+    padding: 0 0 16px;
+  }
+
+  .voice-companion .voice-links {
+    gap: 6px 12px;
+    padding-bottom: 4px;
+  }
+
+  .voice-companion .voice-robot-scene {
+    width: min(100%, 390px);
+  }
+
+  .voice-companion .voice-robot-scene .robot-canvas-wrap {
+    height: clamp(210px, 34svh, 310px);
+  }
+
+  .voice-controls {
+    width: 100%;
+    padding: 7px;
+  }
+
+  .voice-draft-body {
+    padding: 12px;
+  }
+
+  .activity-page {
+    padding-bottom: 8px;
+  }
+
+  .parent-center .parent-center-header {
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .modal-backdrop .confirm-modal {
+    padding: 20px;
+  }
+
+  .modal-backdrop .confirm-modal > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .modal-backdrop .confirm-modal button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --layout-page-gutter: 12px;
+  }
+
+  .topbar,
+  .home-topbar {
+    padding-right: max(10px, var(--layout-safe-right));
+    padding-left: max(10px, var(--layout-safe-left));
+  }
+
+  .brand {
+    gap: 7px;
+  }
+
+  .brand strong {
+    font-size: 19px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .top-actions {
+    gap: 4px;
+  }
+
+  .top-actions > .namespace-badge {
+    display: none;
+  }
+
+  .ui-language-picker select {
+    width: 72px;
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+
+  .home-primary-actions button,
+  .home-view .home-primary-actions button {
+    gap: 6px;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 12px;
+  }
+
+  .home-action-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .voice-controls .ptt {
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 13px;
+  }
+
+  .voice-controls .stop-button {
+    min-width: 64px;
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .parent-center .parent-center-header {
+    padding: 14px;
+  }
+
+  .parent-center-header h2 {
+    font-size: 19px;
+  }
+
+  .modal-backdrop .confirm-modal {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand strong {
+    font-size: 18px;
+  }
+
+  .learning-nav a,
+  .home-topbar .learning-nav a {
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+
+  .home-profile-copy strong {
+    max-width: 100px;
+  }
+
+  .home-primary-actions,
+  .home-view .home-primary-actions {
+    gap: 6px;
+    padding: 6px;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 761px) {
+  :root {
+    --layout-header-height: 72px;
+  }
+
+  .robot-home,
+  .home-view .robot-home {
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .home-robot-scene .robot-canvas-wrap,
+  .home-view .home-robot-scene .robot-canvas-wrap {
+    height: clamp(200px, 36svh, 320px);
+  }
+
+  .voice-companion .voice-robot-scene .robot-canvas-wrap {
+    height: clamp(180px, 34svh, 270px);
+  }
+}
+
+@media (max-width: 760px) and (max-height: 650px) {
+  :root {
+    --layout-header-height: 60px;
+    --layout-nav-block: 0px;
+  }
+
+  .topbar .learning-nav,
+  .home-topbar .learning-nav {
+    min-height: calc(52px + var(--layout-safe-bottom));
+    padding: 4px 4px calc(4px + var(--layout-safe-bottom));
+  }
+
+  .learning-nav a,
+  .home-topbar .learning-nav a {
+    min-height: var(--layout-touch-target);
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .robot-home,
+  .home-view .robot-home {
+    gap: 6px;
+    padding: 8px 0 20px;
+  }
+
+  .home-robot-scene .robot-canvas-wrap,
+  .home-view .home-robot-scene .robot-canvas-wrap {
+    height: clamp(150px, 30svh, 220px);
+  }
+
+  .voice-companion {
+    padding-bottom: 12px;
+  }
+
+  .voice-companion .voice-robot-scene .robot-canvas-wrap {
+    height: clamp(140px, 30svh, 200px);
+  }
+
+  .voice-controls,
+  .voice-draft {
+    margin-top: 8px;
+  }
+}
+
+@media (max-height: 650px) {
+  .modal-backdrop {
+    place-items: start center;
+  }
+}
+
+@media (max-width: 360px) {
+  .voice-controls:has(.look-button) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .voice-controls:has(.look-button) .ptt {
+    grid-column: 1 / -1;
+    min-height: 48px;
+  }
+
+  .voice-controls:has(.look-button) .look-button {
+    justify-self: stretch;
+    min-height: 48px;
+  }
+
+  .voice-controls:has(.look-button) .stop-button {
+    align-self: stretch;
+    min-height: 48px;
+  }
+}

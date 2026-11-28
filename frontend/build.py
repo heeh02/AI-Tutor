@@ -24,7 +24,7 @@ def main():
                     '--out-name','tutor_ui',str(root/'target/ui/wasm32-unknown-unknown/release/tutor-ui.wasm')],
                    cwd=root, check=True)
     shutil.copyfile(frontend/'index.html',output/'index.html')
-    for name in ['style.css','bootstrap.js','robot-companion.js','app-icon.svg','manifest.webmanifest']:
+    for name in ['style.css','home.css','activity-gallery.css','parent-center.css','home-environment.css','layout.css','bootstrap.js','robot-companion.js','home-environment.js','app-icon.svg','manifest.webmanifest']:
         shutil.copyfile(frontend/name,assets/name)
     for source in (frontend/'vendor/three').iterdir():
         if source.is_file():

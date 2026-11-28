@@ -1,4 +1,4 @@
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet, VecDeque};
 
 /// An explicit return to current messages is a retry opportunity, not another
@@ -396,11 +396,9 @@ mod tests {
     use super::*;
     use serde_json::json;
     fn turn_window(first: u32, last: u32) -> Value {
-        json!(
-            (first..=last)
-                .map(|id| json!({"turn_id":format!("turn-{id}"),"content":"观察"}))
-                .collect::<Vec<_>>()
-        )
+        json!((first..=last)
+            .map(|id| json!({"turn_id":format!("turn-{id}"),"content":"观察"}))
+            .collect::<Vec<_>>())
     }
     #[test]
     fn rolling_twenty_four_turn_window_follows_the_newest_id() {

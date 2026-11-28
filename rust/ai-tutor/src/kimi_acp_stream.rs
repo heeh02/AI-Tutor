@@ -122,13 +122,12 @@ pub(crate) struct ScriptedSegmentRequest {
 impl KimiProvider {
     pub(crate) fn scripted_segments_for_test(&self) -> mpsc::Receiver<ScriptedSegmentRequest> {
         let (sender, receiver) = mpsc::channel(2);
-        assert!(
-            self.scripted_segments
-                .lock()
-                .unwrap()
-                .replace(sender)
-                .is_none()
-        );
+        assert!(self
+            .scripted_segments
+            .lock()
+            .unwrap()
+            .replace(sender)
+            .is_none());
         let mut state = self.state.lock().unwrap();
         state.ready = true;
         state.audit = json!({"available":true,"remote_model":false,"test_transport":true});
@@ -342,6 +341,10 @@ fn stream_prompt(policy: &str, reply_schema: Value, request: &Value) -> Result<S
     build_prompt(&policy, &schema, request)
 }
 
+fn complete_prompt(policy: &str, reply_schema: Value, request: &Value) -> Result<String> {
+    build_prompt(policy, &reply_schema, request)
+}
+
 /// Explicit metadata-final protocol. Legacy formatting above stays unchanged.
 fn stream_prompt_metadata(
     policy: &str,
@@ -459,7 +462,8 @@ pub(super) async fn ensure_low_thinking<R: AsyncRead + Unpin, W: tokio::io::Asyn
             metrics["model_after_thinking_receipt_basis"] = json!("set_config_option_result");
         }
         ensure!(
-            thinking_option(&configured["configOptions"]).map_err(|_| AcpFailure::Profile)?["current_value"]
+            thinking_option(&configured["configOptions"]).map_err(|_| AcpFailure::Profile)?
+                ["current_value"]
                 == "low",
             AcpFailure::Profile
         );

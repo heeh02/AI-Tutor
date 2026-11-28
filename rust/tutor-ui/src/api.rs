@@ -6,7 +6,9 @@ use web_sys::{AbortController, RequestCache, RequestCredentials};
 
 pub type ApiResult = Result<Value, String>;
 fn request_timeout_ms(path: &str, method: &str) -> u32 {
-    if path.contains("/voice-loop/")
+    if path == "/api/omni/infer" {
+        300_000
+    } else if path.contains("/voice-loop/")
         || (matches!(path, "/api/audio/status" | "/api/camera/pose") && method == "GET")
     {
         1500

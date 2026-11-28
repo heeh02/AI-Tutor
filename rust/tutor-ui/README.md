@@ -1,8 +1,8 @@
-# Rust WebAssembly 教师工作台
+# Rust WebAssembly 儿童成长陪伴工作台
 
 工作台的界面组件、状态轮询、HTTP 请求、目标选择、教学交互、录音操作代次、显示确认和记忆操作全部由 Rust 实现，使用 Yew 0.21 编译为 WebAssembly。
 
-`frontend/index.html`、`frontend/style.css` 是浏览器的静态展示资源。`frontend/bootstrap.js` 仅导入并初始化 wasm-bindgen 生成的模块；应用业务逻辑没有 JavaScript／TypeScript 实现。wasm-bindgen 自动生成的 JavaScript 负责浏览器与 WebAssembly 的标准绑定。
+`frontend/index.html`、`frontend/style.css`、`frontend/home.css` 是浏览器的静态展示资源。`frontend/bootstrap.js` 仅导入并初始化 wasm-bindgen 生成的模块；应用业务逻辑没有 JavaScript／TypeScript 实现。wasm-bindgen 自动生成的 JavaScript 负责浏览器与 WebAssembly 的标准绑定。
 
 构建：
 
@@ -19,7 +19,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File frontend/build.ps1
 
 保留的行为：
 
-- 三栏真实工作台、教师控制、摄像头原帧与检测框同步、镜像坐标转换、临时目标与档案分离。
+- 机器人首页、机器人常驻语音陪伴页、独立活动页、文字对话工作台与学习记录页；hash 路由支持浏览器前进／后退。活动先查看详情再进入语音页，选择不自动发送，已有草稿不会被静默覆盖；进入后机器人保持主视觉，说话按钮获得焦点，引导语默认收起。
+- 语音回复在完整校验与展示完成后调用本地朗读，并记录已读轮次，避免历史消息或页面返回导致重复播放。
+- 家长控制、摄像头原帧与检测框同步、镜像坐标转换、临时目标与档案分离。
 - 状态每秒更新；预览默认使用同源认证的二进制 WebSocket，每连接最多一个未确认画面。图像 decode 后提交同帧叠层，并在两次 requestAnimationFrame 间提供绘制机会后确认。HTTP/base64 仅作为用户明确选择的兼容通道，两路不并行消费。
 - 真实后端对话；在 Yew `rendered` 生命周期确认显示后提交 `shown`，成功后才可自动播报。无固定对话或演示后端。
 - 按住说话、快速松开处理、20秒上限、转写修改、停止／切换档案丢弃旧录音、过期异步结果保护。

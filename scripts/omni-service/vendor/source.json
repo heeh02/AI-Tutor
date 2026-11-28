@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/QwenLM/Qwen2.5-Omni",
+  "revision": "d8a31ca56c0456b6edfcbcbf4bdbb6ae2200ef42",
+  "files": [
+    "low-VRAM-mode/modeling_qwen2_5_omni_low_VRAM_mode.py",
+    "low-VRAM-mode/low_VRAM_demo_gptq.py",
+    "LICENSE"
+  ],
+  "note": "The low-VRAM model implementation is vendored verbatim. Service registration follows the official GPTQ example; no upstream model code is executed from a network location."
+}

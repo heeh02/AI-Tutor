@@ -1,8 +1,8 @@
 //! Tutor text delivery. Speech ownership and controls remain outside this component.
 use crate::{
-    api::{ApiResult, api},
-    preview_browser::{PaintOpportunity, VisibilityListener, hidden},
-    tutor_stream_state::{StreamKey, StreamState, incomplete, terminal},
+    api::{api, ApiResult},
+    preview_browser::{hidden, PaintOpportunity, VisibilityListener},
+    tutor_stream_state::{incomplete, terminal, StreamKey, StreamState},
 };
 use gloo_timers::callback::Timeout;
 use serde_json::json;
@@ -20,6 +20,7 @@ pub struct StreamProps {
     pub persisted_text: String,
     pub ui_language: String,
     pub on_progress: Callback<String>,
+    pub on_complete: Callback<String>,
     pub on_sync: Callback<()>,
 }
 
@@ -188,6 +189,9 @@ impl TutorStream {
                 self.receipt_retry_blocked = false;
                 if old_phase != self.state.phase() && terminal(self.state.phase()) {
                     ctx.props().on_sync.emit(());
+                    if self.state.phase() == "completed" {
+                        ctx.props().on_complete.emit(self.state.key.turn.clone());
+                    }
                 }
             }
             Err(_) => {

@@ -270,7 +270,7 @@ impl Component for MemoryEvidence {
                     disabled={!self.evidence.context.enabled}
                     onclick={ctx.link().callback(|_| EvidenceMsg::Toggle)}>
                     {if self.evidence.open { tr(language,"收起来源说明","Hide sources") }
-                        else { tr(language,"为什么记住","Why this was remembered") }}
+                        else { tr(language,"查看记忆依据","View evidence") }}
                 </button>
                 {if !self.evidence.open { Html::default() }
                 else if let Some(value) = &self.evidence.value { render_evidence(language, &ctx.props().reading_level, value) }

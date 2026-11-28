@@ -1,7 +1,7 @@
 use crate::{
     evidence_labels::source_label,
     i18n::t,
-    model::{MODULES, fallback, list, text},
+    model::{fallback, list, text, MODULES},
     view::icon,
 };
 use serde_json::Value;
@@ -99,7 +99,7 @@ fn render_summary(props: &ActivitySummaryProps) -> Html {
         text(&state["reported_result"])
     };
     html! {<>
-        <div class="panel-title"><div><span class="section-number">{"03"}</span><h2>{t(language,if props.finished{"本次学习回顾"}else{"学习正在发生"})}</h2></div><span class="small-label">{if props.finished{t(language,"已结束").into()}else{stage_label(language,&state["stage"])}}</span></div>
+        <div class="panel-title"><div><span class="section-number">{icon("flag")}</span><h2>{t(language,if props.finished{"活动回顾"}else{"当前活动"})}</h2></div><span class="small-label">{if props.finished{t(language,"已结束").into()}else{stage_label(language,&state["stage"])}}</span></div>
         <div class="goal-card"><span class="gold-icon">{icon("flag")}</span><small>{t(language,"当前目标")}</small><h3>{fallback(&state["goal"],t(language,"等待学习者提出想法"))}</h3>{badge(language,&field_source(state,"goal"))}</div>
         <div class="module-section"><div class="subsection-label"><h3>{t(language,"功能模块")}</h3>{badge(language,&field_source(state,"modules"))}</div><div class="module-grid">{for MODULES.iter().map(|(id,name)|{let reported=inventory.iter().any(|v|v.as_str()==Some(*id));html!{<div class={classes!("module-tile",reported.then_some("reported"))}><span>{icon(if *id=="light"{"light"}else if *id=="distance"{"radio"}else{"circuit"})}</span><strong>{t(language,name)}</strong><small>{t(language,if reported{"已报告"}else if state["modules"].is_null(){"当前未知"}else{"未报告连接"})}</small></div>}})}</div><p class="fine-print">{t(language,"连接状态来自报告；人脸摄像头不识别积木。")}</p></div>
         <div class="learning-timeline"><div class="timeline-item"><span>{icon("activity")}</span><div><small>{t(language,"最新观察 / 报告")}</small><p>{latest}</p>{badge(language,&field_source(state,"reported_result"))}</div></div>

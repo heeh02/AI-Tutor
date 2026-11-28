@@ -18,6 +18,8 @@ mod memory_retrieval;
 mod memory_review;
 #[path = "memory_schedule.rs"]
 mod memory_schedule;
+#[path = "parent_growth.rs"]
+mod parent_growth;
 #[path = "recording.rs"]
 mod recording;
 #[cfg(all(test, windows))]
@@ -235,10 +237,13 @@ impl Workstation {
                 persisted.insert(key.clone(), json!(count));
             }
         }
-        let session = if let Some((ns, sid)) = current {
-            stores[&ns].session(&sid)?
+        let (session, parent_digest) = if let Some((ns, sid)) = current {
+            let store = &stores[&ns];
+            let session = store.session(&sid)?;
+            let parent_digest = parent_growth::project(store, &session)?;
+            (session, parent_digest)
         } else {
-            Value::Null
+            (Value::Null, parent_growth::empty_digest())
         };
         drop(stores);
         let ptz = self.ptz.status();
@@ -262,7 +267,7 @@ impl Workstation {
             self.shutting_down.load(Ordering::SeqCst),
         );
         Ok(
-            json!({"learners":learners,"session":session,"tutor_delivery":self.delivery_mode.status(),"voice_loop":self.voice_loop_status(),"ui_preferences":self.ui_preferences.lock().unwrap().get()?,"camera":camera,"kimi":self.provider.status(),"teaching":self.provider.foreground_status(),"audio":self.audio.status(),"local_speech":self.local_speech_status(),"local_asr":self.local_asr_status(),"final_asr":self.final_asr_status(),"local_memory":local_memory,"metrics":metrics,"errors":self.errors.lock().unwrap().clone(),"ptz":ptz,"emotion":{"enabled":false},"actuator_execution":false,"implementation":"Rust native + Rust WebAssembly"}),
+            json!({"learners":learners,"session":session,"parent_digest":parent_digest,"tutor_delivery":self.delivery_mode.status(),"voice_loop":self.voice_loop_status(),"ui_preferences":self.ui_preferences.lock().unwrap().get()?,"camera":camera,"kimi":self.provider.status(),"teaching":self.provider.foreground_status(),"audio":self.audio.status(),"local_speech":self.local_speech_status(),"local_asr":self.local_asr_status(),"final_asr":self.final_asr_status(),"local_memory":local_memory,"metrics":metrics,"errors":self.errors.lock().unwrap().clone(),"ptz":ptz,"emotion":{"enabled":false},"actuator_execution":false,"implementation":"Rust native + Rust WebAssembly"}),
         )
     }
     async fn cancel(&self) -> Result<()> {
@@ -742,6 +747,66 @@ impl Workstation {
     }
 }
 
+fn attach_omni_frame(app: &Workstation, request: &mut Value) -> Result<Option<Value>> {
+    let include = request
+        .get("include_current_frame")
+        .map(|value| {
+            value
+                .as_bool()
+                .ok_or_else(|| anyhow!("当前画面提交选项无效"))
+        })
+        .transpose()?
+        .unwrap_or(false);
+    if !include {
+        ensure!(
+            request.get("camera_session_id").is_none() && request.get("frame_id").is_none(),
+            "未明确提交当前画面时不能附带摄像头标识"
+        );
+        request
+            .as_object_mut()
+            .unwrap()
+            .remove("include_current_frame");
+        return Ok(None);
+    }
+    let session_id = text(request, "camera_session_id", 1, 128)?.to_owned();
+    let frame_id = request["frame_id"]
+        .as_u64()
+        .ok_or_else(|| anyhow!("摄像头画面编号无效"))?;
+    let (url, submitted) = app
+        .camera
+        .explicit_frame(&session_id, frame_id)
+        .map_err(|error| anyhow!(error))?;
+    let messages = request["messages"]
+        .as_array()
+        .ok_or_else(|| anyhow!("多模态请求需要消息"))?;
+    ensure!(
+        !messages
+            .iter()
+            .flat_map(|message| message["content"].as_array().into_iter().flatten())
+            .any(|part| part["type"] == "image_url"),
+        "每次请求只能提交一张明确选择的图片"
+    );
+    let content = request["messages"]
+        .as_array_mut()
+        .and_then(|messages| messages.last_mut())
+        .filter(|message| message["role"] == "user")
+        .and_then(|message| message.get_mut("content"))
+        .ok_or_else(|| anyhow!("当前画面只能随最后一条孩子消息提交"))?;
+    if let Some(text) = content.as_str() {
+        *content = json!([{"type":"text","text":text}]);
+    }
+    let parts = content
+        .as_array_mut()
+        .ok_or_else(|| anyhow!("孩子消息格式无效"))?;
+    ensure!(parts.len() < 16, "孩子消息内容过多");
+    parts.push(json!({"type":"image_url","image_url":{"url":url}}));
+    let object = request.as_object_mut().unwrap();
+    object.remove("include_current_frame");
+    object.remove("camera_session_id");
+    object.remove("frame_id");
+    Ok(Some(submitted))
+}
+
 fn allowed_keys(value: &Value, keys: &[&str]) -> Result<()> {
     let object = value.as_object().ok_or_else(|| anyhow!("需要JSON对象"))?;
     ensure!(
@@ -930,10 +995,68 @@ async fn dispatch(
 ) -> Result<Value> {
     let parts: Vec<_> = path.trim_matches('/').split('/').collect();
     match (method.as_str(), parts.as_slice()) {
+        ("POST", ["api", "omni", "infer"]) => {
+            allowed_keys(
+                data,
+                &[
+                    "request_id",
+                    "learner_id",
+                    "messages",
+                    "modalities",
+                    "max_tokens",
+                    "audio",
+                    "include_current_frame",
+                    "camera_session_id",
+                    "frame_id",
+                ],
+            )?;
+            let mut request = data.clone();
+            if s(&request, "request_id").is_empty() {
+                request["request_id"] = json!(uid("omni"));
+            }
+            ensure!(s(&request, "request_id").len() <= 128, "请求编号过长");
+            let learner_id = s(&request, "learner_id");
+            ensure!(
+                !learner_id.is_empty() && learner_id.len() <= 128,
+                "多模态请求需要明确的学习者档案"
+            );
+            {
+                let current = app
+                    .current
+                    .lock()
+                    .unwrap()
+                    .clone()
+                    .ok_or_else(|| anyhow!("请先选择当前学习活动"))?;
+                let stores = app.stores.lock().unwrap();
+                let session = stores[&current.0].session(&current.1)?;
+                ensure!(
+                    s(&session, "learner_id") == learner_id,
+                    "多模态请求只能使用当前学习者档案"
+                );
+            }
+            let submitted_frame = attach_omni_frame(&app, &mut request)?;
+            let id = s(&request, "request_id").to_owned();
+            let mut response = app.provider.infer_omni(request).await?;
+            response["request_id"] = json!(id);
+            if let Some(frame) = submitted_frame {
+                response["submitted_frame"] = json!(frame);
+            }
+            Ok(response)
+        }
+        ("POST", ["api", "omni", "cancel"]) => {
+            let id = s(&data, "request_id");
+            ensure!(!id.is_empty(), "缺少多模态请求编号");
+            app.provider.cancel(&id).await?;
+            Ok(json!({"cancelled":true,"request_id":id}))
+        }
         ("GET", ["api", "state"]) => {
             // Capture adoption changes the session generation and lease together.
             let _control = app.control.lock().await;
             app.state()
+        }
+        ("GET", ["api", "parent", "digest"]) => {
+            let _control = app.control.lock().await;
+            app.parent_digest()
         }
         ("GET", ["api", "ui", "preferences"]) => app.ui_preferences.lock().unwrap().get(),
         ("POST", ["api", "ui", "preferences"]) => {
@@ -980,6 +1103,7 @@ async fn dispatch(
             Ok(app.camera.close())
         }
         ("GET", ["api", "video", "frame"]) => Ok(app.camera.frame()),
+        ("GET", ["api", "camera", "frame-meta"]) => Ok(app.camera.preview_snapshot().0),
         ("POST", ["api", "tracking", "select"]) => {
             allowed_keys(data, &["track_key"])?;
             let key = text(data, "track_key", 1, 150)?;
@@ -1607,6 +1731,10 @@ pub fn router(app: Arc<Workstation>) -> Router {
             "/api/learners/{lid}/sessions/{sid}/comparison-history",
             get(activity_history::comparison_history),
         )
+        .route(
+            "/api/omni/infer",
+            any(endpoint).layer(DefaultBodyLimit::max(16 * 1024 * 1024)),
+        )
         .route("/", any(endpoint))
         .route("/{*path}", any(endpoint))
         .layer(DefaultBodyLimit::max(24000))
@@ -1891,6 +2019,147 @@ mod tests {
         app.close().await;
         Ok(())
     }
+    #[test]
+    fn omni_current_frame_is_attached_once_and_never_implicitly() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let app = Workstation::new(dir.path().into(), "fixture-token".into())?;
+        let mut ordinary = json!({"messages":[{"role":"user","content":"hello"}]});
+        assert!(attach_omni_frame(&app, &mut ordinary)?.is_none());
+        assert!(ordinary.get("include_current_frame").is_none());
+        let mut implicit =
+            json!({"messages":[{"role":"user","content":"hello"}],"camera_session_id":"epoch"});
+        assert!(attach_omni_frame(&app, &mut implicit).is_err());
+        let mut frame = json!({"camera_session_id":"submit-epoch","frame_id":7,
+            "frame_age_ms":0,"raw_media_saved":false,"tracks":[]});
+        assert!(
+            app.camera
+                .inject_preview_fixture(frame.clone(), vec![0xff, 0xd8, 1, 0xff, 0xd9])
+        );
+        let mut request = json!({"messages":[{"role":"user","content":"看看这个"}],
+            "include_current_frame":true,"camera_session_id":"submit-epoch","frame_id":7});
+        let submitted = attach_omni_frame(&app, &mut request)?.unwrap();
+        assert_eq!(submitted["frame_id"], 7);
+        assert_eq!(submitted["raw_media_saved"], false);
+        assert!(submitted.get("jpeg").is_none());
+        let parts = request["messages"][0]["content"].as_array().unwrap();
+        assert_eq!(parts.len(), 2);
+        assert!(
+            parts[1]["image_url"]["url"]
+                .as_str()
+                .unwrap()
+                .starts_with("data:image/jpeg;base64,")
+        );
+        for key in ["include_current_frame", "camera_session_id", "frame_id"] {
+            assert!(request.get(key).is_none());
+        }
+        let mut second_image = request.clone();
+        second_image["include_current_frame"] = json!(true);
+        second_image["camera_session_id"] = json!("submit-epoch");
+        second_image["frame_id"] = json!(7);
+        assert!(attach_omni_frame(&app, &mut second_image).is_err());
+        frame["frame_id"] = json!(8);
+        assert!(
+            app.camera
+                .inject_preview_fixture(frame, vec![0xff, 0xd8, 2, 0xff, 0xd9])
+        );
+        let mut stale = json!({"messages":[{"role":"user","content":"看看这个"}],
+            "include_current_frame":true,"camera_session_id":"submit-epoch","frame_id":7});
+        assert!(attach_omni_frame(&app, &mut stale).is_err());
+        app.camera.close();
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn parent_digest_is_minimal_verbatim_and_profile_scoped() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let app = Workstation::new(dir.path().into(), "fixture-token".into())?;
+        let (sid, other_sid) = {
+            let stores = app.stores.lock().unwrap();
+            let store = &stores["real"];
+            let learner = store.create_learner("小林", "zh", "guided")?;
+            let lid = s(&learner, "learner_id").to_owned();
+            let session = store.create_session(&lid)?;
+            let sid = s(&session, "session_id").to_owned();
+            let other = store.create_learner("另一个孩子", "zh", "guided")?;
+            let other_sid = s(
+                &store.create_session(s(&other, "learner_id"))?,
+                "session_id",
+            )
+            .to_owned();
+            store.add_turn(
+                &sid,
+                "request",
+                0,
+                "user",
+                "我想搭一座桥。",
+                "received",
+                &[],
+            )?;
+            store.add_turn(
+                &sid,
+                "request",
+                0,
+                "assistant",
+                "先观察哪里需要支撑。",
+                "shown",
+                &[],
+            )?;
+            store.add_turn(
+                &other_sid,
+                "request",
+                0,
+                "user",
+                "这是另一个孩子的原话。",
+                "received",
+                &[],
+            )?;
+            let mut state = session["state"].clone();
+            state["goal"] = json!("一起搭一座稳稳的桥");
+            store.checkpoint(&sid, &state)?;
+            (sid, other_sid)
+        };
+        *app.current.lock().unwrap() = Some(("real".into(), sid.clone()));
+        let digest = dispatch(app.clone(), &Method::GET, "/api/parent/digest", &json!({})).await?;
+        assert_eq!(
+            digest
+                .as_object()
+                .unwrap()
+                .keys()
+                .map(String::as_str)
+                .collect::<std::collections::BTreeSet<_>>(),
+            [
+                "activity_finished",
+                "activity_title",
+                "child_name",
+                "has_records",
+                "memory_count",
+                "recent_child_words",
+                "schema_version"
+            ]
+            .into_iter()
+            .collect()
+        );
+        assert_eq!(digest["child_name"], "小林");
+        assert_eq!(digest["activity_title"], "一起搭一座稳稳的桥");
+        assert_eq!(digest["recent_child_words"], json!(["我想搭一座桥。"]));
+        assert_eq!(digest["memory_count"], 0);
+        assert_eq!(digest["activity_finished"], false);
+        assert_eq!(digest["has_records"], true);
+        assert!(!digest.to_string().contains("另一个孩子"));
+        assert!(!digest.to_string().contains("先观察哪里"));
+        let state = app.state()?;
+        assert_eq!(state["parent_digest"], digest);
+        *app.current.lock().unwrap() = Some(("real".into(), other_sid));
+        let other = dispatch(app.clone(), &Method::GET, "/api/parent/digest", &json!({})).await?;
+        assert_eq!(
+            other["recent_child_words"],
+            json!(["这是另一个孩子的原话。"])
+        );
+        assert!(!other.to_string().contains("我想搭一座桥"));
+        app.close().await;
+        Ok(())
+    }
+
     #[test]
     fn origin_is_exact() {
         let mut h = HeaderMap::new();

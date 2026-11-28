@@ -37,6 +37,7 @@ use tokio::{
 };
 
 const VERSION: &str = "2.3.1";
+pub(crate) const OMNI_MODEL: &str = "qwen2_5_omni";
 const CREATION_NO_WINDOW: u32 = 0x08000000;
 const DEADLINE: Duration = Duration::from_secs(90);
 
@@ -545,7 +546,8 @@ pub fn build_prompt(policy: &str, schema: &Value, request: &Value) -> Result<Str
     let comparison_policy = crate::context::comparison_policy(&data)
         .map(|extra| format!("\n\n{extra}"))
         .unwrap_or_default();
-    let prompt = format!("{policy}{comparison_policy}\n\nOUTPUT_SCHEMA:\n{schema}\n\nREQUEST_DATA:\n{data}");
+    let prompt =
+        format!("{policy}{comparison_policy}\n\nOUTPUT_SCHEMA:\n{schema}\n\nREQUEST_DATA:\n{data}");
     ensure!(
         prompt.chars().count() <= 26_000,
         "教学上下文超过本机调用上限；未截断事实"
@@ -1358,6 +1360,7 @@ impl KimiProvider {
             self.calls.lock().unwrap().is_empty(),
             "Model calls are still registered after cancellation"
         );
+        self.foreground.stop().await;
         Ok(())
     }
     pub async fn verify_real(&self) -> Result<Value> {
@@ -1425,7 +1428,8 @@ mod tests {
         Ok(())
     }
     #[test]
-    fn user_plugin_availability_does_not_disable_isolated_profiles_but_project_extensions_stay_blocked() {
+    fn user_plugin_availability_does_not_disable_isolated_profiles_but_project_extensions_stay_blocked()
+     {
         let user = Path::new("/home/user");
         let root = user.join("work/project");
         let paths = inherited_extension_paths(&root, user);
@@ -1437,7 +1441,10 @@ mod tests {
             user.join(".mcp.json"),
             root.join(".kimi-code/plugins"),
         ] {
-            assert!(paths.contains(&expected), "missing blocked path: {expected:?}");
+            assert!(
+                paths.contains(&expected),
+                "missing blocked path: {expected:?}"
+            );
         }
     }
 

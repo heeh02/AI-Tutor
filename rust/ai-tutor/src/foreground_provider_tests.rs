@@ -29,6 +29,18 @@ fn policy_is_bounded_explicit_and_does_not_silently_fall_back() -> Result<()> {
         parse_policy(br#"{"protocol_version":1,"provider":"kimi"}"#)?,
         Selection::Kimi
     );
+    assert_eq!(
+        parse_policy(br#"{"protocol_version":1,"provider":"qwen_omni"}"#)?,
+        Selection::Omni
+    );
+    fs::create_dir_all(dir.path().join("runtime"))?;
+    fs::write(
+        dir.path().join(POLICY_PATH),
+        br#"{"protocol_version":1,"provider":"qwen_omni"}"#,
+    )?;
+    let omni = KimiProvider::new_for_workstation(dir.path().into())?;
+    assert_eq!(omni.foreground_status()["provider"], "qwen_omni");
+    assert_eq!(omni.foreground_status()["available"], false);
     for (mode, expected) in [
         ("non_thinking", Selection::FlashOff),
         ("thinking_low", Selection::FlashLow),
@@ -49,7 +61,7 @@ fn policy_is_bounded_explicit_and_does_not_silently_fall_back() -> Result<()> {
     ] {
         assert!(parse_policy(&serde_json::to_vec(&value)?).is_err());
     }
-    fs::create_dir(dir.path().join("runtime"))?;
+    fs::create_dir_all(dir.path().join("runtime"))?;
     fs::write(dir.path().join(POLICY_PATH), b"not json PRIVATE_CANARY")?;
     let provider = KimiProvider::new_for_workstation(dir.path().into())?;
     assert_eq!(provider.foreground_status()["provider"], "invalid");
@@ -77,7 +89,7 @@ fn policy_is_bounded_explicit_and_does_not_silently_fall_back() -> Result<()> {
 #[tokio::test]
 async fn invalid_selection_blocks_foreground_before_any_registration() -> Result<()> {
     let dir = tempfile::tempdir()?;
-    fs::create_dir(dir.path().join("runtime"))?;
+    fs::create_dir_all(dir.path().join("runtime"))?;
     fs::write(dir.path().join(POLICY_PATH), b"{}")?;
     let provider = KimiProvider::new_for_workstation(dir.path().into())?;
     let (send, _receive) = mpsc::channel(2);

@@ -606,6 +606,48 @@ impl CameraService {
         meta["jpeg"] = jpeg.map_or(Value::Null, |jpeg| json!(STANDARD.encode(jpeg.as_slice())));
         meta
     }
+    pub fn explicit_frame(
+        &self,
+        expected_session: &str,
+        expected_frame: u64,
+    ) -> Result<(String, Value), String> {
+        let (meta, jpeg) = self.preview_snapshot();
+        if meta["state"] != "running"
+            || meta["preview_available"] != true
+            || meta["camera_session_id"].as_str() != Some(expected_session)
+            || meta["frame_id"].as_u64() != Some(expected_frame)
+            || !meta["frame_age_ms"]
+                .as_f64()
+                .is_some_and(|age| (0.0..400.0).contains(&age))
+        {
+            return Err("摄像头画面已变化或不再新鲜，请重新提交".into());
+        }
+        if meta["raw_media_saved"] != false {
+            return Err("当前画面不符合不保存原图的隐私约束".into());
+        }
+        let jpeg = jpeg.ok_or_else(|| "当前没有可提交的摄像头画面".to_owned())?;
+        if jpeg.len() > MAX_JPEG
+            || !jpeg.starts_with(&[0xff, 0xd8])
+            || !jpeg.ends_with(&[0xff, 0xd9])
+        {
+            return Err("摄像头画面不是有效的有界 JPEG".into());
+        }
+        let submitted = json!({
+            "camera_session_id": expected_session,
+            "frame_id": expected_frame,
+            "width": meta["width"],
+            "height": meta["height"],
+            "captured_at_ms": meta["captured_at_ms"],
+            "raw_media_saved": false,
+        });
+        Ok((
+            format!(
+                "data:image/jpeg;base64,{}",
+                STANDARD.encode(jpeg.as_slice())
+            ),
+            submitted,
+        ))
+    }
     pub(crate) fn preview_slot(
         &self,
     ) -> Result<tokio::sync::OwnedSemaphorePermit, tokio::sync::TryAcquireError> {
@@ -815,14 +857,42 @@ mod target_generation_tests {
         assert!(camera.preview_snapshot().1.is_none());
     }
     #[test]
+    fn explicit_frame_requires_matching_fresh_unsaved_jpeg() {
+        let dir = tempfile::tempdir().unwrap();
+        let camera = CameraService::new(dir.path().to_owned());
+        let mut frame = meta("submit-epoch", 7, &[], false);
+        frame["raw_media_saved"] = json!(false);
+        frame["width"] = json!(1280);
+        frame["height"] = json!(720);
+        frame["captured_at_ms"] = json!(1234);
+        assert!(camera.inject_preview_fixture(frame, vec![0xff, 0xd8, 1, 2, 0xff, 0xd9]));
+        assert!(camera.explicit_frame("other-epoch", 7).is_err());
+        assert!(camera.explicit_frame("submit-epoch", 6).is_err());
+        let (url, submitted) = camera.explicit_frame("submit-epoch", 7).unwrap();
+        assert!(url.starts_with("data:image/jpeg;base64,/9g"));
+        assert_eq!(
+            STANDARD.decode(url.split_once(',').unwrap().1).unwrap(),
+            vec![0xff, 0xd8, 1, 2, 0xff, 0xd9]
+        );
+        assert_eq!(submitted["camera_session_id"], "submit-epoch");
+        assert_eq!(submitted["frame_id"], 7);
+        assert_eq!(submitted["raw_media_saved"], false);
+        assert!(submitted.get("jpeg").is_none());
+        camera.close();
+        assert!(camera.explicit_frame("submit-epoch", 7).is_err());
+        assert!(std::fs::read_dir(dir.path()).unwrap().next().is_none());
+    }
+    #[test]
     fn display_pose_is_shared_by_status_and_preview_without_arming_or_opening() {
         let dir = tempfile::tempdir().unwrap();
         let camera = CameraService::new(dir.path().to_owned());
         assert_eq!(camera.status()["pose"]["pose_source"], "unknown");
         assert_eq!(camera.status()["pose"]["active"], false);
         let mut frame = meta("pose-epoch", 1, &[], false);
-        let axis = |value| json!({"value":value,"minimum":-90,"maximum":90,
-            "step":1,"manual":true,"query_success":true});
+        let axis = |value| {
+            json!({"value":value,"minimum":-90,"maximum":90,
+            "step":1,"manual":true,"query_success":true})
+        };
         frame["native_pose"] = json!({"schema_version":"1.0","status":"ok",
             "source":"camera_capture_owner","camera_session_id":"pose-epoch",
             "sampled_at_ms":now_ms(),"sample_seq":1,"read_only":true,"set_calls":0,

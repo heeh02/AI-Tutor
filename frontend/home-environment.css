@@ -1,0 +1,57 @@
+ai-tutor-room {
+  --ai-tutor-room-opacity: .78;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  opacity: var(--ai-tutor-room-opacity);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  contain: layout paint;
+}
+
+ai-tutor-room[data-render-state="fallback"] {
+  --ai-tutor-room-opacity: .68;
+}
+
+ai-tutor-room[data-render-state="loading"] {
+  --ai-tutor-room-opacity: .58;
+}
+
+@media (max-width: 760px) {
+  ai-tutor-room {
+    --ai-tutor-room-opacity: .64;
+  }
+
+  ai-tutor-room[data-render-state="fallback"],
+  ai-tutor-room[data-render-state="loading"] {
+    --ai-tutor-room-opacity: .58;
+  }
+}
+
+@media (prefers-contrast: more) {
+  ai-tutor-room {
+    --ai-tutor-room-opacity: .46;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ai-tutor-room,
+  ai-tutor-room::before,
+  ai-tutor-room::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  ai-tutor-room {
+    display: none;
+  }
+}

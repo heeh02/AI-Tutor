@@ -13,5 +13,5 @@ gloo-timers = "=0.3.0"
 wasm-bindgen = "=0.2.100"
 wasm-bindgen-futures = "=0.4.50"
 js-sys = "=0.3.77"
-web-sys = { version = "=0.3.77", features = ["Window", "Document", "Element", "DomRect", "HtmlElement", "HtmlInputElement", "HtmlTextAreaElement", "HtmlSelectElement", "PointerEvent", "KeyboardEvent", "InputEvent", "RequestCredentials", "RequestCache", "AbortController", "AbortSignal", "EventTarget", "FocusEvent", "WebSocket", "BinaryType", "MessageEvent", "CloseEvent", "ErrorEvent", "Blob", "BlobPropertyBag", "Url", "Location", "HtmlImageElement", "Event", "VisibilityState", "Performance"] }
+web-sys = { version = "=0.3.77", features = ["Window", "Document", "Element", "DomRect", "HtmlElement", "HtmlInputElement", "HtmlTextAreaElement", "HtmlSelectElement", "HtmlAudioElement", "PointerEvent", "KeyboardEvent", "InputEvent", "RequestCredentials", "RequestCache", "AbortController", "AbortSignal", "EventTarget", "FocusEvent", "FocusOptions", "WebSocket", "BinaryType", "MessageEvent", "CloseEvent", "ErrorEvent", "Blob", "BlobPropertyBag", "Url", "Location", "HtmlImageElement", "Event", "VisibilityState", "Performance"] }
 

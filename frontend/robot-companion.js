@@ -16,7 +16,9 @@
  * Positive tilt points up. Optional pan_sign/tilt_sign are +1 or -1 and default
  * to +1. Both angles are relative to the supplied neutral angles.
  * Drag/arrow keys change only the viewer camera. Double-click/Home reset it.
- * Public methods: resetView(), getPoseSnapshot(). Events: ready, error.
+ * Tap/Enter or greet() plays a local wave without changing the head's hardware
+ * alignment. Moods reflect recording, generation and playback, not audio volume.
+ * Public methods: resetView(), greet(), getPoseSnapshot(). Events: ready, error.
  */
 import * as THREE from './vendor/three/three.module.min.js';
 
@@ -26,17 +28,17 @@ const MOODS = new Set(['idle', 'listening', 'thinking', 'speaking']);
 const A11Y_COPY = Object.freeze({
   zh: {
     label: '奶白色 3D 机器人学习伙伴',
-    help: '可拖动或用方向键观察机器人，双击或按 Home 键恢复视角。视角操作不会移动摄像头。机器人头部姿态由页面提供的数据驱动。',
+    help: '可拖动或用方向键观察机器人，轻点或按 Enter 打招呼。双击或按 Home 键恢复视角。视角操作不会移动摄像头。机器人头部姿态由页面提供的数据驱动。',
   },
   en: {
     label: 'Cream-colored 3D robot learning companion',
-    help: 'Drag or use the arrow keys to view the robot. Double-click or press Home to reset the view. View controls do not move the physical camera. The robot head follows pose data supplied by the page.',
+    help: 'Drag or use the arrow keys to view the robot. Tap or press Enter to say hello. Double-click or press Home to reset the view. View controls do not move the physical camera. The robot head follows pose data supplied by the page.',
   },
 });
 const DEFAULT_VIEW = Object.freeze({ azimuth: 0.22, elevation: 0.11 });
 const PALETTE = Object.freeze({
-  shell: 0xfff7e9, lavender: 0xc6bce3, dark: 0x242638,
-  coral: 0xf58d78, eye: 0xa9f1ed, violet: 0xbdb0fa, joint: 0xa8a2b8,
+  shell: 0xfff7e9, lavender: 0x8fb2c9, dark: 0x20384d,
+  coral: 0xd7ad57, eye: 0xa9f1ed, violet: 0xe3b85e, joint: 0x8698a8,
 });
 
 const STYLE = `
@@ -44,11 +46,11 @@ const STYLE = `
   .stage { position:absolute; inset:0; overflow:hidden; border-radius:inherit; }
   canvas { display:block; width:100%; height:100%; outline:none; cursor:grab; touch-action:pan-y; -webkit-tap-highlight-color:transparent; }
   canvas.dragging { cursor:grabbing; }
-  canvas:focus-visible { outline:2px solid #a89bd0; outline-offset:-5px; border-radius:18px; }
-  .fallback { position:absolute; inset:0; display:grid; place-content:center; gap:12px; padding:32px; text-align:center; color:#797386; font:14px/1.7 system-ui,sans-serif; }
+  canvas:focus-visible { outline:2px solid #759abb; outline-offset:-5px; border-radius:18px; }
+  .fallback { position:absolute; inset:0; display:grid; place-content:center; gap:12px; padding:32px; text-align:center; color:#5d7183; font:14px/1.7 system-ui,sans-serif; }
   .fallback[hidden] { display:none; }
-  .fallback strong { display:block; color:#4a4559; font-size:17px; font-weight:600; }
-  .fallback-icon { width:56px; height:56px; margin:0 auto; display:grid; place-items:center; border-radius:18px; background:#eee9f8; font-size:26px; }
+  .fallback strong { display:block; color:#27465e; font-size:17px; font-weight:600; }
+  .fallback-icon { width:56px; height:56px; margin:0 auto; display:grid; place-items:center; border-radius:18px; background:#e7f0f7; font-size:26px; }
   .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 `;
 
@@ -108,12 +110,12 @@ function makeSoftTexture(color, stops) {
 function makeEnvironment(renderer) {
   // A tiny procedural studio. No image/model requests, even on first render.
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xd9d4e0);
+  scene.background = new THREE.Color(0xdbe5eb);
   const shell = new THREE.Mesh(new THREE.BoxGeometry(12, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0x817988, side: THREE.BackSide }));
+    new THREE.MeshBasicMaterial({ color: 0x667c8d, side: THREE.BackSide }));
   scene.add(shell);
   for (const [x, y, z, width, height, color, intensity] of [
-    [-3, 3, 3, 3.5, 5, 0xfff5e7, 5], [4, 1, 0, 2, 5, 0xe8ddff, 3],
+    [-3, 3, 3, 3.5, 5, 0xfff5e7, 5], [4, 1, 0, 2, 5, 0xddeef8, 3],
     [0, 4, -3, 5, 2, 0xffffff, 4],
   ]) {
     const mat = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide });
@@ -152,7 +154,10 @@ class AiTutorRobot extends HTMLElement {
     this._listeners = [];
     this._lastFrame = 0;
     this._elapsed = 0;
-    this._blinkAt = 3.8;
+    this._blinkAt = 2.7;
+    this._gesture = null;
+    this._gaze = { x: 0, y: 0 };
+    this._gazeTarget = { x: 0, y: 0 };
     this._disposed = true;
     this._contextLost = false;
     this._boundTick = timestamp => this._tick(timestamp);
@@ -166,7 +171,12 @@ class AiTutorRobot extends HTMLElement {
     this._reducedMotion = this._motionQuery.matches;
     this._listen(this._motionQuery, 'change', () => {
       this._reducedMotion = this._motionQuery.matches;
-      this._animateDetails(0);
+      if (this._reducedMotion) {
+        this._gesture = null;
+        this._gazeTarget = { x: 0, y: 0 };
+        this.dataset.gesture = 'rest';
+      }
+      this._animateDetails(this._elapsed);
       this._requestFrame();
     });
     this._listen(document, 'visibilitychange', () => this._updateVisibility());
@@ -219,7 +229,15 @@ class AiTutorRobot extends HTMLElement {
 
   resetView() {
     this._view = { ...DEFAULT_VIEW };
+    this._gazeTarget = { x: 0, y: 0 };
     this._updateCamera();
+    this._requestFrame();
+  }
+
+  greet() {
+    if (this._disposed || this._contextLost || this._reducedMotion) return;
+    this._gesture = { name: 'hello', started: this._elapsed, duration: 4 };
+    this.dataset.gesture = 'hello';
     this._requestFrame();
   }
 
@@ -230,7 +248,8 @@ class AiTutorRobot extends HTMLElement {
       euler: { y: this._yawPivot?.rotation.y ?? this._headDegrees.yaw * DEG,
         x: this._pitchPivot?.rotation.x ?? -this._headDegrees.pitch * DEG, order: 'yaw-then-local-pitch' },
       view: { azimuth_deg: this._view.azimuth / DEG, elevation_deg: this._view.elevation / DEG },
-      mood: this._mood, renderer: this.dataset.renderState ?? 'pending',
+      mood: this._mood, gesture: this._gesture?.name ?? 'rest',
+      gaze: { ...this._gaze }, renderer: this.dataset.renderState ?? 'pending',
     };
   }
 
@@ -288,7 +307,7 @@ class AiTutorRobot extends HTMLElement {
       yaw: (this._pose.pan_deg - this._pose.neutral_pan_deg) * this._pose.pan_sign,
       pitch: (this._pose.tilt_deg - this._pose.neutral_tilt_deg) * this._pose.tilt_sign,
     };
-    // Exactly one data path changes head yaw/pitch. No idle/head animation.
+    // Hardware alignment has one data path; local expressions use child pivots.
     this._applyHeadPose();
     this._requestFrame();
   }
@@ -305,19 +324,31 @@ class AiTutorRobot extends HTMLElement {
   }
 
   _readMood(value) {
-    this._mood = MOODS.has(value) ? value : 'idle';
+    const next = MOODS.has(value) ? value : 'idle';
+    this._mood = next;
+    this.dataset.mood = next;
     if (this._eyeMaterial) {
       this._eyeMaterial.color.setHex(this._mood === 'thinking' ? PALETTE.violet : PALETTE.eye);
       this._chestMaterial.color.setHex(this._mood === 'speaking' ? PALETTE.coral : PALETTE.lavender);
       this._chestMaterial.emissive.copy(this._chestMaterial.color);
+      this._animateDetails(this._elapsed);
     }
     this._requestFrame();
+  }
+
+  _updateFallbackLanguage() {
+    const english = this.getAttribute('lang') === 'en';
+    this._fallback.querySelector('strong').textContent = english ? 'The 3D companion is unavailable' : '3D 场景暂时无法显示';
+    this._fallback.querySelector('span:last-child').textContent = english
+      ? 'Enable hardware acceleration or reopen this page. Camera status remains available on this page.'
+      : '请启用浏览器硬件加速，或重新打开页面。摄像头状态仍可在页面查看。';
   }
 
   _readLanguage() {
     const copy = A11Y_COPY[this.getAttribute('lang') === 'en' ? 'en' : 'zh'];
     this.shadowRoot.querySelector('#robot-help').textContent = copy.help;
     this._renderer?.domElement.setAttribute('aria-label', copy.label);
+    this._updateFallbackLanguage();
   }
 
   _buildScene() {
@@ -328,7 +359,7 @@ class AiTutorRobot extends HTMLElement {
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     this._renderer.outputColorSpace = THREE.SRGBColorSpace;
     this._renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this._renderer.toneMappingExposure = 1.18;
+    this._renderer.toneMappingExposure = 1.06;
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     const canvas = this._renderer.domElement;
@@ -339,11 +370,11 @@ class AiTutorRobot extends HTMLElement {
     this._stage.prepend(canvas);
     this._environment = makeEnvironment(this._renderer);
     this._scene.environment = this._environment.texture;
-    this._scene.environmentIntensity = 0.42;
+    this._scene.environmentIntensity = 0.48;
 
-    this._scene.add(new THREE.HemisphereLight(0xfffbf2, 0xb9a7c8, 2));
-    const key = new THREE.DirectionalLight(0xfff1df, 3.6);
-    key.position.set(-3, 5, 4);
+    this._scene.add(new THREE.HemisphereLight(0xfffbf2, 0x94aabc, 1.5));
+    const key = new THREE.DirectionalLight(0xfff1df, 2.7);
+    key.position.set(-3, 7, 5);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
     Object.assign(key.shadow.camera, { left: -3, right: 3, top: 5, bottom: -2, near: 0.1, far: 15 });
@@ -351,56 +382,96 @@ class AiTutorRobot extends HTMLElement {
     key.shadow.bias = -0.0002;
     key.shadow.radius = 3;
     this._scene.add(key);
-    const fill = new THREE.DirectionalLight(0xd9d0ff, 2.2);
+    const fill = new THREE.DirectionalLight(0xd9e9f5, 1.5);
     fill.position.set(4, 2, 2);
     this._scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xffffff, 3);
+    const rim = new THREE.DirectionalLight(0xffffff, 2);
     rim.position.set(1, 4, -4);
     this._scene.add(rim);
 
-    const shell = roundedMaterial(PALETTE.shell);
-    const lavender = roundedMaterial(PALETTE.lavender, { roughness: 0.43 });
-    const joint = roundedMaterial(PALETTE.joint, { metalness: 0.45, roughness: 0.35 });
-    const coral = roundedMaterial(PALETTE.coral, { roughness: 0.42 });
-    const dark = roundedMaterial(PALETTE.dark, { roughness: 0.24, clearcoat: 0.9, metalness: 0.14 });
+    const shell = roundedMaterial(PALETTE.shell, {
+      roughness: 0.28, metalness: 0.025, clearcoat: 0.58, clearcoatRoughness: 0.2,
+    });
+    const lavender = roundedMaterial(PALETTE.lavender, {
+      roughness: 0.38, metalness: 0.08, clearcoat: 0.5, clearcoatRoughness: 0.25,
+    });
+    const joint = roundedMaterial(PALETTE.joint, {
+      metalness: 0.52, roughness: 0.31, clearcoat: 0.28,
+    });
+    const coral = roundedMaterial(PALETTE.coral, { roughness: 0.38, clearcoat: 0.48 });
+    const dark = roundedMaterial(PALETTE.dark, { roughness: 0.2, clearcoat: 0.95, metalness: 0.12 });
     const robot = new THREE.Group();
     this._scene.add(robot);
 
-    // Stable lower body: broad soft shoes, rounded torso, short resting arms.
+    // Layered soles stay planted; only the torso and its child joints breathe.
     for (const side of [-1, 1]) {
-      addMesh(robot, roundedBox(0.47, 0.24, 0.63, 0.14, 0.055), lavender, side * 0.34, 0.18, 0.09);
-      addMesh(robot, roundedBox(0.4, 0.24, 0.59, 0.13, 0.05), shell, side * 0.34, 0.26, 0.11);
-      addMesh(robot, new THREE.CylinderGeometry(0.13, 0.14, 0.24, 24), joint, side * 0.32, 0.46, 0);
+      const x = side * 0.34;
+      addMesh(robot, roundedBox(0.53, 0.16, 0.74, 0.16, 0.045), lavender, x, 0.135, 0.12);
+      addMesh(robot, roundedBox(0.48, 0.25, 0.65, 0.15, 0.06), shell, x, 0.25, 0.11);
+      addMesh(robot, roundedBox(0.4, 0.115, 0.19, 0.075, 0.025), lavender, x, 0.245, 0.395);
+      addMesh(robot, roundedBox(0.38, 0.14, 0.12, 0.055, 0.025), joint, x, 0.19, -0.245);
+      addMesh(robot, new THREE.CylinderGeometry(0.13, 0.145, 0.27, 32), joint, side * 0.32, 0.475, 0);
+      addMesh(robot, new THREE.TorusGeometry(0.137, 0.022, 10, 32), lavender,
+        side * 0.32, 0.38, 0).rotation.x = Math.PI / 2;
     }
-    this._torso = addMesh(robot, roundedBox(1.1, 1.14, 0.81, 0.28, 0.1), shell, 0, 1.09, 0);
-    addMesh(robot, roundedBox(0.7, 0.58, 0.07, 0.18, 0.025), lavender, 0, 1.11, 0.42);
-    addMesh(robot, roundedBox(0.6, 0.49, 0.055, 0.15, 0.02), shell, 0, 1.12, 0.46);
+    this._bodyMotion = new THREE.Group();
+    robot.add(this._bodyMotion);
+    const body = this._bodyMotion;
+    this._torso = addMesh(body, roundedBox(1.1, 1.14, 0.81, 0.28, 0.1), shell, 0, 1.09, 0);
+    addMesh(body, roundedBox(0.7, 0.58, 0.07, 0.18, 0.025), lavender, 0, 1.11, 0.42);
+    addMesh(body, roundedBox(0.6, 0.49, 0.055, 0.15, 0.02), shell, 0, 1.12, 0.46);
     this._chestMaterial = roundedMaterial(PALETTE.lavender, { emissive: PALETTE.lavender, emissiveIntensity: 0.15 });
     const heart = new THREE.Shape();
     heart.moveTo(0, -0.095);
     heart.bezierCurveTo(-0.18, 0.025, -0.105, 0.16, 0, 0.075);
     heart.bezierCurveTo(0.105, 0.16, 0.18, 0.025, 0, -0.095);
-    addMesh(robot, new THREE.ExtrudeGeometry(heart, { depth: 0.018, bevelEnabled: true,
+    addMesh(body, new THREE.ExtrudeGeometry(heart, { depth: 0.018, bevelEnabled: true,
       bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 3, steps: 1, curveSegments: 16 }),
     this._chestMaterial, 0, 1.14, 0.496);
+    this._arms = [];
+    this._elbows = [];
+    this._wrists = [];
     for (const side of [-1, 1]) {
-      addMesh(robot, new THREE.SphereGeometry(0.16, 24, 16), lavender, side * 0.59, 1.35, 0);
-      const arm = addMesh(robot, new THREE.CapsuleGeometry(0.145, 0.38, 8, 24), shell, side * 0.7, 1.05, 0.015);
-      arm.rotation.z = side * 0.18;
-      const hand = addMesh(robot, new THREE.SphereGeometry(0.16, 24, 16), lavender, side * 0.75, 0.78, 0.035);
-      hand.scale.set(0.95, 1.03, 0.9);
-      addMesh(robot, new THREE.SphereGeometry(0.085, 18, 12), shell, side * 0.66, 0.8, 0.12);
+      addMesh(body, new THREE.SphereGeometry(0.17, 28, 20), lavender, side * 0.6, 1.35, 0);
+      const shoulderRing = addMesh(body, new THREE.TorusGeometry(0.145, 0.025, 10, 32), joint,
+        side * 0.635, 1.34, 0);
+      shoulderRing.rotation.y = Math.PI / 2;
+      const arm = new THREE.Group();
+      arm.position.set(side * 0.64, 1.34, 0.015);
+      arm.userData.side = side;
+      body.add(arm);
+      const upperArm = addMesh(arm, new THREE.CapsuleGeometry(0.132, 0.14, 8, 24), shell, 0, -0.155, 0);
+      upperArm.scale.z = 0.94;
+      const elbow = new THREE.Group();
+      elbow.position.set(0, -0.34, 0);
+      arm.add(elbow);
+      addMesh(elbow, new THREE.SphereGeometry(0.126, 24, 16), joint);
+      const forearm = addMesh(elbow, new THREE.CapsuleGeometry(0.118, 0.12, 8, 24), shell, 0, -0.135, 0.015);
+      forearm.scale.z = 0.94;
+      const wrist = new THREE.Group();
+      wrist.position.set(0, -0.29, 0.02);
+      elbow.add(wrist);
+      addMesh(wrist, new THREE.CylinderGeometry(0.105, 0.115, 0.075, 24), joint, 0, 0.035, 0);
+      const hand = addMesh(wrist, new THREE.SphereGeometry(0.15, 28, 20), lavender, 0, -0.035, 0.005);
+      hand.scale.set(0.96, 1.05, 0.88);
+      const thumb = addMesh(wrist, new THREE.SphereGeometry(0.078, 20, 14), shell, -side * 0.105, -0.015, 0.075);
+      thumb.scale.set(0.85, 1, 0.9);
+      this._arms.push(arm);
+      this._elbows.push(elbow);
+      this._wrists.push(wrist);
     }
-    addMesh(robot, new THREE.CylinderGeometry(0.22, 0.25, 0.2, 40), joint, 0, 1.73, 0);
-    addMesh(robot, new THREE.TorusGeometry(0.235, 0.035, 12, 40), lavender, 0, 1.73, 0).rotation.x = Math.PI / 2;
+    addMesh(body, new THREE.CylinderGeometry(0.22, 0.25, 0.2, 40), joint, 0, 1.73, 0);
+    addMesh(body, new THREE.TorusGeometry(0.235, 0.035, 12, 40), lavender, 0, 1.73, 0).rotation.x = Math.PI / 2;
 
-    // Yaw and pitch use separate pivots, matching a two-axis PTZ head.
+    // Hardware owns yaw and pitch; expression tilt lives in its own child pivot.
     this._yawPivot = new THREE.Group();
     this._yawPivot.position.y = 1.81;
-    robot.add(this._yawPivot);
+    body.add(this._yawPivot);
     this._pitchPivot = new THREE.Group();
     this._yawPivot.add(this._pitchPivot);
-    const head = this._pitchPivot;
+    this._expressionPivot = new THREE.Group();
+    this._pitchPivot.add(this._expressionPivot);
+    const head = this._expressionPivot;
     addMesh(head, roundedBox(1.91, 1.38, 1.2, 0.31, 0.14), shell, 0, 0.52, 0);
     addMesh(head, roundedBox(1.64, 1.03, 0.15, 0.27, 0.055), lavender, 0, 0.51, 0.564);
     addMesh(head, roundedBox(1.53, 0.93, 0.115, 0.25, 0.045), dark, 0, 0.515, 0.63);
@@ -414,19 +485,26 @@ class AiTutorRobot extends HTMLElement {
       const dot = addMesh(head, new THREE.CylinderGeometry(0.045, 0.045, 0.125, 20), coral, side * 1.04, 0.5, -0.03);
       dot.rotation.z = Math.PI / 2;
     }
-    addMesh(head, new THREE.CylinderGeometry(0.055, 0.075, 0.22, 24), lavender, 0, 1.29, -0.13);
+    this._antenna = new THREE.Group();
+    this._antenna.position.set(0, 1.18, -0.13);
+    head.add(this._antenna);
+    addMesh(this._antenna, new THREE.CylinderGeometry(0.055, 0.075, 0.22, 24), lavender, 0, 0.11, 0);
     this._antennaMaterial = roundedMaterial(PALETTE.coral, { emissive: PALETTE.coral, emissiveIntensity: 0.12 });
-    addMesh(head, new THREE.SphereGeometry(0.11, 24, 16), this._antennaMaterial, 0, 1.43, -0.13);
+    addMesh(this._antenna, new THREE.SphereGeometry(0.11, 24, 16), this._antennaMaterial, 0, 0.25, 0);
+    addMesh(this._antenna, new THREE.SphereGeometry(0.028, 16, 12),
+      new THREE.MeshBasicMaterial({ color: 0xffe7ac }), -0.028, 0.287, 0.074);
     const lensBase = addMesh(head, new THREE.CylinderGeometry(0.075, 0.075, 0.025, 28), lavender, 0, 1.08, 0.594);
     lensBase.rotation.x = Math.PI / 2;
     const lens = addMesh(head, new THREE.CylinderGeometry(0.044, 0.044, 0.029, 28), dark, 0, 1.08, 0.615);
     lens.rotation.x = Math.PI / 2;
-    addMesh(head, new THREE.SphereGeometry(0.014, 16, 10), new THREE.MeshBasicMaterial({ color: 0xcad7ff }), -0.012, 1.094, 0.637);
+    addMesh(head, new THREE.SphereGeometry(0.014, 16, 10), new THREE.MeshBasicMaterial({ color: 0xc6e3f2 }), -0.012, 1.094, 0.637);
 
     this._eyeMaterial = new THREE.MeshBasicMaterial({ color: PALETTE.eye, toneMapped: false });
-    const eyeRim = new THREE.MeshBasicMaterial({ color: 0x9ba5e8, toneMapped: false });
+    const eyeRim = new THREE.MeshBasicMaterial({ color: 0x82aec5, toneMapped: false });
     const eyeHighlight = new THREE.MeshBasicMaterial({ color: 0xf1fffc, toneMapped: false });
     this._eyes = [];
+    this._pupils = [];
+    this._brows = [];
     const glowTexture = makeSoftTexture('138,202,246', [[0, 0.22], [0.4, 0.12], [1, 0]]);
     for (const side of [-1, 1]) {
       const eye = new THREE.Group();
@@ -437,18 +515,43 @@ class AiTutorRobot extends HTMLElement {
       }), 0, 0, -0.002);
       glow.castShadow = false;
       addMesh(eye, roundedBox(0.225, 0.34, 0.017, 0.1, 0.006), eyeRim);
-      addMesh(eye, roundedBox(0.164, 0.28, 0.018, 0.077, 0.006), this._eyeMaterial, 0.008, 0.006, 0.011);
-      addMesh(eye, new THREE.SphereGeometry(0.027, 16, 12), eyeHighlight, -0.035, 0.092, 0.027).scale.z = 0.2;
+      const pupil = new THREE.Group();
+      eye.add(pupil);
+      addMesh(pupil, roundedBox(0.164, 0.28, 0.018, 0.077, 0.006), this._eyeMaterial, 0.008, 0.006, 0.011);
+      addMesh(pupil, new THREE.SphereGeometry(0.027, 16, 12), eyeHighlight, -0.035, 0.092, 0.027).scale.z = 0.2;
+      addMesh(pupil, new THREE.SphereGeometry(0.012, 12, 8), eyeHighlight, 0.047, -0.071, 0.026).scale.z = 0.18;
       this._eyes.push(eye);
+      this._pupils.push(pupil);
+      const brow = addMesh(head, roundedBox(0.15, 0.024, 0.008, 0.01, 0.002),
+        new THREE.MeshBasicMaterial({ color: 0x8eafc2, toneMapped: false }), side * 0.32, 0.83, 0.704);
+      brow.visible = false;
+      this._brows.push(brow);
     }
     const smileCurve = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(-0.12, 0.335, 0.709), new THREE.Vector3(0, 0.245, 0.715),
       new THREE.Vector3(0.12, 0.335, 0.709));
-    this._smile = addMesh(head, new THREE.TubeGeometry(smileCurve, 24, 0.014, 8, false),
-      new THREE.MeshBasicMaterial({ color: 0xb6cbdc, toneMapped: false }));
+    this._smile = addMesh(head, new THREE.TubeGeometry(smileCurve, 28, 0.014, 8, false),
+      new THREE.MeshBasicMaterial({ color: 0xa9c3d2, toneMapped: false }));
+    this._mouthOpen = new THREE.Group();
+    this._mouthOpen.position.set(0, 0.29, 0.714);
+    this._mouthOpen.scale.set(0.067, 0.075, 0.008);
+    this._mouthOpen.visible = false;
+    head.add(this._mouthOpen);
+    addMesh(this._mouthOpen, new THREE.SphereGeometry(1, 28, 18),
+      new THREE.MeshBasicMaterial({ color: 0x365266, toneMapped: false }));
+    const tongue = addMesh(this._mouthOpen, new THREE.SphereGeometry(1, 20, 14),
+      new THREE.MeshBasicMaterial({ color: 0xd79b78, toneMapped: false }), 0, -0.38, 0.82);
+    tongue.scale.set(0.62, 0.32, 0.22);
+    const tooth = addMesh(this._mouthOpen, roundedBox(0.75, 0.24, 0.12, 0.1, 0.035),
+      new THREE.MeshBasicMaterial({ color: 0xfff7e9, toneMapped: false }), 0, 0.57, 1.02);
+    tooth.scale.set(0.72, 0.72, 0.5);
+    this._cheekMaterial = new THREE.MeshBasicMaterial({
+      color: 0xd59b77, transparent: true, opacity: 0.42, toneMapped: false,
+    });
     for (const side of [-1, 1]) {
-      addMesh(head, roundedBox(0.14, 0.038, 0.008, 0.016, 0.002),
-        new THREE.MeshBasicMaterial({ color: 0xbc7d8d, transparent: true, opacity: 0.5 }), side * 0.56, 0.36, 0.692);
+      const cheek = addMesh(head, new THREE.SphereGeometry(1, 20, 12), this._cheekMaterial,
+        side * 0.56, 0.36, 0.692);
+      cheek.scale.set(0.075, 0.022, 0.004);
     }
     // A soft reflected strip makes the face read as a curved glass screen.
     const reflection = new THREE.QuadraticBezierCurve3(
@@ -459,11 +562,11 @@ class AiTutorRobot extends HTMLElement {
 
     // Real shadow receiver plus a soft ambient contact shadow, on a transparent stage.
     const floor = addMesh(this._scene, new THREE.PlaneGeometry(30, 30),
-      new THREE.ShadowMaterial({ color: 0x71627f, opacity: 0.16 }), 0, 0.055, 0);
+      new THREE.ShadowMaterial({ color: 0x4d6475, opacity: 0.075 }), 0, 0.055, 0);
     floor.rotation.x = -Math.PI / 2;
     floor.castShadow = false;
     const shadow = addMesh(this._scene, new THREE.PlaneGeometry(3.4, 2.65), new THREE.MeshBasicMaterial({
-      map: makeSoftTexture('94,75,110', [[0, 0.19], [0.32, 0.12], [0.65, 0.03], [1, 0]]),
+      map: makeSoftTexture('70,93,110', [[0, 0.19], [0.32, 0.12], [0.65, 0.03], [1, 0]]),
       transparent: true, depthWrite: false, toneMapped: false,
     }), 0, 0.058, 0);
     shadow.rotation.x = -Math.PI / 2;
@@ -477,14 +580,23 @@ class AiTutorRobot extends HTMLElement {
     const canvas = this._renderer.domElement;
     this._listen(canvas, 'pointerdown', event => {
       if (!event.isPrimary || event.button !== 0) return;
-      this._pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      this._pointer = { id: event.pointerId, x: event.clientX, y: event.clientY,
+        startX: event.clientX, startY: event.clientY, startedAt: performance.now(), moved: false };
       canvas.setPointerCapture(event.pointerId);
       canvas.classList.add('dragging');
     });
     this._listen(canvas, 'pointermove', event => {
-      if (this._pointer?.id !== event.pointerId) return;
+      const bounds = canvas.getBoundingClientRect();
+      if (!this._reducedMotion && bounds.width > 0 && bounds.height > 0) {
+        this._gazeTarget = {
+          x: THREE.MathUtils.clamp((event.clientX - bounds.left) / bounds.width * 2 - 1, -1, 1) * 0.044,
+          y: THREE.MathUtils.clamp(1 - (event.clientY - bounds.top) / bounds.height * 2, -1, 1) * 0.024,
+        };
+      }
+      if (this._pointer?.id !== event.pointerId) { this._requestFrame(); return; }
       const dx = event.clientX - this._pointer.x;
       const dy = event.clientY - this._pointer.y;
+      if (Math.hypot(event.clientX - this._pointer.startX, event.clientY - this._pointer.startY) > 6) this._pointer.moved = true;
       this._pointer.x = event.clientX;
       this._pointer.y = event.clientY;
       this._view.azimuth = THREE.MathUtils.clamp(this._view.azimuth - dx * 0.006, -1.2, 1.2);
@@ -492,13 +604,23 @@ class AiTutorRobot extends HTMLElement {
       this._updateCamera();
       this._requestFrame();
     });
-    const endDrag = () => { this._pointer = null; canvas.classList.remove('dragging'); };
+    const endDrag = () => {
+      const tapped = this._pointer && !this._pointer.moved && performance.now() - this._pointer.startedAt < 500;
+      this._pointer = null;
+      canvas.classList.remove('dragging');
+      if (tapped) this.greet();
+    };
+    const cancelDrag = () => { this._pointer = null; canvas.classList.remove('dragging'); };
     this._listen(canvas, 'pointerup', endDrag);
-    this._listen(canvas, 'pointercancel', endDrag);
-    this._listen(canvas, 'lostpointercapture', endDrag);
+    this._listen(canvas, 'pointercancel', cancelDrag);
+    this._listen(canvas, 'lostpointercapture', cancelDrag);
+    this._listen(canvas, 'pointerleave', () => {
+      if (!this._pointer) { this._gazeTarget = { x: 0, y: 0 }; this._requestFrame(); }
+    });
     this._listen(canvas, 'dblclick', () => this.resetView());
     this._listen(canvas, 'keydown', event => {
       if (event.key === 'Home' || event.key === '0') { event.preventDefault(); this.resetView(); return; }
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (!event.repeat) this.greet(); return; }
       const direction = { ArrowLeft: [-0.12, 0], ArrowRight: [0.12, 0], ArrowUp: [0, 0.06], ArrowDown: [0, -0.06] }[event.key];
       if (!direction) return;
       event.preventDefault();
@@ -545,7 +667,8 @@ class AiTutorRobot extends HTMLElement {
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     this._renderer.setSize(width, height, false);
     const aspect = width / height;
-    const viewHeight = Math.max(3.95, 2.8 / aspect);
+    const compactHome = this.closest('.home-robot-scene') && height < 275;
+    const viewHeight = Math.max(compactHome ? 4.05 : 3.72, 2.8 / aspect);
     this._camera.left = -viewHeight * aspect / 2;
     this._camera.right = viewHeight * aspect / 2;
     this._camera.top = viewHeight / 2;
@@ -570,23 +693,146 @@ class AiTutorRobot extends HTMLElement {
   _animateDetails(elapsed) {
     if (!this._eyes) return;
     const active = !this._reducedMotion;
+    const ease = active ? 0.16 : 1;
+    const listening = this._mood === 'listening';
+    const thinking = this._mood === 'thinking';
+    const speaking = this._mood === 'speaking';
+    let wave = 0;
+    let gestureAge = 0;
+    if (this._gesture) {
+      gestureAge = Math.max(0, elapsed - this._gesture.started);
+      const progress = gestureAge / this._gesture.duration;
+      if (progress >= 1) {
+        this._gesture = null;
+        this.dataset.gesture = 'rest';
+      } else {
+        wave = THREE.MathUtils.smoothstep(progress, 0, 0.16)
+          * (1 - THREE.MathUtils.smoothstep(progress, 0.78, 1));
+      }
+    }
     let blink = 1;
     if (active && elapsed > this._blinkAt) {
       const since = elapsed - this._blinkAt;
-      if (since < 0.18) blink = Math.max(0.08, Math.abs(since - 0.09) / 0.09);
-      else this._blinkAt = elapsed + 3.5 + (Math.sin(elapsed * 1.7) + 1) * 1.3;
+      if (since < 0.2) blink = Math.max(0.06, Math.abs(since - 0.1) / 0.1);
+      else this._blinkAt = elapsed + 3.8 + (Math.sin(elapsed * 0.83) + 1) * 1.5;
     }
-    const attentive = this._mood === 'listening' ? 1.12 : 1;
-    const thinking = this._mood === 'thinking' ? 0.8 : 1;
+    const attentive = listening ? 1.12 : 1;
+    const eyelids = thinking ? 0.82 : speaking ? 0.96 : 1;
     this._eyes.forEach((eye, index) => {
-      const speaking = active && this._mood === 'speaking' ? 1 + Math.sin(elapsed * 6 + index * 0.6) * 0.045 : 1;
-      eye.scale.y = blink * attentive * thinking * speaking;
+      const talk = active && speaking ? 1 + Math.sin(elapsed * 4.6 + index * 0.45) * 0.018 : 1;
+      eye.scale.y = blink * attentive * eyelids * talk * (1 - wave * 0.12);
     });
-    // Breathing affects only the torso shell; head pivots remain data-exact.
-    this._torso.scale.y = active ? 1 + Math.sin(elapsed * 1.7) * 0.003 : 1;
-    const pulse = active ? (Math.sin(elapsed * (this._mood === 'speaking' ? 5 : 2.1)) + 1) / 2 : 0.5;
-    this._chestMaterial.emissiveIntensity = 0.08 + pulse * (this._mood === 'idle' ? 0.08 : 0.24);
-    this._antennaMaterial.emissiveIntensity = 0.08 + pulse * 0.12;
+
+    const pointerGaze = this._gazeTarget.x !== 0 || this._gazeTarget.y !== 0;
+    const idleX = active && this._mood === 'idle' && !pointerGaze ? Math.sin(elapsed * 0.43) * 0.007 : 0;
+    const idleY = active && this._mood === 'idle' && !pointerGaze ? Math.sin(elapsed * 0.59) * 0.003 : 0;
+    const speakingX = active && speaking && !pointerGaze ? Math.sin(elapsed * 0.72) * 0.003 : 0;
+    const targetX = thinking ? 0.032 : wave > 0.05 ? 0 : this._gazeTarget.x + idleX + speakingX;
+    const targetY = thinking ? 0.026 : listening && !pointerGaze ? 0.006 : this._gazeTarget.y + idleY;
+    this._gaze.x = THREE.MathUtils.lerp(this._gaze.x, active ? targetX : 0, ease);
+    this._gaze.y = THREE.MathUtils.lerp(this._gaze.y, active ? targetY : 0, ease);
+    this._pupils?.forEach(pupil => pupil.position.set(this._gaze.x, this._gaze.y, 0));
+    this._brows?.forEach((brow, index) => {
+      const side = index === 0 ? -1 : 1;
+      brow.visible = listening || thinking || speaking || wave > 0.04;
+      const browY = 0.83 + (listening ? 0.022 : 0) + wave * 0.012 - (thinking && side > 0 ? 0.012 : 0);
+      brow.position.y = THREE.MathUtils.lerp(brow.position.y, browY, ease);
+      const browTilt = thinking ? (side < 0 ? 0.14 : -0.05) : side * -(listening ? 0.055 : 0.03);
+      brow.rotation.z = THREE.MathUtils.lerp(brow.rotation.z, browTilt, ease);
+    });
+    if (this._smile) {
+      this._smile.visible = !speaking || wave > 0.35;
+      const smileWidth = thinking ? 0.8 : listening ? 1.04 : 1 + wave * 0.18;
+      this._smile.scale.x = THREE.MathUtils.lerp(this._smile.scale.x, smileWidth, ease);
+      this._smile.position.y = THREE.MathUtils.lerp(this._smile.position.y, wave * 0.008, ease);
+    }
+    if (this._mouthOpen) {
+      this._mouthOpen.visible = speaking && wave <= 0.35;
+      const phrase = active && speaking
+        ? (Math.sin(elapsed * 8.6) + 1) * 0.5 * (0.72 + (Math.sin(elapsed * 3.15) + 1) * 0.14)
+        : 0.55;
+      const mouthY = speaking ? 0.026 + phrase * 0.058 : 0.04;
+      const mouthX = speaking ? 0.064 + Math.sin(elapsed * 3.7) * (active ? 0.007 : 0) : 0.06;
+      this._mouthOpen.scale.y = THREE.MathUtils.lerp(this._mouthOpen.scale.y, mouthY, active ? 0.34 : 1);
+      this._mouthOpen.scale.x = THREE.MathUtils.lerp(this._mouthOpen.scale.x, mouthX, active ? 0.28 : 1);
+    }
+    if (this._cheekMaterial) {
+      const cheekOpacity = speaking || wave > 0.1 ? 0.58 : listening ? 0.48 : 0.4;
+      this._cheekMaterial.opacity = THREE.MathUtils.lerp(this._cheekMaterial.opacity, cheekOpacity, ease);
+    }
+
+    if (this._bodyMotion) {
+      const breath = active ? Math.sin(elapsed * 1.45) * 0.003 : 0;
+      const bodyLean = (thinking ? 0.018 : 0) - wave * 0.025
+        + (active && speaking ? Math.sin(elapsed * 1.8) * 0.004 : 0);
+      this._bodyMotion.rotation.z = THREE.MathUtils.lerp(this._bodyMotion.rotation.z, bodyLean, ease * 0.8);
+      this._bodyMotion.rotation.x = THREE.MathUtils.lerp(this._bodyMotion.rotation.x,
+        (listening ? 0.024 : 0) + (active && speaking ? Math.sin(elapsed * 2.1) * 0.004 : 0), ease * 0.8);
+      this._bodyMotion.position.y = breath;
+    }
+    if (this._expressionPivot) {
+      const idleTilt = active && this._mood === 'idle' ? Math.sin(elapsed * 0.62) * 0.005 : 0;
+      const tilt = idleTilt + (thinking ? 0.055 : 0) - (listening ? 0.008 : 0)
+        + (active ? Math.sin(gestureAge * 5) * wave * 0.018 : 0);
+      this._expressionPivot.rotation.z = THREE.MathUtils.lerp(this._expressionPivot.rotation.z, tilt, ease);
+      this._expressionPivot.rotation.x = THREE.MathUtils.lerp(this._expressionPivot.rotation.x,
+        (listening ? -0.024 : thinking ? 0.018 : 0)
+          + (active && speaking ? Math.sin(elapsed * 2.2) * 0.008 : 0) - wave * 0.01, ease);
+    }
+    this._arms?.forEach((arm, index) => {
+      const side = arm.userData.side;
+      let x = active ? Math.sin(elapsed * 1.45 + side * 0.7) * 0.008 : 0;
+      let z = side * 0.13 + (active ? Math.sin(elapsed * 1.45 + side * 0.5) * 0.006 : 0);
+      let elbowX = -0.055;
+      let elbowZ = 0;
+      let wristX = 0;
+      let wristZ = 0;
+      if (listening) {
+        x = -0.1;
+        z = side * 0.14;
+        elbowX = -0.16;
+      }
+      if (thinking) {
+        x = side < 0 ? -0.18 : -0.04;
+        z = side < 0 ? -0.22 : 0.13;
+        elbowX = side < 0 ? -1.5 : -0.08;
+        elbowZ = side < 0 ? 0.12 : 0;
+      }
+      if (speaking) {
+        const phase = elapsed * 2.2 + (side > 0 ? 0 : Math.PI);
+        x = -0.1 + (active ? Math.sin(phase) * 0.035 : 0);
+        z = side * (0.19 + (active ? (Math.sin(phase) + 1) * 0.025 : 0.025));
+        elbowX = -0.18 + (active ? Math.sin(phase + 0.6) * 0.06 : 0);
+        wristX = active ? Math.sin(phase) * 0.035 : 0;
+      }
+      if (wave > 0 && side > 0) {
+        x = THREE.MathUtils.lerp(x, -0.04, wave);
+        z = THREE.MathUtils.lerp(z, 2.42, wave);
+        elbowX = THREE.MathUtils.lerp(elbowX, -0.08, wave);
+        elbowZ = THREE.MathUtils.lerp(elbowZ, -0.18, wave);
+        wristZ = Math.sin(gestureAge * 11) * wave * 0.26;
+      } else if (wave > 0) {
+        z += side * wave * 0.035;
+        elbowX -= wave * 0.06;
+      }
+      arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, x, ease);
+      arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, z, ease);
+      const elbow = this._elbows[index];
+      elbow.rotation.x = THREE.MathUtils.lerp(elbow.rotation.x, elbowX, ease);
+      elbow.rotation.z = THREE.MathUtils.lerp(elbow.rotation.z, elbowZ, ease);
+      const wrist = this._wrists[index];
+      wrist.rotation.x = THREE.MathUtils.lerp(wrist.rotation.x, wristX, ease);
+      wrist.rotation.z = THREE.MathUtils.lerp(wrist.rotation.z, wristZ, ease);
+    });
+    if (this._antenna) {
+      this._antenna.rotation.z = active
+        ? Math.sin(elapsed * 1.55) * 0.015 + Math.sin(gestureAge * 10) * wave * 0.07 : 0;
+    }
+    this._torso.scale.y = 1 + (active ? Math.sin(elapsed * 1.45) * 0.002 : 0);
+    const pulse = active
+      ? (Math.sin(elapsed * (speaking ? 4.2 : thinking ? 1.4 : listening ? 2.4 : 1.8)) + 1) / 2 : 0.5;
+    this._chestMaterial.emissiveIntensity = 0.07 + pulse * (this._mood === 'idle' ? 0.06 : 0.18) + wave * 0.1;
+    this._antennaMaterial.emissiveIntensity = 0.07 + pulse * (listening ? 0.18 : 0.1) + wave * 0.12;
   }
 
   _tick(timestamp) {
@@ -605,8 +851,7 @@ class AiTutorRobot extends HTMLElement {
   _showError(code, error) {
     this.dataset.renderState = 'error';
     this._fallback.hidden = false;
-    this._fallback.querySelector('strong').textContent = '3D 场景暂时无法显示';
-    this._fallback.querySelector('span:last-child').textContent = '请启用浏览器硬件加速，或重新打开页面。摄像头状态仍可在页面查看。';
+    this._updateFallbackLanguage();
     this.dispatchEvent(new CustomEvent('error', { bubbles: true, composed: true,
       detail: { code, fatal: true, message: error instanceof Error ? error.message : String(error) } }));
   }
@@ -637,7 +882,20 @@ class AiTutorRobot extends HTMLElement {
     this._environment = null;
     this._yawPivot = null;
     this._pitchPivot = null;
+    this._expressionPivot = null;
+    this._bodyMotion = null;
+    this._arms = null;
+    this._elbows = null;
+    this._wrists = null;
     this._eyes = null;
+    this._pupils = null;
+    this._brows = null;
+    this._antenna = null;
+    this._mouthOpen = null;
+    this._gesture = null;
+    this.dataset.gesture = 'rest';
+    this._gaze = { x: 0, y: 0 };
+    this._gazeTarget = { x: 0, y: 0 };
     // Mesh.parent links otherwise retain the entire disposed scene while a
     // detached custom element remains held by the UI's component reference.
     this._torso = null;
@@ -646,6 +904,7 @@ class AiTutorRobot extends HTMLElement {
     this._eyeMaterial = null;
     this._chestMaterial = null;
     this._antennaMaterial = null;
+    this._cheekMaterial = null;
     this._pointer = null;
     this._lastFrame = 0;
   }

@@ -14,6 +14,9 @@ target/
 rust/tutor-ui/dist/
 models/native/
 models/speech/
+models/qwen-omni/*.safetensors
+models/qwen-omni/*.pt
+models/qwen-omni/.gitattributes
 models/memory/
 models/ggml-base.bin
 runtime-tools/
