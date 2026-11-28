@@ -1954,8 +1954,13 @@ impl Component for App {
                 self.navigate(ctx, AppView::Voice, true);
             }
             Msg::ChooseActivity(prompt) => {
-                if self.input_disabled() || !self.busy.is_empty() || !self.input.trim().is_empty() {
-                    return false;
+                if self.input_disabled() {
+                    self.error = t(&self.ui_language, "当前活动尚未准备好，请稍后再试。").to_owned();
+                    return true;
+                }
+                if !self.busy.is_empty() || !self.input.trim().is_empty() {
+                    self.error = t(&self.ui_language, "请先发送或清空当前草稿，再开始活动。").to_owned();
+                    return true;
                 }
                 self.pause_voice_loop(ctx, "edited");
                 self.set_input(prompt);

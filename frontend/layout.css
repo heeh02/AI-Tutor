@@ -329,6 +329,10 @@ main.home-view {
   margin: 0;
 }
 
+.app-main > footer {
+  pointer-events: none;
+}
+
 .voice-status {
   flex-shrink: 0;
   max-width: 100%;

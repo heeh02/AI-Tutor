@@ -55,9 +55,11 @@
   padding: 18px;
   border: 1px solid rgba(205, 220, 231, .82);
   border-radius: 18px;
-  background: rgba(255, 255, 255, .66);
+  background: rgba(255, 255, 255, .9);
   color: #2d536f;
   text-align: left;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: 0 7px 24px rgba(34, 65, 91, .04), inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 .activity-gallery .activity-card:hover {
@@ -70,6 +72,47 @@
   border-color: #6f9ab7;
   background: #f7fbfd;
   box-shadow: 0 0 0 2px rgba(64, 115, 151, .1), 0 10px 28px rgba(34, 65, 91, .06);
+}
+.activity-gallery .activity-card.featured {
+  grid-column: span 3;
+  grid-template-columns: 62px minmax(0, 1fr);
+  min-height: 168px;
+  padding: 22px;
+  border-color: #194c73;
+  background: linear-gradient(120deg, #103c64, #17577f);
+  box-shadow: 0 14px 32px rgba(19, 62, 96, .16);
+}
+.activity-gallery .activity-card.featured:hover {
+  border-color: #2d6d97;
+  background: linear-gradient(120deg, #123f69, #1a5d87);
+  box-shadow: 0 17px 36px rgba(19, 62, 96, .2);
+}
+.activity-gallery .activity-card.featured.selected {
+  border-color: #c7a756;
+  box-shadow: 0 0 0 2px rgba(199, 167, 86, .18), 0 14px 32px rgba(19, 62, 96, .16);
+}
+.activity-gallery .activity-card.featured .activity-copy strong {
+  color: #fff;
+}
+.activity-gallery .activity-card.featured .activity-copy small {
+  color: #d2e4ef;
+}
+.activity-gallery .activity-card.featured .activity-choice-status {
+  border-top-color: rgba(215, 232, 241, .2);
+  color: #f0d58b;
+}
+.activity-gallery .activity-card.featured .activity-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 19px;
+}
+.activity-gallery .activity-card.featured .activity-icon svg {
+  width: 31px;
+  height: 31px;
+}
+.activity-gallery .activity-card.featured .activity-copy strong {
+  font-size: 21px;
+  font-weight: 650;
 }
 .activity-gallery .activity-card .activity-icon {
   width: 50px;
@@ -93,8 +136,8 @@
 }
 .activity-gallery .activity-card .activity-copy small {
   margin-top: 5px;
-  color: #60788d;
-  font-size: 12px;
+  color: #536f86;
+  font-size: 13px;
   line-height: 1.65;
 }
 .activity-gallery .activity-choice-status {
@@ -107,8 +150,8 @@
   margin-top: auto;
   padding-top: 11px;
   border-top: 1px solid rgba(214, 226, 235, .7);
-  color: #70879a;
-  font-size: 11px;
+  color: #58748b;
+  font-size: 12px;
   font-weight: 500;
 }
 .activity-gallery .activity-choice-status svg {
@@ -119,7 +162,13 @@
   border-top-color: #d5e3ec;
   color: #356789;
 }
+.activity-gallery .activity-card.featured.selected .activity-choice-status {
+  border-top-color: rgba(215, 232, 241, .2);
+  color: #f0d58b;
+}
 .activity-gallery .activity-preview {
+  position: relative;
+  z-index: var(--layout-z-action);
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr) auto;
   align-items: center;
@@ -182,16 +231,19 @@
 }
 .activity-gallery .activity-start {
   min-width: 152px;
-  min-height: 46px;
-  padding: 11px 17px;
+  min-height: 48px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  touch-action: none;
   white-space: nowrap;
 }
 .activity-gallery .activity-preview-icon.activity-story,
 .activity-gallery .activity-card .activity-story { background: #e7f0f7; color: #356789; }
 .activity-gallery .activity-preview-icon.activity-curiosity,
 .activity-gallery .activity-card .activity-curiosity { background: #f8efd8; color: #947125; }
-.activity-gallery .activity-preview-icon.activity-learning,
-.activity-gallery .activity-card .activity-learning { background: #e8f1ed; color: #47745e; }
+.activity-gallery .activity-preview-icon.activity-play,
+.activity-gallery .activity-card .activity-play { background: #f7ece4; color: #9a6c4e; }
 .activity-gallery .activity-preview-icon.activity-creative,
 .activity-gallery .activity-card .activity-creative { background: #f7ece4; color: #9a6c4e; }
 .activity-gallery .activity-preview-icon.activity-english,
@@ -226,7 +278,7 @@
   .activity-gallery .activity-preview { background: #eff7fb; }
 }
 @media (max-width: 980px) {
-  .activity-gallery .activity-page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .activity-gallery .activity-page-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .activity-gallery .activity-preview { grid-template-columns: 50px minmax(0, 1fr); }
   .activity-gallery .activity-preview-icon { width: 50px; height: 50px; }
   .activity-gallery .activity-start { grid-column: 2; justify-self: start; }
@@ -243,6 +295,15 @@
     padding: 14px 15px;
     border-radius: 16px;
   }
+  .activity-gallery .activity-card.featured {
+    grid-column: span 1;
+    grid-template-columns: 46px minmax(0, 1fr) auto;
+    min-height: 88px;
+    padding: 14px 15px;
+  }
+  .activity-gallery .activity-card.featured .activity-icon { width: 46px; height: 46px; border-radius: 14px; }
+  .activity-gallery .activity-card.featured .activity-icon svg { width: 23px; height: 23px; }
+  .activity-gallery .activity-card.featured .activity-copy strong { font-size: 16px; }
   .activity-gallery .activity-card .activity-icon { width: 46px; height: 46px; border-radius: 14px; }
   .activity-gallery .activity-card .activity-icon svg { width: 23px; height: 23px; }
   .activity-gallery .activity-card .activity-copy { padding-top: 0; }
@@ -267,16 +328,31 @@
   .activity-gallery .activity-preview-icon svg { width: 22px; height: 22px; }
   .activity-gallery .activity-preview-copy h2 { font-size: 17px; }
   .activity-gallery .activity-preview .activity-prompt { font-size: 13px; }
+  .activity-gallery.activity-page {
+    padding-bottom: 104px;
+  }
+  .activities-view > footer {
+    display: none;
+  }
   .activity-gallery .activity-start {
+    position: fixed;
+    right: 16px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 16px;
+    z-index: var(--layout-z-nav);
     grid-column: 1 / -1;
     justify-self: stretch;
-    width: 100%;
-    min-height: 48px;
+    width: auto;
+    min-height: 52px;
+    touch-action: manipulation;
+    box-shadow: 0 12px 30px rgba(16, 55, 88, .22);
   }
   .activity-gallery .experiment-entry { background: #f7f9fa; }
 }
 @media (max-width: 390px) {
-  .activity-gallery .activity-card { grid-template-columns: 42px minmax(0, 1fr); }
+  .activity-gallery .activity-card,
+  .activity-gallery .activity-card.featured { grid-template-columns: 42px minmax(0, 1fr); }
+  .activity-gallery .activity-card.featured .activity-icon { width: 42px; height: 42px; }
   .activity-gallery .activity-card .activity-icon { width: 42px; height: 42px; }
   .activity-gallery .activity-choice-status { grid-column: 1 / -1; grid-row: auto; justify-self: end; }
 }

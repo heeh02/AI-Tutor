@@ -1,5 +1,5 @@
 ai-tutor-room {
-  --ai-tutor-room-opacity: .78;
+  --ai-tutor-room-opacity: .86;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -26,7 +26,7 @@ ai-tutor-room[data-render-state="loading"] {
 
 @media (max-width: 760px) {
   ai-tutor-room {
-    --ai-tutor-room-opacity: .64;
+    --ai-tutor-room-opacity: .72;
   }
 
   ai-tutor-room[data-render-state="fallback"],

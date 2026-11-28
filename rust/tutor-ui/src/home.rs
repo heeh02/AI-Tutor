@@ -59,6 +59,8 @@ pub fn activity_gallery(props: &ActivityGalleryProps) -> Html {
         .find(|activity| activity.id == *active_id)
         .unwrap_or(&ACTIVITIES[0]);
     let prompt = activity.prompt(en).to_owned();
+    let start_disabled = props.disabled || props.has_draft;
+    let on_start = props.on_select.clone();
     let title = if en {
         activity.title_en
     } else {
@@ -85,7 +87,7 @@ pub fn activity_gallery(props: &ActivityGalleryProps) -> Html {
                         Callback::from(move |_| active_id.set(activity.id))
                     };
                     html! {
-                        <button key={activity.id} type="button" class={classes!("activity-card",selected.then_some("selected"))} data-activity={activity.id} aria-pressed={selected.to_string()} aria-controls="activity-preview" onclick={choose}>
+                        <button key={activity.id} type="button" class={classes!("activity-card",selected.then_some("selected"),(activity.id=="story").then_some("featured"))} data-activity={activity.id} aria-pressed={selected.to_string()} aria-controls="activity-preview" onclick={choose}>
                             <span class={classes!("activity-icon",format!("activity-{}",activity.id))}>{icon(activity.icon)}</span>
                             <span class="activity-copy"><strong>{title}</strong><small>{description}</small></span>
                             <span class="activity-choice-status">{if selected {html!{<>{icon("check")}{if en {"Selected"} else {"已选择"}}</>}} else {html!{<>{if en {"Preview"} else {"查看"}}{icon("arrow")}</>}}}</span>
@@ -101,9 +103,15 @@ pub fn activity_gallery(props: &ActivityGalleryProps) -> Html {
                     <p class="activity-prompt">{description}</p>
                     <details class="activity-prompt-details"><summary>{if en {"View prompt"} else {"查看引导语"}}</summary><p>{prompt.clone()}</p></details>
                 </div>
-                <button type="button" class="primary activity-start" disabled={props.disabled || props.has_draft} onclick={props.on_select.reform(move |_| prompt.clone())}>
+                <a class="primary activity-start" href="#/voice" aria-disabled={start_disabled.to_string()} tabindex={if start_disabled {"-1"} else {"0"}}
+                    onclick={on_start.reform(move |event: MouseEvent| {
+                        if start_disabled {
+                            event.prevent_default();
+                        }
+                        prompt.clone()
+                    })}>
                     {if en {"Start activity"} else {"开始活动"}}{icon("arrow")}
-                </button>
+                </a>
             </section>
         </section>
     }
