@@ -126,7 +126,7 @@ function makeEnvironment(renderer) {
     scene.add(softbox);
   }
   const generator = new THREE.PMREMGenerator(renderer);
-  const target = generator.fromScene(scene, 0.12, 0.1, 30, { size: 128 });
+  const target = generator.fromScene(scene, 0.08, 0.1, 20, { size: 128 });
   generator.dispose();
   scene.traverse(object => { object.geometry?.dispose(); object.material?.dispose(); });
   return target;
